@@ -8,11 +8,31 @@
 import SwiftUI
 
 struct PortraitView: View {
+    @Bindable var gov: Governor
     var body: some View {
-        Text(/*@START_MENU_TOKEN@*/"Hello, World!"/*@END_MENU_TOKEN@*/)
+        NavigationView {
+            ZStack {
+                
+                CalendarScrollView(gov: gov)
+                
+                TimeControlView(gov: gov)
+            }
+            .monospaced()
+        }
+        .toolbar {
+            ToolbarItemGroup(placement: .bottomBar) {
+                Button(action: {}) {
+                    Image(systemName: "bell")
+                }
+                Spacer()
+                Button(action: {}) {
+                    Image(systemName: "plus")
+                }
+            }
+        }
     }
 }
 
 #Preview {
-    PortraitView()
+    PortraitView(gov: Governor())
 }

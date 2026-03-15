@@ -6,14 +6,126 @@
 	objectVersion = 77;
 	objects = {
 
+/* Begin PBXBuildFile section */
+		C1501DB12F20853B00521DF6 /* WidgetKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = C1501DB02F20853B00521DF6 /* WidgetKit.framework */; };
+		C1501DB32F20853B00521DF6 /* SwiftUI.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = C1501DB22F20853B00521DF6 /* SwiftUI.framework */; };
+		C1501DC22F20853C00521DF6 /* MetricWatchWidgitExtension.appex in Embed Foundation Extensions */ = {isa = PBXBuildFile; fileRef = C1501DAE2F20853B00521DF6 /* MetricWatchWidgitExtension.appex */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
+/* End PBXBuildFile section */
+
+/* Begin PBXContainerItemProxy section */
+		C1501DC02F20853C00521DF6 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = C1362A0B2F0496A500F2B467 /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = C1501DAD2F20853B00521DF6;
+			remoteInfo = MetricWatchWidgitExtension;
+		};
+/* End PBXContainerItemProxy section */
+
+/* Begin PBXCopyFilesBuildPhase section */
+		C1501DC72F20853C00521DF6 /* Embed Foundation Extensions */ = {
+			isa = PBXCopyFilesBuildPhase;
+			buildActionMask = 2147483647;
+			dstPath = "";
+			dstSubfolderSpec = 13;
+			files = (
+				C1501DC22F20853C00521DF6 /* MetricWatchWidgitExtension.appex in Embed Foundation Extensions */,
+			);
+			name = "Embed Foundation Extensions";
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXCopyFilesBuildPhase section */
+
 /* Begin PBXFileReference section */
 		C1362A132F0496A500F2B467 /* chronometrixt.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = chronometrixt.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		C1501DAE2F20853B00521DF6 /* MetricWatchWidgitExtension.appex */ = {isa = PBXFileReference; explicitFileType = "wrapper.app-extension"; includeInIndex = 0; path = MetricWatchWidgitExtension.appex; sourceTree = BUILT_PRODUCTS_DIR; };
+		C1501DB02F20853B00521DF6 /* WidgetKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = WidgetKit.framework; path = System/Library/Frameworks/WidgetKit.framework; sourceTree = SDKROOT; };
+		C1501DB22F20853B00521DF6 /* SwiftUI.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = SwiftUI.framework; path = System/Library/Frameworks/SwiftUI.framework; sourceTree = SDKROOT; };
+		C1E7322B2F0B39C600B3A639 /* watchixt Watch App.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "watchixt Watch App.app"; sourceTree = BUILT_PRODUCTS_DIR; };
 /* End PBXFileReference section */
+
+/* Begin PBXFileSystemSynchronizedBuildFileExceptionSet section */
+		C1501DC32F20853C00521DF6 /* Exceptions for "MetricWatchWidgit" folder in "MetricWatchWidgitExtension" target */ = {
+			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
+			membershipExceptions = (
+				Info.plist,
+			);
+			target = C1501DAD2F20853B00521DF6 /* MetricWatchWidgitExtension */;
+		};
+		C1E64CD42F6621AB00059B84 /* Exceptions for "depricated" folder in "chronometrixt" target */ = {
+			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
+			membershipExceptions = (
+				CalendarSubviews/DayMetricViewArchaic.swift,
+				CalendarSubviews/HourMetricView.swift,
+				CalendarSubviews/MetricDayView.swift,
+				CalendarSubviews/MetricMonthView.swift,
+				CalendarSubviews/MetricYearView.swift,
+				CalendarSubviews/MinuteMetricView.swift,
+				CalendarSubviews/SimpleScrollView_Alternative.swift,
+				CalendarSubviews/SimpleScrollView.swift,
+				CalendarSubviews/YearMetricScrollView.swift,
+				ControlView.swift,
+				DayScrollView.swift,
+				FunctionalScrollView.swift,
+				MetricCalendarView.swift,
+				MonthScrollView.swift,
+				MonthSubScrollView.swift,
+				WeekScrollView.swift,
+				YearScrollView.swift,
+			);
+			target = C1362A122F0496A500F2B467 /* chronometrixt */;
+		};
+		C1E64CD52F6621AB00059B84 /* Exceptions for "depricated" folder in "MetricWatchWidgitExtension" target */ = {
+			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
+			membershipExceptions = (
+				CalendarSubviews/DayMetricViewArchaic.swift,
+				CalendarSubviews/HourMetricView.swift,
+				CalendarSubviews/MetricDayView.swift,
+				CalendarSubviews/MetricMonthView.swift,
+				CalendarSubviews/MetricYearView.swift,
+				CalendarSubviews/MinuteMetricView.swift,
+				CalendarSubviews/SimpleScrollView_Alternative.swift,
+				CalendarSubviews/SimpleScrollView.swift,
+				CalendarSubviews/YearMetricScrollView.swift,
+				ControlView.swift,
+				DayScrollView.swift,
+				FunctionalScrollView.swift,
+				MetricCalendarView.swift,
+				MonthScrollView.swift,
+				MonthSubScrollView.swift,
+				WeekScrollView.swift,
+				YearScrollView.swift,
+			);
+			target = C1501DAD2F20853B00521DF6 /* MetricWatchWidgitExtension */;
+		};
+/* End PBXFileSystemSynchronizedBuildFileExceptionSet section */
 
 /* Begin PBXFileSystemSynchronizedRootGroup section */
 		C1362A152F0496A500F2B467 /* chronometrixt */ = {
 			isa = PBXFileSystemSynchronizedRootGroup;
 			path = chronometrixt;
+			sourceTree = "<group>";
+		};
+		C1501DB42F20853B00521DF6 /* MetricWatchWidgit */ = {
+			isa = PBXFileSystemSynchronizedRootGroup;
+			exceptions = (
+				C1501DC32F20853C00521DF6 /* Exceptions for "MetricWatchWidgit" folder in "MetricWatchWidgitExtension" target */,
+			);
+			path = MetricWatchWidgit;
+			sourceTree = "<group>";
+		};
+		C1E64CD32F66219400059B84 /* depricated */ = {
+			isa = PBXFileSystemSynchronizedRootGroup;
+			exceptions = (
+				C1E64CD42F6621AB00059B84 /* Exceptions for "depricated" folder in "chronometrixt" target */,
+				C1E64CD52F6621AB00059B84 /* Exceptions for "depricated" folder in "MetricWatchWidgitExtension" target */,
+			);
+			path = depricated;
+			sourceTree = "<group>";
+		};
+		C1E7322F2F0B39C600B3A639 /* watchixt Watch App */ = {
+			isa = PBXFileSystemSynchronizedRootGroup;
+			path = "watchixt Watch App";
 			sourceTree = "<group>";
 		};
 /* End PBXFileSystemSynchronizedRootGroup section */
@@ -26,13 +138,33 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
+		C1501DAB2F20853B00521DF6 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				C1501DB32F20853B00521DF6 /* SwiftUI.framework in Frameworks */,
+				C1501DB12F20853B00521DF6 /* WidgetKit.framework in Frameworks */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		C1E732282F0B39C600B3A639 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
 		C1362A0A2F0496A500F2B467 = {
 			isa = PBXGroup;
 			children = (
+				C1E64CD32F66219400059B84 /* depricated */,
 				C1362A152F0496A500F2B467 /* chronometrixt */,
+				C1E7322F2F0B39C600B3A639 /* watchixt Watch App */,
+				C1501DB42F20853B00521DF6 /* MetricWatchWidgit */,
+				C1501DAF2F20853B00521DF6 /* Frameworks */,
 				C1362A142F0496A500F2B467 /* Products */,
 			);
 			sourceTree = "<group>";
@@ -41,8 +173,19 @@
 			isa = PBXGroup;
 			children = (
 				C1362A132F0496A500F2B467 /* chronometrixt.app */,
+				C1E7322B2F0B39C600B3A639 /* watchixt Watch App.app */,
+				C1501DAE2F20853B00521DF6 /* MetricWatchWidgitExtension.appex */,
 			);
 			name = Products;
+			sourceTree = "<group>";
+		};
+		C1501DAF2F20853B00521DF6 /* Frameworks */ = {
+			isa = PBXGroup;
+			children = (
+				C1501DB02F20853B00521DF6 /* WidgetKit.framework */,
+				C1501DB22F20853B00521DF6 /* SwiftUI.framework */,
+			);
+			name = Frameworks;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -70,6 +213,53 @@
 			productReference = C1362A132F0496A500F2B467 /* chronometrixt.app */;
 			productType = "com.apple.product-type.application";
 		};
+		C1501DAD2F20853B00521DF6 /* MetricWatchWidgitExtension */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = C1501DC42F20853C00521DF6 /* Build configuration list for PBXNativeTarget "MetricWatchWidgitExtension" */;
+			buildPhases = (
+				C1501DAA2F20853B00521DF6 /* Sources */,
+				C1501DAB2F20853B00521DF6 /* Frameworks */,
+				C1501DAC2F20853B00521DF6 /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			fileSystemSynchronizedGroups = (
+				C1501DB42F20853B00521DF6 /* MetricWatchWidgit */,
+				C1E64CD32F66219400059B84 /* depricated */,
+			);
+			name = MetricWatchWidgitExtension;
+			packageProductDependencies = (
+			);
+			productName = MetricWatchWidgitExtension;
+			productReference = C1501DAE2F20853B00521DF6 /* MetricWatchWidgitExtension.appex */;
+			productType = "com.apple.product-type.app-extension";
+		};
+		C1E7322A2F0B39C600B3A639 /* watchixt Watch App */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = C1E7323B2F0B39C700B3A639 /* Build configuration list for PBXNativeTarget "watchixt Watch App" */;
+			buildPhases = (
+				C1E732272F0B39C600B3A639 /* Sources */,
+				C1E732282F0B39C600B3A639 /* Frameworks */,
+				C1E732292F0B39C600B3A639 /* Resources */,
+				C1501DC72F20853C00521DF6 /* Embed Foundation Extensions */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+				C1501DC12F20853C00521DF6 /* PBXTargetDependency */,
+			);
+			fileSystemSynchronizedGroups = (
+				C1E7322F2F0B39C600B3A639 /* watchixt Watch App */,
+			);
+			name = "watchixt Watch App";
+			packageProductDependencies = (
+			);
+			productName = "watchixt Watch App";
+			productReference = C1E7322B2F0B39C600B3A639 /* watchixt Watch App.app */;
+			productType = "com.apple.product-type.application";
+		};
 /* End PBXNativeTarget section */
 
 /* Begin PBXProject section */
@@ -78,9 +268,15 @@
 			attributes = {
 				BuildIndependentTargetsInParallel = 1;
 				LastSwiftUpdateCheck = 2620;
-				LastUpgradeCheck = 2620;
+				LastUpgradeCheck = 2630;
 				TargetAttributes = {
 					C1362A122F0496A500F2B467 = {
+						CreatedOnToolsVersion = 26.2;
+					};
+					C1501DAD2F20853B00521DF6 = {
+						CreatedOnToolsVersion = 26.2;
+					};
+					C1E7322A2F0B39C600B3A639 = {
 						CreatedOnToolsVersion = 26.2;
 					};
 				};
@@ -100,12 +296,28 @@
 			projectRoot = "";
 			targets = (
 				C1362A122F0496A500F2B467 /* chronometrixt */,
+				C1E7322A2F0B39C600B3A639 /* watchixt Watch App */,
+				C1501DAD2F20853B00521DF6 /* MetricWatchWidgitExtension */,
 			);
 		};
 /* End PBXProject section */
 
 /* Begin PBXResourcesBuildPhase section */
 		C1362A112F0496A500F2B467 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		C1501DAC2F20853B00521DF6 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		C1E732292F0B39C600B3A639 /* Resources */ = {
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
@@ -122,7 +334,29 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
+		C1501DAA2F20853B00521DF6 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		C1E732272F0B39C600B3A639 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 /* End PBXSourcesBuildPhase section */
+
+/* Begin PBXTargetDependency section */
+		C1501DC12F20853C00521DF6 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = C1501DAD2F20853B00521DF6 /* MetricWatchWidgitExtension */;
+			targetProxy = C1501DC02F20853C00521DF6 /* PBXContainerItemProxy */;
+		};
+/* End PBXTargetDependency section */
 
 /* Begin XCBuildConfiguration section */
 		C1362A1E2F0496A600F2B467 /* Debug */ = {
@@ -159,7 +393,9 @@
 				CLANG_WARN_UNREACHABLE_CODE = YES;
 				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
 				COPY_PHASE_STRIP = NO;
+				DEAD_CODE_STRIPPING = YES;
 				DEBUG_INFORMATION_FORMAT = dwarf;
+				DEVELOPMENT_TEAM = PS7P2998W4;
 				ENABLE_STRICT_OBJC_MSGSEND = YES;
 				ENABLE_TESTABILITY = YES;
 				ENABLE_USER_SCRIPT_SANDBOXING = YES;
@@ -181,6 +417,7 @@
 				MTL_ENABLE_DEBUG_INFO = INCLUDE_SOURCE;
 				MTL_FAST_MATH = YES;
 				ONLY_ACTIVE_ARCH = YES;
+				STRING_CATALOG_GENERATE_SYMBOLS = YES;
 				SWIFT_ACTIVE_COMPILATION_CONDITIONS = "DEBUG $(inherited)";
 				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
 			};
@@ -220,7 +457,9 @@
 				CLANG_WARN_UNREACHABLE_CODE = YES;
 				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
 				COPY_PHASE_STRIP = NO;
+				DEAD_CODE_STRIPPING = YES;
 				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
+				DEVELOPMENT_TEAM = PS7P2998W4;
 				ENABLE_NS_ASSERTIONS = NO;
 				ENABLE_STRICT_OBJC_MSGSEND = YES;
 				ENABLE_USER_SCRIPT_SANDBOXING = YES;
@@ -235,6 +474,7 @@
 				LOCALIZATION_PREFERS_STRING_CATALOGS = YES;
 				MTL_ENABLE_DEBUG_INFO = NO;
 				MTL_FAST_MATH = YES;
+				STRING_CATALOG_GENERATE_SYMBOLS = YES;
 				SWIFT_COMPILATION_MODE = wholemodule;
 			};
 			name = Release;
@@ -246,10 +486,12 @@
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
+				DEAD_CODE_STRIPPING = YES;
 				ENABLE_APP_SANDBOX = YES;
 				ENABLE_PREVIEWS = YES;
 				ENABLE_USER_SELECTED_FILES = readonly;
 				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_KEY_CFBundleDisplayName = "'metrixt";
 				"INFOPLIST_KEY_UIApplicationSceneManifest_Generation[sdk=iphoneos*]" = YES;
 				"INFOPLIST_KEY_UIApplicationSceneManifest_Generation[sdk=iphonesimulator*]" = YES;
 				"INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents[sdk=iphoneos*]" = YES;
@@ -288,10 +530,12 @@
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
+				DEAD_CODE_STRIPPING = YES;
 				ENABLE_APP_SANDBOX = YES;
 				ENABLE_PREVIEWS = YES;
 				ENABLE_USER_SELECTED_FILES = readonly;
 				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_KEY_CFBundleDisplayName = "'metrixt";
 				"INFOPLIST_KEY_UIApplicationSceneManifest_Generation[sdk=iphoneos*]" = YES;
 				"INFOPLIST_KEY_UIApplicationSceneManifest_Generation[sdk=iphonesimulator*]" = YES;
 				"INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents[sdk=iphoneos*]" = YES;
@@ -323,6 +567,136 @@
 			};
 			name = Release;
 		};
+		C1501DC52F20853C00521DF6 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				ASSETCATALOG_COMPILER_WIDGET_BACKGROUND_COLOR_NAME = WidgetBackground;
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = MetricWatchWidgit/Info.plist;
+				INFOPLIST_KEY_CFBundleDisplayName = MetricWatchWidgit;
+				INFOPLIST_KEY_NSHumanReadableCopyright = "";
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+					"@executable_path/../../Frameworks",
+					"@executable_path/../../../../Frameworks",
+				);
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = com.txixt.watchixt.watchkitapp.MetricWatchWidgit;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SDKROOT = watchos;
+				SKIP_INSTALL = YES;
+				STRING_CATALOG_GENERATE_SYMBOLS = YES;
+				SWIFT_APPROACHABLE_CONCURRENCY = YES;
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_UPCOMING_FEATURE_MEMBER_IMPORT_VISIBILITY = YES;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = 4;
+				WATCHOS_DEPLOYMENT_TARGET = 26.2;
+			};
+			name = Debug;
+		};
+		C1501DC62F20853C00521DF6 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				ASSETCATALOG_COMPILER_WIDGET_BACKGROUND_COLOR_NAME = WidgetBackground;
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = MetricWatchWidgit/Info.plist;
+				INFOPLIST_KEY_CFBundleDisplayName = MetricWatchWidgit;
+				INFOPLIST_KEY_NSHumanReadableCopyright = "";
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+					"@executable_path/../../Frameworks",
+					"@executable_path/../../../../Frameworks",
+				);
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = com.txixt.watchixt.watchkitapp.MetricWatchWidgit;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SDKROOT = watchos;
+				SKIP_INSTALL = YES;
+				STRING_CATALOG_GENERATE_SYMBOLS = YES;
+				SWIFT_APPROACHABLE_CONCURRENCY = YES;
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_UPCOMING_FEATURE_MEMBER_IMPORT_VISIBILITY = YES;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = 4;
+				VALIDATE_PRODUCT = YES;
+				WATCHOS_DEPLOYMENT_TARGET = 26.2;
+			};
+			name = Release;
+		};
+		C1E732392F0B39C700B3A639 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				ENABLE_PREVIEWS = YES;
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_KEY_CFBundleDisplayName = watchixt;
+				INFOPLIST_KEY_UISupportedInterfaceOrientations = "UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown";
+				INFOPLIST_KEY_WKWatchOnly = YES;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+				);
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = com.txixt.watchixt.watchkitapp;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SDKROOT = watchos;
+				SKIP_INSTALL = YES;
+				STRING_CATALOG_GENERATE_SYMBOLS = YES;
+				SWIFT_APPROACHABLE_CONCURRENCY = YES;
+				SWIFT_DEFAULT_ACTOR_ISOLATION = MainActor;
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_UPCOMING_FEATURE_MEMBER_IMPORT_VISIBILITY = YES;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = 4;
+				WATCHOS_DEPLOYMENT_TARGET = 26.2;
+			};
+			name = Debug;
+		};
+		C1E7323A2F0B39C700B3A639 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				ENABLE_PREVIEWS = YES;
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_KEY_CFBundleDisplayName = watchixt;
+				INFOPLIST_KEY_UISupportedInterfaceOrientations = "UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown";
+				INFOPLIST_KEY_WKWatchOnly = YES;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+				);
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = com.txixt.watchixt.watchkitapp;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SDKROOT = watchos;
+				SKIP_INSTALL = YES;
+				STRING_CATALOG_GENERATE_SYMBOLS = YES;
+				SWIFT_APPROACHABLE_CONCURRENCY = YES;
+				SWIFT_DEFAULT_ACTOR_ISOLATION = MainActor;
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_UPCOMING_FEATURE_MEMBER_IMPORT_VISIBILITY = YES;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = 4;
+				VALIDATE_PRODUCT = YES;
+				WATCHOS_DEPLOYMENT_TARGET = 26.2;
+			};
+			name = Release;
+		};
 /* End XCBuildConfiguration section */
 
 /* Begin XCConfigurationList section */
@@ -340,6 +714,24 @@
 			buildConfigurations = (
 				C1362A212F0496A600F2B467 /* Debug */,
 				C1362A222F0496A600F2B467 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		C1501DC42F20853C00521DF6 /* Build configuration list for PBXNativeTarget "MetricWatchWidgitExtension" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				C1501DC52F20853C00521DF6 /* Debug */,
+				C1501DC62F20853C00521DF6 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		C1E7323B2F0B39C700B3A639 /* Build configuration list for PBXNativeTarget "watchixt Watch App" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				C1E732392F0B39C700B3A639 /* Debug */,
+				C1E7323A2F0B39C700B3A639 /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;

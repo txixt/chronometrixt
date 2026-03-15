@@ -8,11 +8,41 @@
 import SwiftUI
 
 struct LandscapeView: View {
+    @Bindable var gov: Governor
+    
     var body: some View {
-        Text(/*@START_MENU_TOKEN@*/"Hello, World!"/*@END_MENU_TOKEN@*/)
+
+        HStack {
+            
+            VStack {
+                HStack {
+                    SimpleYearView(gov: gov)
+        
+                    Spacer()
+                }
+                .padding(.bottom)
+                
+                HStack {
+                    VStack {
+                        Text(gov.eternalNow.time.description)
+                            .font(.largeTitle).bold()
+                            .lineLimit(1)
+                            .foregroundColor(.metricOrange)
+                            .monospaced()
+                    }
+                    
+                    Spacer()
+                }
+                .padding(.top)
+            }
+            
+            Spacer()
+            
+            MetricClockView(gov: gov, scale: 3.0)
+        }
     }
 }
 
 #Preview {
-    LandscapeView()
+    LandscapeView(gov: Governor())
 }

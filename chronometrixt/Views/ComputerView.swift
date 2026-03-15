@@ -8,11 +8,13 @@
 import SwiftUI
 
 struct ComputerView: View {
+    @Bindable var gov: Governor
+    
     var body: some View {
-        Text(/*@START_MENU_TOKEN@*/"Hello, World!"/*@END_MENU_TOKEN@*/)
+        MetricClockView(gov: gov, scale: 4.0)
     }
 }
 
 #Preview {
-    ComputerView()
+    ComputerView(gov: Governor())
 }

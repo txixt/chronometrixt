@@ -102,7 +102,7 @@
 //        populateStack()
 //    }
 //}
-
-#Preview {
-    FunctionalScrollView()
-}
+//
+//#Preview {
+//    FunctionalScrollView()
+//}

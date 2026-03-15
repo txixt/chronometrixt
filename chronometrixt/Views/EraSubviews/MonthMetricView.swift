@@ -8,11 +8,82 @@
 import SwiftUI
 
 struct MonthMetricView: View {
-    var body: some View {
-        Text(/*@START_MENU_TOKEN@*/"Hello, World!"/*@END_MENU_TOKEN@*/)
+    @Bindable var gov: Governor
+    var month: MetrixtTime
+    
+        var body: some View {
+//            let govTime = gov.finiteNotNow ?? gov.eternalNow.time
+            
+            GeometryReader { geo in
+                ZStack {
+                    VStack {
+                        
+                        Button(action: goToYearView) {
+                            HStack {
+                                Text(month.yearTxt + "." + month.monthTxt)
+                                    .font(.largeTitle.bold())
+                                    .foregroundColor(month.years == gov.eternalNow.time.years && month.month == gov.eternalNow.time.month ? .metricOrange : .primary)
+                                Spacer()
+                            }
+                        }
+                        
+                        Divider()
+                        
+                        VStack {
+                            ForEach(0..<10, id: \.self) { week in
+                                HStack {
+                                    Button(action: { goToDayOrWeekView(week: week, day: nil) }) {
+                                        Text("\(week)").bold()
+                                            .foregroundColor(month.year == gov.eternalNow.time.year && month.month == gov.eternalNow.time.month && month.week == week ? .metricOrange : .primary)
+                                    }
+                                    .frame(width: 25, height: 25)
+                                    .opacity(month.month == 3 && week > 6 ? 0 : 1)
+
+                                    Spacer()
+                                    
+                                    HStack {
+                                        ForEach(0..<10, id: \.self) { day in
+                                            let isLeapYear = metric.cal.isLeapYear(month.year)
+                                            let pastEndOfYear = ((month.month * 100) + (week * 10) + day) > (isLeapYear ? 364 : 365)
+                                            
+                                            Button(action: { goToDayOrWeekView(week: week, day: day)}) {
+                                                ZStack {
+                                                    Text("\(day)")
+                                                        .font(.caption)
+                                                        .foregroundColor(month.year == gov.eternalNow.time.year && month.month == gov.eternalNow.time.month && month.week == week && month.day == day ? .metricOrange : .secondary)
+                                                    RoundedRectangle(cornerRadius: 8)
+                                                        .foregroundColor(month.year == gov.eternalNow.time.year && month.month == gov.eternalNow.time.month && month.week == week && month.day == day ? .metricOrange : .secondary).opacity(0.2)
+                                                        .frame(width: 25, height: 25)
+
+                                                }
+                                                .opacity(pastEndOfYear ? 0 : 1)
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
+                    .padding()
+                    .monospaced()
+                }
+                .frame(width: geo.size.width, height: geo.size.width)
+            }
+
+        }
+    
+    private func goToYearView() {
+        gov.scale = .year
     }
+    
+    private func goToDayOrWeekView(week: Int, day: Int?) {
+        gov.finiteNotNow = metric.cal.replace(time: month, component: .week, with: week)
+        if day != nil { gov.finiteNotNow = metric.cal.replace(time: gov.finiteNotNow!, component: .day, with: day!) }
+        gov.scale = day != nil ? .day : .week
+    }
+    
 }
 
 #Preview {
-    MonthMetricView()
+    MonthMetricView(gov: Governor(), month: MetrixtTime(date: nil))
 }

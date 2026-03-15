@@ -8,11 +8,78 @@
 import SwiftUI
 
 struct YearMetricView: View {
+    @Bindable var gov: Governor
+    var year: MetrixtTime?
+    
     var body: some View {
-        Text(/*@START_MENU_TOKEN@*/"Hello, World!"/*@END_MENU_TOKEN@*/)
+        let govTime = gov.finiteNotNow ?? gov.eternalNow.time
+        let someTime = year ?? govTime
+        
+        GeometryReader { geo in
+            VStack {
+                Button(action: goToEonView) {
+                    HStack {
+                        Text(someTime.yearTxt)
+                        .font(.largeTitle).bold()
+                        .foregroundColor(someTime.year == gov.eternalNow.time.year && someTime.month == gov.eternalNow.time.month ? .metricOrange : .primary)
+                        Spacer()
+                    }
+                }
+                .padding(.horizontal)
+                
+                VStack {
+                    ForEach(0..<4, id: \.self) { month in
+                        VStack {
+                            
+                            Button(action: { goToMonthView(month: month) }) {
+                                VStack {
+                                    Divider()
+                                    HStack(alignment: .top) {
+                                        Text("\(month)")
+                                        .bold()
+                                        .foregroundColor(someTime.year == gov.eternalNow.time.year && someTime.month == month ? .metricOrange : .primary)
+                                        
+                                        Spacer()
+                                        
+                                        VStack(spacing: 3) {
+                                            ForEach(0..<10, id: \.self) { week in
+                                                HStack() {
+                                                    ForEach(0..<10, id: \.self) { day in
+                                                        
+                                                        let isLeapYear = metric.cal.isLeapYear(someTime.year)
+                                                        let pastEndOfYear = ((month * 100) + (week * 10) + day) > (isLeapYear ? 364 : 365)
+                                                        RoundedRectangle(cornerRadius: 2)
+                                                            .foregroundColor(someTime.year == gov.eternalNow.time.year && someTime.month == month && someTime.week == week && someTime.day == day ? .metricOrange : .primary)
+                                                            .frame(width: geo.size.width * 0.07, height: 4)
+                                                            .opacity(pastEndOfYear ? 0 : 1)
+
+                                                    }
+                                                }
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+                .padding(.horizontal)
+            }
+            .frame(width: geo.size.width, height: geo.size.width)
+            .monospaced()
+        }
+    }
+    
+    private func goToEonView() {
+        gov.scale = .eon
+    }
+    
+    private func goToMonthView (month: Int) {
+        gov.finiteNotNow = metric.cal.replace(time: gov.someTimes[1], component: .month, with: month)
+        gov.scale = .month
     }
 }
 
 #Preview {
-    YearMetricView()
+    YearMetricView(gov: Governor())
 }

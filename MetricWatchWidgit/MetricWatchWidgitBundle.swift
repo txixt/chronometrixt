@@ -13,5 +13,7 @@ struct MetricWatchWidgitBundle: WidgetBundle {
     var body: some Widget {
         MetricWatchWidgit()
         MetricWatchWidgitControl()
+        MetricClockOnlyWidget()
+        MetricCalendarOnlyWidget()
     }
 }

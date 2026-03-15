@@ -19,46 +19,56 @@ struct Provider: AppIntentTimelineProvider {
     
     func timeline(for configuration: ConfigurationAppIntent, in context: Context) async -> Timeline<SimpleEntry> {
         var entries: [SimpleEntry] = []
-
-        // Generate a timeline consisting of five entries an hour apart, starting from the current date.
+        
         let currentDate = Date()
-        for hourOffset in 0 ..< 5 {
-            let entryDate = Calendar.current.date(byAdding: .hour, value: hourOffset, to: currentDate)!
+        let calendar = Calendar.current
+        
+        for minuteOffset in 0..<10 {
+            let entryDate = calendar.date(byAdding: .minute, value: minuteOffset * 6, to: currentDate)!
             let entry = SimpleEntry(date: entryDate, configuration: configuration)
             entries.append(entry)
         }
-
+        
         return Timeline(entries: entries, policy: .atEnd)
     }
 
     func recommendations() -> [AppIntentRecommendation<ConfigurationAppIntent>] {
-        // Create an array with all the preconfigured widgets to show.
         [AppIntentRecommendation(intent: ConfigurationAppIntent(), description: "Example Widget")]
     }
-
-//    func relevances() async -> WidgetRelevances<ConfigurationAppIntent> {
-//        // Generate a list containing the contexts this widget is relevant in.
-//    }
 }
 
 struct SimpleEntry: TimelineEntry {
     let date: Date
     let configuration: ConfigurationAppIntent
+    let percentOfYear: CGFloat
+    let hourRotation: CGFloat
+    let minuteRotation: CGFloat
+    let metricYear: String
+    let metricDay: String
+    let metricHour: String
+    let metricMinute: String
+    
+    init(date: Date, configuration: ConfigurationAppIntent) {
+        self.date = date
+        self.configuration = configuration
+        let cal = Calendar.current
+        metricYear = String(cal.component(.year, from: date) + 3030)
+        metricDay = String(format: "%03d", (cal.component(.dayOfYear, from: date) - 1))
+        let metricMinutesToday: CGFloat = (CGFloat(cal.component(.hour, from: date) * 60) + CGFloat(cal.component(.minute, from: date))) / 1.44
+        metricHour = String(Int(metricMinutesToday / 100))
+        metricMinute = String(format: "%02d", Int(metricMinutesToday) % 100)
+        percentOfYear = CGFloat(cal.component(.dayOfYear, from: date)) / CGFloat(cal.range(of: .day, in: .year, for: Date())!.count)
+        hourRotation = (metricMinutesToday / 1000) * 360.0
+        minuteRotation = (metricMinutesToday.truncatingRemainder(dividingBy: 100) / 100) * 360.0
+    }
 }
 
 struct MetricWatchWidgitEntryView : View {
     var entry: Provider.Entry
 
     var body: some View {
-        VStack {
-            HStack {
-                Text("Time:")
-                Text(entry.date, style: .time)
-            }
-        
-            Text("Favorite Emoji:")
-            Text(entry.configuration.favoriteEmoji)
-        }
+        ComplicationView(entry: entry)
+            .widgetURL(URL(string: "chronometrixt://main"))
     }
 }
 
@@ -68,6 +78,28 @@ struct MetricWatchWidgit: Widget {
     var body: some WidgetConfiguration {
         AppIntentConfiguration(kind: kind, intent: ConfigurationAppIntent.self, provider: Provider()) { entry in
             MetricWatchWidgitEntryView(entry: entry)
+                .containerBackground(.fill.tertiary, for: .widget)
+        }
+    }
+}
+
+struct MetricClockOnlyWidget: Widget {
+    let kind: String = "MetricClockWidget"
+    
+    var body: some WidgetConfiguration {
+        AppIntentConfiguration(kind: kind, intent: ConfigurationAppIntent.self, provider: Provider()) { entry in
+            MetricClockOnlyComplicationView(entry: entry)
+                .containerBackground(.fill.tertiary, for: .widget)
+        }
+    }
+}
+
+struct MetricCalendarOnlyWidget: Widget {
+    let kind: String = "MetricCalendarWidgit"
+    
+    var body: some WidgetConfiguration {
+        AppIntentConfiguration(kind: kind, intent: ConfigurationAppIntent.self, provider: Provider()) { entry in
+            MetricCalendarOnlyComplicationView(entry: entry)
                 .containerBackground(.fill.tertiary, for: .widget)
         }
     }
@@ -88,7 +120,9 @@ extension ConfigurationAppIntent {
 }
 
 #Preview(as: .accessoryRectangular) {
-    MetricWatchWidgit()
+//    MetricWatchWidgit()
+//    MetricClockOnlyWidget()
+    MetricCalendarOnlyWidget()
 } timeline: {
     SimpleEntry(date: .now, configuration: .smiley)
     SimpleEntry(date: .now, configuration: .starEyes)

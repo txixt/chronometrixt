@@ -6,16 +6,31 @@
 //
 
 import SwiftUI
+import WatchKit
 
 struct ContentView: View {
+    @Environment(\.scenePhase) private var scenePhase
+    
     var body: some View {
-        VStack {
-            Image(systemName: "globe")
-                .imageScale(.large)
-                .foregroundStyle(.tint)
-            Text("Hello, world!")
+        GeometryReader { geometry in
+            ZStack {
+                GlassWatchView(scale: scaleForWatch(geometry.size))
+            }
+            .padding(.top,30)
+            .frame(maxWidth: .infinity, maxHeight: .infinity)
         }
-        .padding()
+        .ignoresSafeArea()
+    }
+    
+    private func scaleForWatch(_ size: CGSize) -> CGFloat {
+        let diameter = min(size.width, size.height)
+        if diameter < 170 {
+            return 1.6
+        } else if diameter < 195 {
+            return 1.8
+        } else {
+            return 1.8
+        }
     }
 }
 

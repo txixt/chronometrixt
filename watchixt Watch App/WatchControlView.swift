@@ -7,30 +7,32 @@
 
 import SwiftUI
 
-struct ControlView: View {
-    @Binding var gov: WatchGovernor
-    
-    var body: some View {
-        VStack {
-            HStack {
-                Button(action: switchBase) {
-                    Text(gov.timeBase == .ten ? "φ" : "10")
-                        .foregroundColor(.primary)
-                        .bold()
-                }
-                Spacer()
-            }
-            Spacer()
-        }
-        .padding()
-    }
-    
-    private func switchBase() {
-        if gov.timeBase == .ten { gov.timeBase = .eleven }
-        else { gov.timeBase = .ten }
-    }
-}
-
-#Preview {
-    ControlView(gov: .constant(WatchGovernor()))
-}
+//struct WatchControlView: View {
+//    @Binding var gov: WatchGovernor
+//    
+//    var body: some View {
+//        VStack {
+//            HStack {
+//                Text("10")
+//                    .font(.system(size: 18, weight: .bold))
+//                    .foregroundColor(.gray).opacity(0.3)
+//                    .padding()
+//                    .padding(.top, 20)
+//                    .onTapGesture(count: 3) {
+//                        switchBase()
+//                    }
+//                Spacer()
+//            }
+//            Spacer()
+//        }
+//    }
+//    
+//    private func switchBase() {
+//        if gov.timeBase == .ten { gov.timeBase = .eleven }
+//        else { gov.timeBase = .ten }
+//    }
+//}
+//
+//#Preview {
+//    WatchControlView(gov: .constant(WatchGovernor()))
+//}
