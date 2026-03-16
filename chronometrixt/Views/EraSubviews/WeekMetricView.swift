@@ -73,7 +73,11 @@ struct WeekMetricView: View {
     
     private func goToDayView(day: Int, hour: Int?) {
         gov.finiteNotNow = metric.cal.replace(time: gov.someTimes[1], component: .day, with: day)
-        if hour != nil { gov.finiteNotNow = metric.cal.replace(time: gov.finiteNotNow!, component: .hour, with: hour!) }
+        if hour != nil {
+            gov.finiteNotNow = metric.cal.replace(time: gov.finiteNotNow!, component: .hour, with: hour!)
+            gov.finiteNotNow = metric.cal.replace(time: gov.finiteNotNow!, component: .minute, with: 0)
+            gov.finiteNotNow = metric.cal.replace(time: gov.finiteNotNow!, component: .second, with: 0)
+        }
         gov.scale = .day
     }
 }

@@ -68,15 +68,9 @@ struct DayMetricView: View {
     
     private func selectTime(hours: Int, minutes: Int) {
         gov.finiteNotNow = metric.cal.replace(time: gov.someTimes[1], component: .hour, with: hours)
-        gov.finiteNotNow = metric.cal.replace(time: gov.finiteNotNow!, component: .minute, with: minutes)
+        gov.finiteNotNow = metric.cal.replace(time: gov.finiteNotNow!, component: .minute, with: minutes * 10)
+        gov.finiteNotNow = metric.cal.replace(time: gov.finiteNotNow!, component: .second, with: 0)
     }
-//    private func selectTime(timeInt: Int) {
-//        if gov.finiteNotNow == nil { gov.finiteNotNow = gov.eternalNow.time }
-//        gov.finiteNotNow!.hour = timeInt / 10_000
-//        gov.finiteNotNow!.minute = (timeInt / 100) % 100
-//        gov.finiteNotNow!.second = 0
-//        gov.finiteNotNow!.updateRawFromComponents()
-//    }
 }
 
 #Preview {

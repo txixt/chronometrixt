@@ -41,7 +41,9 @@ struct MetrixtTime: Hashable, Codable, Identifiable {
     var id: String { "\(years):\(seconds)" }
     let years: Int
     let seconds: Int
+    let creationTimeZone: TimeZone = .current
     enum CodingKeys: String, CodingKey { case years, seconds }
+    private static var cachedOffset: TimeInterval?     ///adjustment for DST or other local time idiosyncracies
     
     init(date: Date?) {
         years = Calendar.current.component(.year, from: date ?? .now) + 3030
@@ -54,7 +56,17 @@ struct MetrixtTime: Hashable, Codable, Identifiable {
         guard let initialYear = Calendar.current.date(from: DateComponents(year: years - 3030)) else {
             return Date(timeIntervalSince1970: 0)
         }
-        return initialYear.addingTimeInterval((TimeInterval(seconds) * 0.864)) //does this need a +1 for the 1index??
+        let result = initialYear.addingTimeInterval((TimeInterval(seconds) * 0.864))
+        let someOffset = MetrixtTime.cachedOffset ?? MetrixtTime.getOffset()
+        return someOffset == 0 ? result : result.addingTimeInterval(someOffset)
+    }
+    private static func getOffset() -> TimeInterval {
+        cachedOffset = Date.now.timeIntervalSince(MetrixtTime(date: nil).basicGreg())
+        return cachedOffset!
+    }
+    private func basicGreg() -> Date {
+        guard let initialYear = Calendar.current.date(from: DateComponents(year: years - 3030, month: 1, day: 1)) else { return Date(timeIntervalSince1970: 0) }
+        return initialYear.addingTimeInterval(TimeInterval(seconds) * 0.864)
     }
 }
 ///Computed properties are simple divisions of the seconds per year, plus rotational values for clock hands
