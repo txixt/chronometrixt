@@ -18,46 +18,41 @@ struct WeekMetricView: View {
         GeometryReader { geo in
             ZStack {
                 VStack {
-                    Button(action: goToYearView) {
-                        HStack {
-                            Text(someTime.yearTxt + "." + someTime.monthTxt + ":" + someTime.weekTxt)
-                                .font(.largeTitle).bold()
-                                .foregroundColor(someTime.year == gov.eternalNow.time.year && someTime.month == gov.eternalNow.time.month && someTime.week == gov.eternalNow.time.week ? .metricOrange : .primary)
-                            Spacer()
-                        }
+                    HStack(spacing: 0) {
+                        Text(someTime.yearTxt + "." + someTime.monthTxt + ":" + someTime.weekTxt)
+                            .font(.largeTitle).bold()
+                            .foregroundColor(someTime.year == gov.eternalNow.time.year && someTime.month == gov.eternalNow.time.month && someTime.week == gov.eternalNow.time.week ? .metricOrange : .primary)
+                        Spacer()
                     }
-                    .padding(.bottom)
+                    .onTapGesture(count: 1) { goToYearView() }
                     
                     Divider()
                     
                     HStack {
                         ForEach(0..<10, id: \.self) { day in
                             VStack {
-                                Button(action: { goToDayView(day: day, hour: nil)}) {
-                                    VStack {
-                                        Text("\(day)").bold().foregroundColor(someTime.year == gov.eternalNow.time.year && someTime.month == gov.eternalNow.time.month && someTime.week == gov.eternalNow.time.week && someTime.day == day ? .metricOrange : .primary)
-                                    }
-                                }
+                                Text("\(day)")
+                                    .bold()
+                                    .foregroundColor(someTime.year == gov.eternalNow.time.year && someTime.month == gov.eternalNow.time.month && someTime.week == gov.eternalNow.time.week && someTime.day == day ? .metricOrange : .primary)
+                                    .onTapGesture(count: 1) { goToDayView(day: day, hour: nil) }
 
                                 ZStack {
 
                                     VStack {
                                         
                                         ForEach(0..<10, id: \.self) { hour in
-                                            Button(action: { goToDayView(day: day, hour: hour) }) {
-                                                Text("\(hour)")
-                                                    .font(.caption)
-                                                    .foregroundColor(.gray)
-                                            }
-                                            .padding(.vertical, 2.5)
-                            
+                                            Text("\(hour)")
+                                                .font(.caption)
+                                                .foregroundColor(.gray)
+                                                .onTapGesture(count: 1) { goToDayView(day: day, hour: hour)  }
+                                                .padding(.vertical, 2.5)
                                         }
                                         
                                     }
                                     .padding(10)
                                     .padding(.bottom, 3)
                                     .background(RoundedRectangle(cornerRadius: 8)
-                                        .foregroundColor(someTime.year == gov.eternalNow.time.year && someTime.month == gov.eternalNow.time.month && someTime.week == gov.eternalNow.time.week && someTime.day == day ? .metricOrange : .primary).opacity(0.2))
+                                    .foregroundColor(someTime.year == gov.eternalNow.time.year && someTime.month == gov.eternalNow.time.month && someTime.week == gov.eternalNow.time.week && someTime.day == day ? .metricOrange : .primary).opacity(0.2))
                                 }
                             }
                             if day != 9 { Spacer() }

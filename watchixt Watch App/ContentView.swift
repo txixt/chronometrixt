@@ -10,11 +10,23 @@ import WatchKit
 
 struct ContentView: View {
     @Environment(\.scenePhase) private var scenePhase
+    @State var display: Bool = true
     
     var body: some View {
         GeometryReader { geometry in
             ZStack {
-                GlassWatchView(scale: scaleForWatch(geometry.size))
+                VStack {
+                    Spacer()
+                    
+                    if display {
+                        GlassWatchView(scale: scaleForWatch(geometry.size))
+                    } else {
+                        CalendarView()
+                    }
+                    
+                    Spacer()
+                }
+                .onTapGesture(count: 1) { display.toggle() }
             }
             .padding(.top,30)
             .frame(maxWidth: .infinity, maxHeight: .infinity)

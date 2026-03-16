@@ -10,8 +10,7 @@ import SwiftUI
 struct GlassWatchView: View {
     var scale: CGFloat
     private let cal: Calendar = Calendar.current
-    @Environment(\.isLuminanceReduced) private var isLuminanceReduced
-    @State var animationReset: Bool = false
+    @Environment(\.isLuminanceReduced) private var dimmed
 
         var body: some View {
             let clockSize: CGFloat = 100 * scale
@@ -25,8 +24,6 @@ struct GlassWatchView: View {
                 
                 ZStack {
                     
-//                    CalendarView()
-//                        .opacity(0.5)
                     Circle()
                         .frame(width: 92 * scale, height: 92 * scale)
                         .glassEffect(.clear)
@@ -57,92 +54,21 @@ struct GlassWatchView: View {
                         .fill(Color.black)
                         .frame(width: 5 * scale, height: 5 * scale)
 
-                    if !isLuminanceReduced {
-                        TimelineView(.animation) { animation in
-                            let gregorianSecondsToday = cal.component(.hour, from: animation.date) * 3600 +
-                            cal.component(.minute, from: animation.date) * 60 +
-                            cal.component(.second, from: animation.date)
-                            let metricSecondsToday = Double(gregorianSecondsToday) / 0.864
-                            let hourRot = (metricSecondsToday / 10_000) * 36.0
-                            let minRot = (metricSecondsToday / 100) * 360.0 / 100
-                            let secondRotation = (metricSecondsToday / 100) * 360.0
-                            
-                            ZStack {
-                                GlassClockHand(
-                                    rotationDegrees: hourRot, // 360/10 + 360/10000
-                                    width: 4 * scale,
-                                    length: clockSize * 0.25,
-                                    color: .black
-                                )
-                                
-                                GlassClockHand(
-                                    rotationDegrees: minRot, // 360/100
-                                    width: 2 * scale,
-                                    length: clockSize * 0.4,
-                                    color: .black
-                                )
-                                
-                                if !animationReset {
-                                    GlassClockSecondHand(
-                                        rotationDegrees: secondRotation,
-                                        width: 0.5 * scale,
-                                        length: clockSize * 0.5,
-                                        color: .metricOrange
-                                    )
-                                    .animation(.linear(duration: 8.64), value: secondRotation)
-                                } else {
-                                    GlassClockSecondHand(
-                                        rotationDegrees: secondRotation,
-                                        width: 0.5 * scale,
-                                        length: clockSize * 0.5,
-                                        color: .metricOrange
-                                    )
-                                    .onAppear() {
-                                        animationReset = false
-                                    }
-                                }
-                
-                                
-                                Circle()
-                                    .fill(Color.metricOrange)
-                                    .frame(width: 4 * scale, height: 6 * scale)
-                                Circle()
-                                    .fill(Color.black)
-                                    .frame(width: 2 * scale, height: 2 * scale)
-                            }
-                            .onAppear() {
-                                animationReset = true
-                            }
-                        }
-
+                    if !dimmed {
+                        GlassActiveHands(scale: scale, clockSize: clockSize)
                     } else {
-                        
-                        ZStack {
-                            GlassClockHand(
-                                rotationDegrees: hourRotation, // 360/10 + 360/10000
-                                width: 4 * scale,
-                                length: clockSize * 0.25,
-                                color: .black
-                            )
-                            
-                            GlassClockHand(
-                                rotationDegrees: minuteRotation, // 360/100
-                                width: 2 * scale,
-                                length: clockSize * 0.4,
-                                color: .black
-                            )
-                        }
-
+                        GlassDimmedHands(scale: scale, clockSize: clockSize, hourRotation: hourRotation, minuteRotation: minuteRotation)
                     }
                 }
                 .frame(width: scale == 1.0 ? 101 : 100 * scale, height: scale == 1.0 ? 101 : 100 * scale)
                 .monospaced()
+                .padding(.bottom)
             }
         }
     }
 
 struct GlassClockHand: View {
-    let rotationDegrees: Double
+    let rotationDegrees: CGFloat
     let width: CGFloat
     let length: CGFloat
     let color: Color
@@ -163,10 +89,12 @@ struct GlassClockHand: View {
 }
 
 struct GlassClockSecondHand: View {
-    let rotationDegrees: Double
+    let rotationDegrees: CGFloat
     let width: CGFloat
     let length: CGFloat
     let color: Color
+    
+    @State private var rotation: CGFloat = 0
     
     var body: some View {
         VStack(spacing: 0) {
@@ -178,8 +106,13 @@ struct GlassClockSecondHand: View {
                 .frame(width: width, height: length * 0.95)
         }
         .offset(y: -length / 2)
-        .rotationEffect(.degrees(rotationDegrees))
-        .shadow(color: color, radius: 1)
+        .rotationEffect(.degrees(rotation))
+        .onAppear {
+            rotation = rotationDegrees
+            withAnimation(.linear(duration: 86.4).repeatForever(autoreverses: false)) {
+                rotation = rotationDegrees + 360
+            }
+        }
     }
 }
 
@@ -203,6 +136,77 @@ struct GlassMetricClockNumeral: View {
     
     private var radius: Double {
         Double(clockSize/4 - (clockSize / 22))
+    }
+}
+
+private struct GlassActiveHands: View {
+    let scale: CGFloat
+    let clockSize: CGFloat
+    private let cal: Calendar = Calendar.current
+    
+    var body: some View {
+        TimelineView(.animation) { animation in
+            let gregorianSecondsToday = CGFloat(cal.ordinality(of: .second, in: .day, for: animation.date) ?? 0)
+            let metricSecondsToday = gregorianSecondsToday / 0.864
+            let hourRot = (metricSecondsToday / 10_000) * 36.0
+            let minRot = (metricSecondsToday / 100) * 360.0 / 100
+            let secondRotation = (metricSecondsToday / 100) * 360.0
+            
+            ZStack {
+                GlassClockHand(
+                    rotationDegrees: hourRot,
+                    width: 4 * scale,
+                    length: clockSize * 0.25,
+                    color: .black
+                )
+                
+                GlassClockHand(
+                    rotationDegrees: minRot,
+                    width: 2 * scale,
+                    length: clockSize * 0.4,
+                    color: .black
+                )
+                
+                GlassClockSecondHand(
+                    rotationDegrees: secondRotation,
+                    width: 0.5 * scale,
+                    length: clockSize * 0.5,
+                    color: .metricOrange
+                )
+                
+                Circle()
+                    .fill(Color.metricOrange)
+                    .frame(width: 4 * scale, height: 6 * scale)
+                Circle()
+                    .fill(Color.black)
+                    .frame(width: 2 * scale, height: 2 * scale)
+            }
+        }
+    }
+}
+
+private struct GlassDimmedHands: View {
+    let scale: CGFloat
+    let clockSize: CGFloat
+    let hourRotation: CGFloat
+    let minuteRotation: CGFloat
+    
+    var body: some View {
+        ZStack {
+            GlassClockHand(
+                rotationDegrees: hourRotation,
+                width: 4 * scale,
+                length: clockSize * 0.25,
+                color: .black
+            )
+            
+            GlassClockHand(
+                rotationDegrees: minuteRotation,
+                width: 2 * scale,
+                length: clockSize * 0.4,
+                color: .black
+            )
+        }
     }
 }
 

@@ -25,7 +25,7 @@ struct CalendarScrollView: View {
                                 case .year: YearMetricView(gov: gov, year: gov.someTimes[timeIndex]).opacity(timeIndex == 1 ? 1.0 : 0.2)
                                 case .month: MonthMetricView(gov: gov, month: gov.someTimes[timeIndex]).opacity(timeIndex == 1 ? 1.0 : 0.2)
                                 case .week: WeekMetricView(gov: gov, week: gov.someTimes[timeIndex]).opacity(timeIndex == 1 ? 1.0 : 0.2)
-                                case .day: DayMetricView(gov: gov, day: gov.someTimes[timeIndex]).opacity(timeIndex == 1 ? 1.0 : 0.2)
+                                case .day: DayMetricView(gov: gov, day: gov.someTimes[timeIndex]).opacity(timeIndex == 1 ? 1.0 : 0.5)
                                 }
                             }
                             .frame(height: geo.size.width)

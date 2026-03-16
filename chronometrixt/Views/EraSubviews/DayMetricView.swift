@@ -19,13 +19,12 @@ struct DayMetricView: View {
             ZStack {
                 VStack {
                     
-                    Button(action: goToYearView) {
-                        HStack {
-                            Text(someTime.yearTxt + "." + someTime.mwdTxt)
-                                .font(.largeTitle.bold())
-                                .foregroundColor(someTime.year == gov.eternalNow.time.year && someTime.mwd == gov.eternalNow.time.mwd ? .metricOrange : .primary)
-                            Spacer()
-                        }
+                    HStack(spacing: 0) {
+                        Text(someTime.yearTxt + "." + someTime.monthWeekDayTxt)
+                            .font(.largeTitle.bold())
+                            .foregroundColor(someTime.year == gov.eternalNow.time.year && someTime.mwd == gov.eternalNow.time.mwd ? .metricOrange : .primary)
+                            .onTapGesture { goToYearView() }
+                        Spacer()
                     }
                     
                     Divider()
@@ -37,19 +36,18 @@ struct DayMetricView: View {
                                     .foregroundColor(.gray).opacity(0.2)
             
                                 HStack {
-                                    Button(action: { selectTime(hours: hour, minutes: 0) } ) {
-                                        Text("\(hour)").bold().foregroundColor(.primary)
-                                    }
-                                    
+                                    Text("\(hour)")
+                                        .bold()
+                                        .foregroundColor(.primary)
+                                        .onTapGesture(count: 1) { selectTime(hours: hour, minutes: 0) }
                                     Spacer()
                                     
                                     ForEach(0..<10, id:\.self) { minutes in
-                                        Button(action: { selectTime(hours: hour, minutes: minutes) } ) {
-                                            Text(":\(minutes)0")
-                                                .font(.caption)
-                                                .foregroundColor(.gray)
-                                            Spacer()
-                                        }
+                                        Text(":\(minutes)0")
+                                            .font(.caption)
+                                            .foregroundColor(.gray)
+                                            .onTapGesture(count: 1) { selectTime(hours: hour, minutes: minutes) }
+                                        Spacer()
                                     }
                                 }
                             }
@@ -69,7 +67,7 @@ struct DayMetricView: View {
     }
     
     private func selectTime(hours: Int, minutes: Int) {
-        gov.finiteNotNow = metric.cal.replace(time: gov.someTimes[0], component: .hour, with: hours)
+        gov.finiteNotNow = metric.cal.replace(time: gov.someTimes[1], component: .hour, with: hours)
         gov.finiteNotNow = metric.cal.replace(time: gov.finiteNotNow!, component: .minute, with: minutes)
     }
 //    private func selectTime(timeInt: Int) {

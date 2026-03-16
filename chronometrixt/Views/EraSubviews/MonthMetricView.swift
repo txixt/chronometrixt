@@ -12,19 +12,16 @@ struct MonthMetricView: View {
     var month: MetrixtTime
     
         var body: some View {
-//            let govTime = gov.finiteNotNow ?? gov.eternalNow.time
-            
             GeometryReader { geo in
                 ZStack {
                     VStack {
                         
-                        Button(action: goToYearView) {
-                            HStack {
-                                Text(month.yearTxt + "." + month.monthTxt)
-                                    .font(.largeTitle.bold())
-                                    .foregroundColor(month.years == gov.eternalNow.time.years && month.month == gov.eternalNow.time.month ? .metricOrange : .primary)
-                                Spacer()
-                            }
+                        HStack(spacing: 0) {
+                            Text(month.yearTxt + "." + month.monthTxt)
+                                .font(.largeTitle.bold())
+                                .foregroundColor(month.years == gov.eternalNow.time.years && month.month == gov.eternalNow.time.month ? .metricOrange : .primary)
+                                .onTapGesture(count: 1) { goToYearView() }
+                            Spacer()
                         }
                         
                         Divider()
@@ -32,12 +29,10 @@ struct MonthMetricView: View {
                         VStack {
                             ForEach(0..<10, id: \.self) { week in
                                 HStack {
-                                    Button(action: { goToDayOrWeekView(week: week, day: nil) }) {
-                                        Text("\(week)").bold()
-                                            .foregroundColor(month.year == gov.eternalNow.time.year && month.month == gov.eternalNow.time.month && month.week == week ? .metricOrange : .primary)
-                                    }
-                                    .frame(width: 25, height: 25)
-                                    .opacity(month.month == 3 && week > 6 ? 0 : 1)
+                                    Text("\(week)").bold()
+                                        .foregroundColor(month.year == gov.eternalNow.time.year && month.month == gov.eternalNow.time.month && month.week == week ? .metricOrange : .secondary)
+                                        .onTapGesture(count: 1) { goToDayOrWeekView(week: week, day: nil) }
+                                        .opacity(month.month == 3 && week > 6 ? 0 : 1)
 
                                     Spacer()
                                     
@@ -46,18 +41,19 @@ struct MonthMetricView: View {
                                             let isLeapYear = metric.cal.isLeapYear(month.year)
                                             let pastEndOfYear = ((month.month * 100) + (week * 10) + day) > (isLeapYear ? 364 : 365)
                                             
-                                            Button(action: { goToDayOrWeekView(week: week, day: day)}) {
-                                                ZStack {
-                                                    Text("\(day)")
-                                                        .font(.caption)
-                                                        .foregroundColor(month.year == gov.eternalNow.time.year && month.month == gov.eternalNow.time.month && month.week == week && month.day == day ? .metricOrange : .secondary)
-                                                    RoundedRectangle(cornerRadius: 8)
-                                                        .foregroundColor(month.year == gov.eternalNow.time.year && month.month == gov.eternalNow.time.month && month.week == week && month.day == day ? .metricOrange : .secondary).opacity(0.2)
-                                                        .frame(width: 25, height: 25)
+                                            ZStack {
+                                                Text("\(day)")
+                                                    .font(.caption)
+                                                    .foregroundColor(month.year == gov.eternalNow.time.year && month.month == gov.eternalNow.time.month && month.week == week && month.day == day ? .metricOrange : .primary)
+                                                    .bold()
+                                                RoundedRectangle(cornerRadius: 8)
+                                                    .foregroundColor(month.year == gov.eternalNow.time.year && month.month == gov.eternalNow.time.month && month.week == week && month.day == day ? .metricOrange : .secondary).opacity(0.2)
+                                                    .frame(width: geo.size.width * 0.068, height: 22)
 
-                                                }
-                                                .opacity(pastEndOfYear ? 0 : 1)
                                             }
+                                            .onTapGesture(count: 1) { goToDayOrWeekView(week: week, day: day) }
+                                            .opacity(pastEndOfYear ? 0 : 1)
+                                            
                                         }
                                     }
                                 }
@@ -77,7 +73,7 @@ struct MonthMetricView: View {
     }
     
     private func goToDayOrWeekView(week: Int, day: Int?) {
-        gov.finiteNotNow = metric.cal.replace(time: month, component: .week, with: week)
+        gov.finiteNotNow = metric.cal.replace(time: gov.someTimes[1], component: .week, with: week)
         if day != nil { gov.finiteNotNow = metric.cal.replace(time: gov.finiteNotNow!, component: .day, with: day!) }
         gov.scale = day != nil ? .day : .week
     }

@@ -17,13 +17,12 @@ struct YearMetricView: View {
         
         GeometryReader { geo in
             VStack {
-                Button(action: goToEonView) {
-                    HStack {
-                        Text(someTime.yearTxt)
-                        .font(.largeTitle).bold()
-                        .foregroundColor(someTime.year == gov.eternalNow.time.year && someTime.month == gov.eternalNow.time.month ? .metricOrange : .primary)
-                        Spacer()
-                    }
+                HStack {
+                    Text(someTime.yearTxt)
+                    .font(.largeTitle).bold()
+                    .foregroundColor(someTime.year == gov.eternalNow.time.year && someTime.month == gov.eternalNow.time.month ? .metricOrange : .primary)
+                    .onTapGesture(count: 1) { goToEonView() }
+                    Spacer()
                 }
                 .padding(.horizontal)
                 
@@ -31,35 +30,35 @@ struct YearMetricView: View {
                     ForEach(0..<4, id: \.self) { month in
                         VStack {
                             
-                            Button(action: { goToMonthView(month: month) }) {
-                                VStack {
-                                    Divider()
-                                    HStack(alignment: .top) {
-                                        Text("\(month)")
-                                        .bold()
-                                        .foregroundColor(someTime.year == gov.eternalNow.time.year && someTime.month == month ? .metricOrange : .primary)
-                                        
-                                        Spacer()
-                                        
-                                        VStack(spacing: 3) {
-                                            ForEach(0..<10, id: \.self) { week in
-                                                HStack() {
-                                                    ForEach(0..<10, id: \.self) { day in
-                                                        
-                                                        let isLeapYear = metric.cal.isLeapYear(someTime.year)
-                                                        let pastEndOfYear = ((month * 100) + (week * 10) + day) > (isLeapYear ? 364 : 365)
-                                                        RoundedRectangle(cornerRadius: 2)
-                                                            .foregroundColor(someTime.year == gov.eternalNow.time.year && someTime.month == month && someTime.week == week && someTime.day == day ? .metricOrange : .primary)
-                                                            .frame(width: geo.size.width * 0.07, height: 4)
-                                                            .opacity(pastEndOfYear ? 0 : 1)
+                            VStack {
+                                Divider()
+                                HStack(alignment: .top) {
+                                    Text("\(month)")
+                                    .bold()
+                                    .foregroundColor(someTime.year == gov.eternalNow.time.year && someTime.month == month ? .metricOrange : .primary)
+                                    
+                                    Spacer()
+                                    
+                                    VStack(spacing: 3) {
+                                        ForEach(0..<10, id: \.self) { week in
+                                            HStack() {
+                                                ForEach(0..<10, id: \.self) { day in
+                                                    
+                                                    let isLeapYear = metric.cal.isLeapYear(someTime.year)
+                                                    let pastEndOfYear = ((month * 100) + (week * 10) + day) > (isLeapYear ? 364 : 365)
+                                                    RoundedRectangle(cornerRadius: 2)
+                                                        .foregroundColor(someTime.year == gov.eternalNow.time.year && someTime.month == month && someTime.week == week && someTime.day == day ? .metricOrange : .primary)
+                                                        .frame(width: geo.size.width * 0.07, height: 4)
+                                                        .opacity(pastEndOfYear ? 0 : 1)
 
-                                                    }
                                                 }
                                             }
                                         }
                                     }
                                 }
                             }
+                            .onTapGesture(count: 1) { goToMonthView(month: month) }
+                            
                         }
                     }
                 }
