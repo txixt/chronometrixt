@@ -10,13 +10,13 @@ import SwiftUI
 struct EventCreationView: View {
     @Environment(\.modelContext) private var context
     @Binding var gov: Governor
+    @State var endDate: MetrixtTime? = nil
     @State var newEvent: MetricEvent? = nil
     @State var eventTitle: String = ""
     @State var editTitle: Bool = false
     
     
     var body: some View {
-        
         VStack {
             HStack {
                 Image(systemName: "plus")
@@ -48,13 +48,51 @@ struct EventCreationView: View {
                     }
                 }
                 
+                if newEvent != nil {
+                    VStack {
+                        HStack {
+                            Text("event date: \(gov.finiteNotNow!.fullDateTxt)")
+                            Spacer()
+                            Button(action: { editStartDateMetric() }) {
+                                
+                            }
+                            
+                        }
+                    }
+                }
+                
+                
                 Spacer()
             }
         }
         .padding()
+        
+        
+        if gov.finiteNotNow != nil {
+         
+
+            
+        }
+    }
+    
+    private func editStartDateMetric() {
+        
+    }
+    
+    private func editStartDateGreg() {
+        
+    }
+    
+    private func editEndDateMetric() {
+        
+    }
+    
+    private func editEndDateGreg() {
+        
     }
     
     private func finishEditingTitle() {
+        guard !eventTitle.isEmpty else { return }
         if newEvent == nil {
             initializeEvent()
         } else {
@@ -64,6 +102,7 @@ struct EventCreationView: View {
     }
     
     private func initializeEvent() {
+        if gov.finiteNotNow == nil { gov.finiteNotNow = gov.eternalNow.time }
         let handler = EventHandler(modelContext: context)
         do {
             newEvent = try handler.createEvent(title: eventTitle, startTime: gov.finiteNotNow!, sequnece: 0)
