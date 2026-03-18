@@ -12,13 +12,15 @@ import SwiftUI
     var eternalNow: MetrixtEntropy
     var finiteNotNow: MetrixtTime? = nil
     var someTimes: [MetrixtTime] = []
+    var event: MetricEvent?
     var span: ClosedRange<Int>? = nil
     var scale: CalendarScale = .year
     var sheet: SheetView = .none
     var alert: AlertView = .none
+    var errorMessage: String = ""
     enum CalendarScale { case eon, year, month, week, day }
-    enum SheetView { case none, event, timers, settings }
-    enum AlertView { case none, eventCreationError, destroyAllEvents }
+    enum SheetView { case none, makeEvent, showEvent, findEvent, timers, settings }
+    enum AlertView { case none, error, destroyAllEvents }
 
     init() {
         eternalNow = MetrixtEntropy()

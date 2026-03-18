@@ -10,10 +10,8 @@ import SwiftUI
 struct EventCreationView: View {
     @Environment(\.modelContext) private var context
     @Binding var gov: Governor
-    @State var endDate: MetrixtTime? = nil
-    @State var newEvent: MetricEvent? = nil
+    @State var eventGov: EventGovernor? = nil
     @State var eventTitle: String = ""
-    @State var editTitle: Bool = false
     
     
     var body: some View {
@@ -31,33 +29,130 @@ struct EventCreationView: View {
             .font(.largeTitle.bold())
             .foregroundStyle(.primary)
             
-            Divider()
+            ZStack {
+                RoundedRectangle(cornerRadius: 2.5).frame(width: 100, height: 5)
+                Divider()
+            }
+
                 .padding(.bottom)
             
             VStack {
-                if newEvent == nil || editTitle == false {
-                    TextField("event title", text: $eventTitle, prompt: Text("event title"))
-                        .padding()
-                        .background(RoundedRectangle(cornerRadius: 10).fill(.gray))
-                        .onSubmit { finishEditingTitle() }
-                } else {
-                    Button(action: { editTitle = true }) {
-                        Text(newEvent!.title)
-                            .font(.title)
-                            .bold()
+                if eventGov == nil || eventGov!.editTitle == true {
+                    VStack(alignment: .leading) {
+
+                        Text("event title:")
+                        TextField("event title", text: $eventTitle, prompt: Text("event title"))
+                            .padding()
+                            .background(RoundedRectangle(cornerRadius: 10).fill(.gray))
+                            .onSubmit { finishEditingTitle() }
                     }
+                } else if eventGov != nil {
+                    Button(action: { eventGov!.editTitle = true }) {
+                        HStack {
+                            Text(eventGov!.title)
+                                .font(.title)
+                                .bold()
+                            Spacer()
+                        }
+                        .foregroundColor(.primary)
+                    }
+                    .padding(.bottom)
                 }
                 
-                if newEvent != nil {
+                if eventGov != nil {
                     VStack {
-                        HStack {
-                            Text("event date: \(gov.finiteNotNow!.fullDateTxt)")
-                            Spacer()
-                            Button(action: { editStartDateMetric() }) {
-                                
+                        
+                        ZStack {
+                            
+                            Divider()
+                            
+                            HStack {
+                                VStack(alignment: .leading) {
+                                    Text("metric event date:")
+                                        .font(.caption)
+                                    Text(gov.finiteNotNow!.fullDateTxt)
+                                        .font(.title3)
+                                        .bold()
+                                }
+
+                                Spacer()
+                                Button(action: { editStartDateMetric() }) {
+                                    VStack {
+                                        Image(systemName: "wrench.adjustable.fill")
+                                            .font(.title2)
+                                            .shadow(color: .gray, radius: 3)
+                                        Text("adjust metrically")
+                                            .font(.caption)
+                                    }
+                                    .foregroundColor(.primary)
+                                    .frame(width: 100, height: 100)
+                                }
                             }
                             
                         }
+                        ZStack {
+                            
+                            Divider()
+                            
+                            HStack {
+                                VStack(alignment: .leading) {
+                                    Text("gregorian event date:")
+                                        .font(.caption)
+                                    Text(gov.finiteNotNow!.toGreg().formatted())
+                                        .font(.title3)
+                                        .bold()
+                                }
+
+                                Spacer()
+                                Button(action: { editStartDateGreg() }) {
+                                    VStack {
+                                        Image(systemName: "wrench.adjustable.fill")
+                                            .scaleEffect(x: -1.0)
+                                            .font(.title2)
+                                            .shadow(color: .gray, radius: 3)
+                                        Text("ye olde adjustments")
+                                            .font(.caption)
+                                    }
+                                    .foregroundColor(.primary)
+                                    .frame(width: 100, height: 100)
+                                }
+                            }
+                            
+                        }
+                        ZStack {
+                            
+                            Divider()
+                            
+                            HStack {
+                                VStack(alignment: .leading) {
+                                    Text(gov.finiteNotNow!.fullDateTxt)
+                                        .font(.title3)
+                                        .bold()
+                                    Text(gov.finiteNotNow!.toGreg().formatted())
+                                        .font(.title3)
+                                        .bold()
+                                }
+
+                                Spacer()
+                                Button(action: { editStartDateGreg() }) {
+                                    VStack {
+                                        ZStack {
+                                            Image(systemName: "clock")
+                                                .foregroundColor(.gray)
+                                            Image(systemName: "checkmark").bold()
+                                        }
+                                        .font(.title2)
+                                        .shadow(color: .gray, radius: 3)
+                                        Text("use this time")
+                                            .font(.caption)
+                                    }
+                                    .foregroundColor(.primary)
+                                    .frame(width: 100, height: 100)
+                                }
+                            }
+                            
+                        }
+
                     }
                 }
                 
@@ -66,13 +161,7 @@ struct EventCreationView: View {
             }
         }
         .padding()
-        
-        
-        if gov.finiteNotNow != nil {
-         
-
-            
-        }
+        .monospaced()
     }
     
     private func editStartDateMetric() {
@@ -93,22 +182,17 @@ struct EventCreationView: View {
     
     private func finishEditingTitle() {
         guard !eventTitle.isEmpty else { return }
-        if newEvent == nil {
+        if eventGov == nil {
             initializeEvent()
         } else {
-            newEvent!.title = eventTitle
-            editTitle = false
+            eventGov!.title = eventTitle
+            eventGov!.editTitle = false
         }
     }
     
     private func initializeEvent() {
         if gov.finiteNotNow == nil { gov.finiteNotNow = gov.eternalNow.time }
-        let handler = EventHandler(modelContext: context)
-        do {
-            newEvent = try handler.createEvent(title: eventTitle, startTime: gov.finiteNotNow!, sequnece: 0)
-        } catch {
-            gov.alert = .eventCreationError
-        }
+        eventGov = EventGovernor(title: eventTitle, starting: gov.finiteNotNow!, ending: metric.cal.update(time: gov.finiteNotNow!, component: .second, byAdding: 1))
     }
 }
 
