@@ -27,6 +27,8 @@ import SwiftUI
     var calendar: String
     var externalId: String
     
+    var editField: EditingFields = .title
+    enum EditingFields { case none, title, startDateMetric, startDateGreg, endDateMetric, endDateGreg, alarms, recurrence, location, notes, calendar, participants }
     var editTitle: Bool = false
     
     init(title: String, starting: MetrixtTime, ending: MetrixtTime?) {
