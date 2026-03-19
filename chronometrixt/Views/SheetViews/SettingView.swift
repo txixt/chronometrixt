@@ -8,7 +8,7 @@
 import SwiftUI
 
 struct SettingsView: View {
-    @Binding var gov: Governor
+    @Bindable var gov: Governor
     
     var body: some View {
         VStack {
@@ -186,5 +186,5 @@ struct SettingsView: View {
 }
 
 #Preview {
-    SettingsView(gov: .constant(Governor()))
+    SettingsView(gov: Governor())
 }

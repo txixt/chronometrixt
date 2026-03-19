@@ -58,8 +58,7 @@ struct TimeControlView: View {
                             }
                             Spacer()
                         }
-                        
-
+                        .onTapGesture(count: 1) { resetGov() }
                         
                         Spacer()
                     }

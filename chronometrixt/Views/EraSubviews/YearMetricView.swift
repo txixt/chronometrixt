@@ -43,12 +43,15 @@ struct YearMetricView: View {
                                         ForEach(0..<10, id: \.self) { week in
                                             HStack() {
                                                 ForEach(0..<10, id: \.self) { day in
-                                                    
+                                                    let isToday = someTime.year == gov.eternalNow.time.year && someTime.month == month && someTime.week == week && someTime.day == day
                                                     let isLeapYear = metric.cal.isLeapYear(someTime.year)
                                                     let pastEndOfYear = ((month * 100) + (week * 10) + day) > (isLeapYear ? 364 : 365)
                                                     RoundedRectangle(cornerRadius: 2)
-                                                        .foregroundColor(someTime.year == gov.eternalNow.time.year && someTime.month == month && someTime.week == week && someTime.day == day ? .metricOrange : .primary)
+                                                        .foregroundColor(isToday ? .metricOrange : .primary)
                                                         .frame(width: geo.size.width * 0.07, height: 4)
+                                                        .shadow(color: isToday ? .metricOrange : .clear, radius: 5)
+                                                        .shadow(color: isToday ? .metricOrange : .clear, radius: 5)
+                                                        .shadow(color: isToday ? .metricOrange : .clear, radius: 5)
                                                         .opacity(pastEndOfYear ? 0 : 1)
 
                                                 }

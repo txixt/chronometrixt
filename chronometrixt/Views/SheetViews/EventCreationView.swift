@@ -9,7 +9,7 @@ import SwiftUI
 
 struct EventCreationView: View {
     @Environment(\.modelContext) private var context
-    @Binding var gov: Governor
+    @Bindable var gov: Governor
     @State var eventGov: EventGovernor? = nil
     @State var eventTitle: String = ""
     
@@ -216,5 +216,5 @@ struct EventLabelView: View {
 }
 
 #Preview {
-    EventCreationView(gov: .constant(Governor()))
+    EventCreationView(gov: Governor())
 }

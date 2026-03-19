@@ -30,10 +30,12 @@ struct WeekMetricView: View {
                     
                     HStack {
                         ForEach(0..<10, id: \.self) { day in
+                            let isToday = someTime.year == gov.eternalNow.time.year && someTime.month == gov.eternalNow.time.month && someTime.week == gov.eternalNow.time.week && someTime.day == day
+                            
                             VStack {
                                 Text("\(day)")
                                     .bold()
-                                    .foregroundColor(someTime.year == gov.eternalNow.time.year && someTime.month == gov.eternalNow.time.month && someTime.week == gov.eternalNow.time.week && someTime.day == day ? .metricOrange : .primary)
+                                    .foregroundColor(isToday ? .metricOrange : .primary)
                                     .onTapGesture(count: 1) { goToDayView(day: day, hour: nil) }
 
                                 ZStack {
@@ -43,7 +45,7 @@ struct WeekMetricView: View {
                                         ForEach(0..<10, id: \.self) { hour in
                                             Text("\(hour)")
                                                 .font(.caption)
-                                                .foregroundColor(.gray)
+                                                .foregroundColor(isToday ? .primary : .gray)
                                                 .onTapGesture(count: 1) { goToDayView(day: day, hour: hour)  }
                                                 .padding(.vertical, 2.5)
                                         }
@@ -52,7 +54,7 @@ struct WeekMetricView: View {
                                     .padding(10)
                                     .padding(.bottom, 3)
                                     .background(RoundedRectangle(cornerRadius: 8)
-                                    .foregroundColor(someTime.year == gov.eternalNow.time.year && someTime.month == gov.eternalNow.time.month && someTime.week == gov.eternalNow.time.week && someTime.day == day ? .metricOrange : .primary).opacity(0.2))
+                                        .foregroundColor(isToday ? .metricOrange : .primary).opacity(isToday ? 0.5 : 0.2))
                                 }
                             }
                             if day != 9 { Spacer() }

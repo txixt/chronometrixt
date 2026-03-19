@@ -8,7 +8,7 @@
 import SwiftUI
 
 struct ErrorAlertView: View {
-    @Binding var gov: Governor
+    @Bindable var gov: Governor
     
     var body: some View {
         if !gov.errorMessage.isEmpty {
@@ -17,13 +17,16 @@ struct ErrorAlertView: View {
                     RoundedRectangle(cornerRadius: 30).fill(.background)
                     VStack {
                         Spacer()
-                        Image(systemName: "ant")
-                            .font(.largeTitle)
+                        ZStack {
+                            Divider()
+                            Image(systemName: "ant")
+                                .font(.largeTitle)
+                        }
                         Spacer()
                         
                         Text(gov.errorMessage)
                         
-                        Button(action: { gov.alert = .none }) {
+                        Button(action: { gov.alert = nil }) {
                             Image(systemName: "plus")
                                 .rotationEffect(Angle(degrees: 45))
                                 .bold()
@@ -32,11 +35,17 @@ struct ErrorAlertView: View {
                     .padding()
                 }
                 .frame(width: geo.size.width * 0.5, height: geo.size.height * 0.5)
+                .task { await lifeIsShort() }
             }
         }
+    }
+    
+    private func lifeIsShort() async {
+        try? await Task.sleep(for: .seconds(2))
+        gov.alert = nil
     }
 }
 
 #Preview {
-    ErrorAlertView(gov: .constant(Governor()))
+    ErrorAlertView(gov: Governor())
 }
