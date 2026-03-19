@@ -17,201 +17,25 @@ struct EventCreationView: View {
     
     var body: some View {
         VStack {
-            HStack {
-                Image(systemName: "plus")
-                Text("new event")
-                Spacer()
-                Button(action: { gov.sheet = .none }) {
-                    Image(systemName: "plus")
-                        .rotationEffect(Angle(degrees: 45))
-                        .shadow(color: .gray, radius: 3)
-                }
-            }
-            .font(.largeTitle.bold())
-            .foregroundStyle(.primary)
-            
-            ZStack {
-                RoundedRectangle(cornerRadius: 2.5).frame(width: 100, height: 5)
-                Divider()
-            }
-            .padding(.bottom)
+            SheetHeaderView(gov: gov, title: "new event", titleImage: "plus")
             
             ScrollView {
                 VStack {
+                    
                     if eventGov == nil {
-                        VStack(alignment: .leading) {
-                            Text("event title:")
-                                .font(.caption2)
-                            TextField("event title", text: $eventTitle, prompt: Text("event title"))
-                                .focused($focus, equals: .initialTitle)
-                                .onChange(of: eventTitle) { _, new in
-                                    if new.count > 42 { eventTitle = String(new.prefix(42)) }
-                                }
-                                .padding()
-                                .background(RoundedRectangle(cornerRadius: 10).fill(.gray.opacity(0.2)))
-                                .onSubmit { focus = nil; finishEditingTitle() }
-                                .padding(.bottom)
-                                .onAppear { focus = .initialTitle }
-                            VStack(alignment: .leading) {
-                                Text("metric:")
-                                Text(gov.finiteNotNow?.fullDateTxt ?? gov.eternalNow.time.fullDateTxt)
-                                    .font(.title2).bold()
-                            }
-                            VStack(alignment: .leading) {
-                                Text("gregorian:")
-                                Text(gov.finiteNotNow?.toGreg().formatted() ?? gov.eternalNow.time.toGreg().formatted())
-                                    .font(.title2).bold()
-                            }
-                        }
+                        EventCreationLandingView(
+                            gov: gov,
+                            eventTitle: $eventTitle,
+                            focus: $focus,
+                            onSubmit: finishEditingTitle)
                     }
                     
                     if eventGov != nil {
-                        if eventGov!.editField != .title {
-                            EventLabelView(eventGov: $eventGov,
-                                           label: nil,
-                                           value: eventGov!.title,
-                                           imageString: "square.and.pencil",
-                                           size: 1,
-                                           titleColor: .green,
-                                           target: .title)
-                            .padding(.bottom)
-                        } else {
-                            TitleEditorView(eventGov: $eventGov)
-                        }
-
-                        if eventGov!.editField != .startDateMetric {
-                            EventLabelView(eventGov: $eventGov,
-                                           label: "metric start: ",
-                                           value: eventGov!.metricStart.fullDateTxt,
-                                           imageString: "wrench",
-                                           size: 2,
-                                           target: .startDateMetric)
-                        } else {
-                            MetricDateEditor(eventGov: $eventGov, target: .startDateMetric)
-                        }
-
-                        if eventGov!.editField != .startDateGreg {
-                            EventLabelView(eventGov: $eventGov,
-                                           label: "gregorian start: ",
-                                           value: eventGov!.metricStart.toGreg().formatted(),
-                                           imageString: "wrench",
-                                           size: 2,
-                                           target: .startDateGreg)
-                            .padding(.bottom)
-                        } else {
-                            GregDateEditor(eventGov: $eventGov, target: .startDateGreg)
-                        }
-                        
-                        if eventGov!.editField != .endDateMetric {
-                            EventLabelView(eventGov: $eventGov,
-                                           label: "metric end: ",
-                                           value: eventGov!.metricEnd.fullDateTxt,
-                                           imageString: "wrench",
-                                           size: 2,
-                                           target: .endDateMetric)
-                        } else {
-                            MetricDateEditor(eventGov: $eventGov, target: .endDateMetric)
-                        }
-
-                        if eventGov!.editField != .endDateGreg {
-                            EventLabelView(eventGov: $eventGov,
-                                           label: "gregorian end: ",
-                                           value: eventGov!.metricEnd.toGreg().formatted(),
-                                           imageString: "wrench",
-                                           size: 2,
-                                           target: .endDateGreg)
-                            .padding(.bottom)
-                        } else {
-                            GregDateEditor(eventGov: $eventGov, target: .endDateGreg)
-                        }
-                        
-                        if eventGov!.editField != .alarms {
-                            EventLabelView(eventGov: $eventGov,
-                                           label: "alarms: ",
-                                           value: eventGov!.alarms.count.description,
-                                           imageString: "slider.horizontal.3",
-                                           size: 4,
-                                           target: .alarms)
-                        } else {
-                            EventAlarmEditor(eventGov: $eventGov)
-                        }
-                        
-                        if eventGov!.editField != .recurrence {
-                            EventLabelView(eventGov: $eventGov,
-                                           label: "recurrence: ",
-                                           value: String("\(eventGov!.recurrence.frequency)"),
-                                           imageString: "slider.horizontal.3",
-                                           size: 4,
-                                           target: .recurrence)
-                            .padding(.bottom)
-                        } else {
-                            EventRecurrenceEditor(eventGov: $eventGov)
-                        }
-                        
-                        if eventGov!.editField != .location {
-                            EventLabelView(eventGov: $eventGov,
-                                           label: "location: ",
-                                           value: eventGov!.location.isEmpty ? "none" : eventGov!.location,
-                                           imageString: "square.and.pencil",
-                                           size: 4,
-                                           target: .location)
-                        } else {
-                            EventLocationEditor(eventGov: $eventGov)
-                        }
-                        
-                        if eventGov!.editField != .notes {
-                            EventLabelView(eventGov: $eventGov,
-                                           label: "notes: ",
-                                           value: eventGov!.notes.isEmpty ? "none" : eventGov!.notes,
-                                           imageString: "square.and.pencil",
-                                           size: 4,
-                                           target: .notes)
-                            .padding(.bottom)
-                        } else {
-                            EventNotesEditor(eventGov: $eventGov)
-                        }
-                        
-                        if eventGov!.editField != .calendar {
-                            EventLabelView(eventGov: $eventGov,
-                                           label: "calendar: ",
-                                           value: eventGov!.calendar.isEmpty ? "none" : eventGov!.calendar,
-                                           imageString: "slider.horizontal.3",
-                                           size: 4,
-                                           labelColor: .gray,
-                                           target: .calendar)
-                        } else {
-                            EventCalendarEditor(eventGov: $eventGov)
-                        }
-                        
-                        if eventGov!.editField != .participants {
-                            EventLabelView(eventGov: $eventGov,
-                                           label: "participants: ",
-                                           value: eventGov!.participants.isEmpty ? "none" : "\(eventGov!.participants.count)",
-                                           imageString: "square.and.pencil",
-                                           size: 4,
-                                           labelColor: .gray,
-                                           target: .participants)
-                            .padding(.bottom)
-                        } else {
-                            EventParticipantEditor(eventGov: $eventGov)
-                        }
-                        
-                        Spacer()
-                        
-                        Button(action: { saveEvent() }) {
-                            HStack {
-                                Spacer()
-                                Image(systemName: "square.and.arrow.down")
-                                Text("save")
-                                Spacer()
-                            }
-                            .foregroundColor(.black)
-                            .padding(10)
-                            .background(RoundedRectangle(cornerRadius: 10).fill(.metricOrange))
-                        }
+                        EventEditMainView(gov: gov, eventGov: eventGov!)
                     } else {
                         Spacer()
                     }
+                    
                 }
             }
         }
@@ -228,12 +52,6 @@ struct EventCreationView: View {
         }
     }
     
-    private func saveEvent() {
-        guard let eg = eventGov else { return }
-        let handler = EventHandler(modelContext: context)
-        eg.itsADate(handler: handler, gov: gov)
-    }
-    
     private func initializeEvent() {
         if gov.finiteNotNow == nil { gov.finiteNotNow = gov.eternalNow.time }
         eventGov = EventGovernor(
@@ -242,135 +60,137 @@ struct EventCreationView: View {
             ending: metric.cal.update(time: gov.finiteNotNow!, component: .second, byAdding: 1)
         )
     }
+//    
+//    private func saveEvent() {
+//        guard let eg = eventGov else { return }
+//        let handler = EventHandler(modelContext: context)
+//        eg.itsADate(handler: handler, gov: gov)
+//    }
 }
 
-struct EventLabelView: View {
-    @Binding var eventGov: EventGovernor?
-    var label: String?
-    var value: String
-    var imageString: String
-    var size: Int
-    var titleColor: Color? = nil
-    var labelColor: Color? = nil
-    var target: EventGovernor.EditingFields
-    
-    var body: some View {
-        VStack(alignment: .leading, spacing: 0) {
-            if label != nil {
-                Text(label!)
-                    .font(.caption2)
-            }
-            ZStack {
-                Divider()
-                HStack {
-                    Text(value)
-                        .font(size == 1 ? .title : size == 2 ? .title2 : size == 3 ? .title3 : .default)
-                        .foregroundStyle(labelColor != nil ? labelColor! : titleColor ?? .primary)
-                        .bold()
-                    Spacer()
-                    Button(action: { eventGov!.editField = target }) {
-                        Image(systemName: imageString)
-                    }
-                    .shadow(color: .gray, radius: 3)
-                }
-            }
-        }
-        .foregroundColor(labelColor ?? .primary)
-    }
-}
+//struct EventLabelView: View {
+//    @Binding var eventGov: EventGovernor
+//    var label: String?
+//    var value: String
+//    var imageString: String
+//    var size: Int
+//    var titleColor: Color? = nil
+//    var labelColor: Color? = nil
+//    var target: EventGovernor.EditingFields
+//    
+//    var body: some View {
+//        VStack(alignment: .leading, spacing: 0) {
+//            if label != nil {
+//                Text(label!)
+//                    .font(.caption2)
+//            }
+//            ZStack {
+//                Divider()
+//                HStack {
+//                    Text(value)
+//                        .font(size == 1 ? .title : size == 2 ? .title2 : size == 3 ? .title3 : .default)
+//                        .foregroundStyle(labelColor != nil ? labelColor! : titleColor ?? .primary)
+//                        .bold()
+//                    Spacer()
+//                    Button(action: { eventGov.editField = target }) {
+//                        Image(systemName: imageString)
+//                    }
+//                    .shadow(color: .gray, radius: 3)
+//                }
+//            }
+//        }
+//        .foregroundColor(labelColor ?? .primary)
+//    }
+//}
 
 // MARK: - Title Editor
 
 struct TitleEditorView: View {
-    @Binding var eventGov: EventGovernor?
+    @Bindable var eventGov: EventGovernor
     @FocusState private var isFocused: Bool
     
     var body: some View {
-        if let eg = eventGov {
-            VStack(alignment: .leading, spacing: 4) {
-                Text("title:")
-                    .font(.caption2)
-                HStack {
-                    TextField("event title", text: Binding(
-                        get: { eg.title },
-                        set: { eg.title = String($0.prefix(42)) }
-                    ))
-                    .focused($isFocused)
-                    .onSubmit { isFocused = false; eg.editField = .none }
-                    .padding(8)
-                    .background(RoundedRectangle(cornerRadius: 8).fill(.gray.opacity(0.2)))
-                    Button(action: { isFocused = false; eg.editField = .none }) {
-                        Image(systemName: "checkmark")
-                            .bold()
-                    }
+        VStack(alignment: .leading, spacing: 4) {
+            Text("title:")
+                .font(.caption2)
+            HStack {
+                TextField("event title", text: Binding(
+                    get: { eventGov.title },
+                    set: { eventGov.title = String($0.prefix(42)) }
+                ))
+                .focused($isFocused)
+                .onSubmit { isFocused = false; eventGov.editField = .none }
+                .padding(8)
+                .background(RoundedRectangle(cornerRadius: 8).fill(.gray.opacity(0.2)))
+                Button(action: { isFocused = false; eventGov.editField = .none }) {
+                    Image(systemName: "checkmark")
+                        .bold()
                 }
             }
-            .padding(.bottom)
-            .onAppear { isFocused = true }
         }
+        .padding(.bottom)
+        .onAppear { isFocused = true }
     }
 }
 
 // MARK: - Metric Date Editor
 
 struct MetricDateEditor: View {
-    @Binding var eventGov: EventGovernor?
+    @Bindable var eg: EventGovernor
     var target: EventGovernor.EditingFields
     
     var body: some View {
-        if let eg = eventGov {
-            let isStart = (target == .startDateMetric)
-            let time = isStart ? eg.metricStart : eg.metricEnd
+        let isStart = (target == .startDateMetric)
+        let time = isStart ? eg.metricStart : eg.metricEnd
+        
+        VStack(alignment: .leading, spacing: 4) {
+            Text(isStart ? "metric start:" : "metric end:")
+                .font(.caption2)
             
-            VStack(alignment: .leading, spacing: 4) {
-                Text(isStart ? "metric start:" : "metric end:")
-                    .font(.caption2)
-                
-                HStack(spacing: 4) {
-                    // Year stepper
-                    MetricStepperCell(label: "Y", value: time.year, range: 0...99999) { v in
-                        applyComponent(eg: eg, isStart: isStart, year: v)
-                    }
-                    Text(".").bold()
-                    // Month 0-3
-                    MetricStepperCell(label: "M", value: time.month, range: 0...3) { v in
-                        applyComponent(eg: eg, isStart: isStart, month: v)
-                    }
-                    Text(":").bold()
-                    // Week 0-9 or 0-5
-                    MetricStepperCell(label: "W", value: time.week, range: 0...eg.maxWeek(forMonth: time.month)) { v in
-                        applyComponent(eg: eg, isStart: isStart, week: v)
-                    }
-                    Text(":").bold()
-                    // Day
-                    MetricStepperCell(label: "D", value: time.day, range: 0...eg.maxDay(forMonth: time.month, week: time.week, year: time.year)) { v in
-                        applyComponent(eg: eg, isStart: isStart, day: v)
-                    }
+            HStack(spacing: 4) {
+                // Year stepper
+                MetricStepperCell(label: "Y", value: time.year, range: 0...99999) { v in
+                    applyComponent(eg: eg, isStart: isStart, year: v)
                 }
-                
-                HStack(spacing: 4) {
-                    // Hour 0-9
-                    MetricStepperCell(label: "H", value: time.hour, range: 0...9) { v in
-                        applyComponent(eg: eg, isStart: isStart, hour: v)
-                    }
-                    Text(":").bold()
-                    // Minute 0-99
-                    MetricStepperCell(label: "Mi", value: time.minute, range: 0...99) { v in
-                        applyComponent(eg: eg, isStart: isStart, minute: v)
-                    }
-                    Text(":").bold()
-                    // Second 0-99
-                    MetricStepperCell(label: "Se", value: time.second, range: 0...99) { v in
-                        applyComponent(eg: eg, isStart: isStart, second: v)
-                    }
-                    Spacer()
-                    Button(action: { eg.editField = .none }) {
-                        Image(systemName: "checkmark").bold()
-                    }
+                Text(".").bold()
+                // Month 0-3
+                MetricStepperCell(label: "M", value: time.month, range: 0...3) { v in
+                    applyComponent(eg: eg, isStart: isStart, month: v)
+                }
+                Text(":").bold()
+                // Week 0-9 or 0-5
+                MetricStepperCell(label: "W", value: time.week, range: 0...eg.maxWeek(forMonth: time.month)) { v in
+                    applyComponent(eg: eg, isStart: isStart, week: v)
+                }
+                Text(":").bold()
+                // Day
+                MetricStepperCell(label: "D", value: time.day, range: 0...eg.maxDay(forMonth: time.month, week: time.week, year: time.year)) { v in
+                    applyComponent(eg: eg, isStart: isStart, day: v)
                 }
             }
-            .padding(.bottom)
+            
+            HStack(spacing: 4) {
+                // Hour 0-9
+                MetricStepperCell(label: "H", value: time.hour, range: 0...9) { v in
+                    applyComponent(eg: eg, isStart: isStart, hour: v)
+                }
+                Text(":").bold()
+                // Minute 0-99
+                MetricStepperCell(label: "Mi", value: time.minute, range: 0...99) { v in
+                    applyComponent(eg: eg, isStart: isStart, minute: v)
+                }
+                Text(":").bold()
+                // Second 0-99
+                MetricStepperCell(label: "Se", value: time.second, range: 0...99) { v in
+                    applyComponent(eg: eg, isStart: isStart, second: v)
+                }
+                Spacer()
+                Button(action: { eg.editField = .none }) {
+                    Image(systemName: "checkmark").bold()
+                }
+            }
         }
+        .padding(.bottom)
     }
     
     private func applyComponent(
@@ -427,37 +247,35 @@ struct MetricStepperCell: View {
 // MARK: - Gregorian Date Editor
 
 struct GregDateEditor: View {
-    @Binding var eventGov: EventGovernor?
+    @Bindable var eventGov: EventGovernor
     var target: EventGovernor.EditingFields
     
     var body: some View {
-        if let eg = eventGov {
-            let isStart = (target == .startDateGreg)
-            
-            VStack(alignment: .leading, spacing: 4) {
-                Text(isStart ? "gregorian start:" : "gregorian end:")
-                    .font(.caption2)
-                HStack {
-                    DatePicker("", selection: isStart
-                               ? Binding(get: { eg.gregStart }, set: { eg.gregStart = $0; eg.syncStartFromGreg() })
-                               : Binding(get: { eg.gregEnd }, set: { eg.gregEnd = $0; eg.syncEndFromGreg() }),
-                               displayedComponents: [.date, .hourAndMinute])
-                    .labelsHidden()
-                    Spacer()
-                    Button(action: { eg.editField = .none }) {
-                        Image(systemName: "checkmark").bold()
-                    }
+        let isStart = (target == .startDateGreg)
+        
+        VStack(alignment: .leading, spacing: 4) {
+            Text(isStart ? "gregorian start:" : "gregorian end:")
+                .font(.caption2)
+            HStack {
+                DatePicker("", selection: isStart
+                           ? Binding(get: { eventGov.gregStart }, set: { eventGov.gregStart = $0; eventGov.syncStartFromGreg() })
+                           : Binding(get: { eventGov.gregEnd }, set: { eventGov.gregEnd = $0; eventGov.syncEndFromGreg() }),
+                           displayedComponents: [.date, .hourAndMinute])
+                .labelsHidden()
+                Spacer()
+                Button(action: { eventGov.editField = .none }) {
+                    Image(systemName: "checkmark").bold()
                 }
             }
-            .padding(.bottom)
         }
+        .padding(.bottom)
     }
 }
 
 // MARK: - Alarm Editor
 
 struct EventAlarmEditor: View {
-    @Binding var eventGov: EventGovernor?
+    @Bindable var eg: EventGovernor
     
     private let offsets: [(String, TimeInterval)] = [
         ("none", 0),
@@ -470,46 +288,43 @@ struct EventAlarmEditor: View {
     ]
     
     var body: some View {
-        if let eg = eventGov {
-            VStack(alignment: .leading, spacing: 4) {
-                Text("alarms:")
-                    .font(.caption2)
-                Picker("alarm", selection: Binding(
-                    get: { eg.alarms.first?.offset ?? -1 },
-                    set: { newVal in
-                        if newVal < 0 {
-                            eg.alarms = []
-                        } else {
-                            eg.alarms = [EventAlarm(id: UUID().uuidString, offset: newVal, type: .notification)]
-                        }
-                    }
-                )) {
-                    Text("none").tag(TimeInterval(-1))
-                    ForEach(offsets.dropFirst(), id: \.1) { name, val in
-                        Text(name).tag(val)
+        VStack(alignment: .leading, spacing: 4) {
+            Text("alarms:")
+                .font(.caption2)
+            Picker("alarm", selection: Binding(
+                get: { eg.alarms.first?.offset ?? -1 },
+                set: { newVal in
+                    if newVal < 0 {
+                        eg.alarms = []
+                    } else {
+                        eg.alarms = [EventAlarm(id: UUID().uuidString, offset: newVal, type: .notification)]
                     }
                 }
-                .labelsHidden()
-                
-                HStack {
-                    Spacer()
-                    Button(action: { eg.editField = .none }) {
-                        Image(systemName: "checkmark").bold()
-                    }
+            )) {
+                Text("none").tag(TimeInterval(-1))
+                ForEach(offsets.dropFirst(), id: \.1) { name, val in
+                    Text(name).tag(val)
                 }
             }
-            .padding(.bottom)
+            .labelsHidden()
+            
+            HStack {
+                Spacer()
+                Button(action: { eg.editField = .none }) {
+                    Image(systemName: "checkmark").bold()
+                }
+            }
         }
+        .padding(.bottom)
     }
 }
 
 // MARK: - Recurrence Editor
 
 struct EventRecurrenceEditor: View {
-    @Binding var eventGov: EventGovernor?
+    @Bindable var eg: EventGovernor
     
     var body: some View {
-        if let eg = eventGov {
             VStack(alignment: .leading, spacing: 4) {
                 Text("recurrence:")
                     .font(.caption2)
@@ -540,19 +355,17 @@ struct EventRecurrenceEditor: View {
                 }
             }
             .padding(.bottom)
-        }
     }
 }
 
 // MARK: - Location Editor
 
 struct EventLocationEditor: View {
-    @Binding var eventGov: EventGovernor?
+    @Bindable var eg: EventGovernor
     @FocusState private var isFocused: Bool
     
     var body: some View {
-        if let eg = eventGov {
-            VStack(alignment: .leading, spacing: 4) {
+        VStack(alignment: .leading, spacing: 4) {
                 Text("location:")
                     .font(.caption2)
                 HStack {
@@ -571,18 +384,16 @@ struct EventLocationEditor: View {
             }
             .padding(.bottom)
             .onAppear { isFocused = true }
-        }
     }
 }
 
 // MARK: - Notes Editor
 
 struct EventNotesEditor: View {
-    @Binding var eventGov: EventGovernor?
+    @Bindable var eg: EventGovernor
     @FocusState private var isFocused: Bool
     
     var body: some View {
-        if let eg = eventGov {
             VStack(alignment: .leading, spacing: 4) {
                 Text("notes:")
                     .font(.caption2)
@@ -603,17 +414,15 @@ struct EventNotesEditor: View {
             }
             .padding(.bottom)
             .onAppear { isFocused = true }
-        }
     }
 }
 
 // MARK: - Calendar Editor (placeholder)
 
 struct EventCalendarEditor: View {
-    @Binding var eventGov: EventGovernor?
+    @Bindable var eg: EventGovernor
     
     var body: some View {
-        if let eg = eventGov {
             VStack(alignment: .leading, spacing: 4) {
                 Text("calendar:")
                     .font(.caption2)
@@ -630,17 +439,15 @@ struct EventCalendarEditor: View {
                 }
             }
             .padding(.bottom)
-        }
     }
 }
 
 // MARK: - Participant Editor (placeholder)
 
 struct EventParticipantEditor: View {
-    @Binding var eventGov: EventGovernor?
+    @Bindable var eg: EventGovernor
     
     var body: some View {
-        if let eg = eventGov {
             VStack(alignment: .leading, spacing: 4) {
                 Text("participants:")
                     .font(.caption2)
@@ -654,10 +461,154 @@ struct EventParticipantEditor: View {
                 }
             }
             .padding(.bottom)
-        }
     }
 }
 
 #Preview {
     EventCreationView(gov: Governor())
 }
+
+
+//                        if eventGov!.editField != .title {
+//                            EventLabelView(eventGov: $eventGov,
+//                                           label: nil,
+//                                           value: eventGov!.title,
+//                                           imageString: "square.and.pencil",
+//                                           size: 1,
+//                                           titleColor: .green,
+//                                           target: .title)
+//                            .padding(.bottom)
+//                        } else {
+//                            TitleEditorView(eventGov: $eventGov)
+//                        }
+//
+//                        if eventGov!.editField != .startDateMetric {
+//                            EventLabelView(eventGov: $eventGov,
+//                                           label: "metric start: ",
+//                                           value: eventGov!.metricStart.fullDateTxt,
+//                                           imageString: "wrench",
+//                                           size: 2,
+//                                           target: .startDateMetric)
+//                        } else {
+//                            MetricDateEditor(eventGov: $eventGov, target: .startDateMetric)
+//                        }
+//
+//                        if eventGov!.editField != .startDateGreg {
+//                            EventLabelView(eventGov: $eventGov,
+//                                           label: "gregorian start: ",
+//                                           value: eventGov!.metricStart.toGreg().formatted(),
+//                                           imageString: "wrench",
+//                                           size: 2,
+//                                           target: .startDateGreg)
+//                            .padding(.bottom)
+//                        } else {
+//                            GregDateEditor(eventGov: $eventGov, target: .startDateGreg)
+//                        }
+//
+//                        if eventGov!.editField != .endDateMetric {
+//                            EventLabelView(eventGov: $eventGov,
+//                                           label: "metric end: ",
+//                                           value: eventGov!.metricEnd.fullDateTxt,
+//                                           imageString: "wrench",
+//                                           size: 2,
+//                                           target: .endDateMetric)
+//                        } else {
+//                            MetricDateEditor(eventGov: $eventGov, target: .endDateMetric)
+//                        }
+//
+//                        if eventGov!.editField != .endDateGreg {
+//                            EventLabelView(eventGov: $eventGov,
+//                                           label: "gregorian end: ",
+//                                           value: eventGov!.metricEnd.toGreg().formatted(),
+//                                           imageString: "wrench",
+//                                           size: 2,
+//                                           target: .endDateGreg)
+//                            .padding(.bottom)
+//                        } else {
+//                            GregDateEditor(eventGov: $eventGov, target: .endDateGreg)
+//                        }
+//
+//                        if eventGov!.editField != .alarms {
+//                            EventLabelView(eventGov: $eventGov,
+//                                           label: "alarms: ",
+//                                           value: eventGov!.alarms.count.description,
+//                                           imageString: "slider.horizontal.3",
+//                                           size: 4,
+//                                           target: .alarms)
+//                        } else {
+//                            EventAlarmEditor(eventGov: $eventGov)
+//                        }
+//
+//                        if eventGov!.editField != .recurrence {
+//                            EventLabelView(eventGov: $eventGov,
+//                                           label: "recurrence: ",
+//                                           value: String("\(eventGov!.recurrence.frequency)"),
+//                                           imageString: "slider.horizontal.3",
+//                                           size: 4,
+//                                           target: .recurrence)
+//                            .padding(.bottom)
+//                        } else {
+//                            EventRecurrenceEditor(eventGov: $eventGov)
+//                        }
+//
+//                        if eventGov!.editField != .location {
+//                            EventLabelView(eventGov: $eventGov,
+//                                           label: "location: ",
+//                                           value: eventGov!.location.isEmpty ? "none" : eventGov!.location,
+//                                           imageString: "square.and.pencil",
+//                                           size: 4,
+//                                           target: .location)
+//                        } else {
+//                            EventLocationEditor(eventGov: $eventGov)
+//                        }
+//
+//                        if eventGov!.editField != .notes {
+//                            EventLabelView(eventGov: $eventGov,
+//                                           label: "notes: ",
+//                                           value: eventGov!.notes.isEmpty ? "none" : eventGov!.notes,
+//                                           imageString: "square.and.pencil",
+//                                           size: 4,
+//                                           target: .notes)
+//                            .padding(.bottom)
+//                        } else {
+//                            EventNotesEditor(eventGov: $eventGov)
+//                        }
+//
+//                        if eventGov!.editField != .calendar {
+//                            EventLabelView(eventGov: $eventGov,
+//                                           label: "calendar: ",
+//                                           value: eventGov!.calendar.isEmpty ? "none" : eventGov!.calendar,
+//                                           imageString: "slider.horizontal.3",
+//                                           size: 4,
+//                                           labelColor: .gray,
+//                                           target: .calendar)
+//                        } else {
+//                            EventCalendarEditor(eventGov: $eventGov)
+//                        }
+//
+//                        if eventGov!.editField != .participants {
+//                            EventLabelView(eventGov: $eventGov,
+//                                           label: "participants: ",
+//                                           value: eventGov!.participants.isEmpty ? "none" : "\(eventGov!.participants.count)",
+//                                           imageString: "square.and.pencil",
+//                                           size: 4,
+//                                           labelColor: .gray,
+//                                           target: .participants)
+//                            .padding(.bottom)
+//                        } else {
+//                            EventParticipantEditor(eventGov: $eventGov)
+//                        }
+//
+//                        Spacer()
+//
+//                        Button(action: { saveEvent() }) {
+//                            HStack {
+//                                Spacer()
+//                                Image(systemName: "square.and.arrow.down")
+//                                Text("save")
+//                                Spacer()
+//                            }
+//                            .foregroundColor(.black)
+//                            .padding(10)
+//                            .background(RoundedRectangle(cornerRadius: 10).fill(.metricOrange))
+//                        }
