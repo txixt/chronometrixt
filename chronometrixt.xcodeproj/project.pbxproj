@@ -10,6 +10,7 @@
 		C1501DB12F20853B00521DF6 /* WidgetKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = C1501DB02F20853B00521DF6 /* WidgetKit.framework */; };
 		C1501DB32F20853B00521DF6 /* SwiftUI.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = C1501DB22F20853B00521DF6 /* SwiftUI.framework */; };
 		C1501DC22F20853C00521DF6 /* MetricWatchWidgitExtension.appex in Embed Foundation Extensions */ = {isa = PBXBuildFile; fileRef = C1501DAE2F20853B00521DF6 /* MetricWatchWidgitExtension.appex */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
+		C1881C782F6BD5A10008B2FE /* README.md in Resources */ = {isa = PBXBuildFile; fileRef = C1881C772F6BD5A10008B2FE /* README.md */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -41,6 +42,7 @@
 		C1501DAE2F20853B00521DF6 /* MetricWatchWidgitExtension.appex */ = {isa = PBXFileReference; explicitFileType = "wrapper.app-extension"; includeInIndex = 0; path = MetricWatchWidgitExtension.appex; sourceTree = BUILT_PRODUCTS_DIR; };
 		C1501DB02F20853B00521DF6 /* WidgetKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = WidgetKit.framework; path = System/Library/Frameworks/WidgetKit.framework; sourceTree = SDKROOT; };
 		C1501DB22F20853B00521DF6 /* SwiftUI.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = SwiftUI.framework; path = System/Library/Frameworks/SwiftUI.framework; sourceTree = SDKROOT; };
+		C1881C772F6BD5A10008B2FE /* README.md */ = {isa = PBXFileReference; lastKnownFileType = net.daringfireball.markdown; path = README.md; sourceTree = "<group>"; };
 		C1E7322B2F0B39C600B3A639 /* watchixt Watch App.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "watchixt Watch App.app"; sourceTree = BUILT_PRODUCTS_DIR; };
 /* End PBXFileReference section */
 
@@ -67,6 +69,7 @@
 				ControlView.swift,
 				DayScrollView.swift,
 				FunctionalScrollView.swift,
+				Item.swift,
 				MetricCalendarView.swift,
 				MonthScrollView.swift,
 				MonthSubScrollView.swift,
@@ -90,6 +93,7 @@
 				ControlView.swift,
 				DayScrollView.swift,
 				FunctionalScrollView.swift,
+				Item.swift,
 				MetricCalendarView.swift,
 				MonthScrollView.swift,
 				MonthSubScrollView.swift,
@@ -160,6 +164,7 @@
 		C1362A0A2F0496A500F2B467 = {
 			isa = PBXGroup;
 			children = (
+				C1881C772F6BD5A10008B2FE /* README.md */,
 				C1E64CD32F66219400059B84 /* depricated */,
 				C1362A152F0496A500F2B467 /* chronometrixt */,
 				C1E7322F2F0B39C600B3A639 /* watchixt Watch App */,
@@ -314,6 +319,7 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				C1881C782F6BD5A10008B2FE /* README.md in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

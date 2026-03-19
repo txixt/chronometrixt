@@ -10,8 +10,8 @@ import SwiftData
 
 struct ContentView: View {
     @Environment(\.scenePhase) private var scene
-    @Environment(\.modelContext) private var context
-    @Query private var items: [Item]
+//    @Environment(\.modelContext) private var context
+    @Query private var items: [MetricEvent]
     @State var gov: Governor = Governor()
     
     var body: some View {
@@ -35,7 +35,7 @@ struct ContentView: View {
 
 #Preview {
     ContentView()
-        .modelContainer(for: Item.self, inMemory: true)
+//        .modelContainer(for: MetricEvent.self, inMemory: true)
 }
 
 //#if os(watchOS)

@@ -27,9 +27,49 @@ import SwiftUI
     var calendar: String
     var externalId: String
     
-    var editField: EditingFields = .title
+    var editField: EditingFields = .none
     enum EditingFields { case none, title, startDateMetric, startDateGreg, endDateMetric, endDateGreg, alarms, recurrence, location, notes, calendar, participants }
-    var editTitle: Bool = false
+    
+    // MARK: - Metric Date Picker Ranges
+    
+    /// Weeks in a given month: months 0-2 have 10 weeks (0-9), month 3 has 6 (0-5)
+    func maxWeek(forMonth month: Int) -> Int {
+        month < 3 ? 9 : 5
+    }
+    
+    /// Days in a given week: normally 0-9, except month 3 week 5 is the partial stub
+    func maxDay(forMonth month: Int, week: Int, year: Int) -> Int {
+        if month == 3 && week == 5 {
+            return metric.cal.isLeapYear(year) ? 4 : 3
+        }
+        return 9
+    }
+    
+    // MARK: - Start/End Sync
+    
+    /// After changing a metric start component, rebuild metricStart and sync gregStart
+    func updateMetricStart(year: Int, month: Int, week: Int, day: Int, hour: Int, minute: Int, second: Int) {
+        let secs = month * 10_000_000 + week * 1_000_000 + day * 100_000 + hour * 10_000 + minute * 100 + second
+        metricStart = MetrixtTime(years: year, seconds: secs)
+        gregStart = metricStart.toGreg()
+    }
+    
+    /// After changing a metric end component, rebuild metricEnd and sync gregEnd
+    func updateMetricEnd(year: Int, month: Int, week: Int, day: Int, hour: Int, minute: Int, second: Int) {
+        let secs = month * 10_000_000 + week * 1_000_000 + day * 100_000 + hour * 10_000 + minute * 100 + second
+        metricEnd = MetrixtTime(years: year, seconds: secs)
+        gregEnd = metricEnd.toGreg()
+    }
+    
+    /// After changing gregStart via DatePicker, rebuild metricStart
+    func syncStartFromGreg() {
+        metricStart = MetrixtTime(date: gregStart)
+    }
+    
+    /// After changing gregEnd via DatePicker, rebuild metricEnd
+    func syncEndFromGreg() {
+        metricEnd = MetrixtTime(date: gregEnd)
+    }
     
     init(title: String, starting: MetrixtTime, ending: MetrixtTime?) {
         self.id = ""
