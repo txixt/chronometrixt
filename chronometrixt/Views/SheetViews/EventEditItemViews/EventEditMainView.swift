@@ -55,7 +55,7 @@ struct EventEditMainView: View {
                     if eventGov.editField != .endDateMetric {
                         EventLabelView(eventGov: eventGov,
                                        label: "metric end: ",
-                                       value: eventGov.metricEnd.fullDateTxt,
+                                       value: eventGov.isAllDay ? "all day" : eventGov.metricEnd.fullDateTxt,
                                        imageString: "wrench",
                                        size: 2,
                                        target: .endDateMetric)
@@ -66,7 +66,7 @@ struct EventEditMainView: View {
                     if eventGov.editField != .endDateGreg {
                         EventLabelView(eventGov: eventGov,
                                        label: "gregorian end: ",
-                                       value: eventGov.metricEnd.toGreg().formatted(),
+                                       value: eventGov.isAllDay ? "all day" : eventGov.metricEnd.toGreg().formatted(),
                                        imageString: "wrench",
                                        size: 2,
                                        target: .endDateGreg)
@@ -79,11 +79,11 @@ struct EventEditMainView: View {
                         EventLabelView(eventGov: eventGov,
                                        label: "alarms: ",
                                        value: eventGov.alarms.count.description,
-                                       imageString: "slider.horizontal.3",
+                                       imageString: eventGov.alarms.isEmpty ? "bell" : "bell.fill",
                                        size: 4,
                                        target: .alarms)
                     } else {
-                        EventAlarmEditor(eg: eventGov)
+                        EventAlarmEditorView(eg: eventGov)
                     }
                     
                     if eventGov.editField != .recurrence {
@@ -151,7 +151,6 @@ struct EventEditMainView: View {
                 Spacer()
 
             }
-            
             
             VStack {
                 Spacer()

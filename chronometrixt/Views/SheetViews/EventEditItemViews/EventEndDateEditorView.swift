@@ -58,15 +58,6 @@ struct EventEndDateEditorView: View {
                     }
                     Spacer()
                 }
-//                HStack {
-//                    VStack(alignment: .leading) {
-//                        Text("gregorian equivalent: ")
-//                            .font(.caption)
-//                        Text(eg.isAllDay ? "all day" : eg.gregEnd.formatted())
-//                            .bold()
-//                    }
-//                    Spacer()
-//                }
                 .padding(.bottom)
                 
                 HStack {

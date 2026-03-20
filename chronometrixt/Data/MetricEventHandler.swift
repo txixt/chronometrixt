@@ -807,7 +807,7 @@ struct EventParticipant: Codable, Identifiable, Sendable {
     }
 }
 
-struct EventAlarm: Codable, Identifiable, Sendable {
+struct EventAlarm: Codable, Identifiable, Sendable, Hashable {
     var id: String
     var offset: TimeInterval // seconds before event
     var type: AlarmType
