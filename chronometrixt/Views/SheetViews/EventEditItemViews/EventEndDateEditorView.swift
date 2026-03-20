@@ -15,6 +15,7 @@ struct EventEndDateEditorView: View {
     
     var body: some View {
         if !goGranular {
+            
             VStack {
                 MetrixtSubdivider()
                 HStack {
@@ -57,30 +58,32 @@ struct EventEndDateEditorView: View {
                     }
                     Spacer()
                 }
-                HStack {
-                    VStack(alignment: .leading) {
-                        Text("gregorian equivalent: ")
-                            .font(.caption)
-                        Text(eg.isAllDay ? "all day" : eg.gregEnd.formatted())
-                            .bold()
-                    }
-                    Spacer()
-                }
+//                HStack {
+//                    VStack(alignment: .leading) {
+//                        Text("gregorian equivalent: ")
+//                            .font(.caption)
+//                        Text(eg.isAllDay ? "all day" : eg.gregEnd.formatted())
+//                            .bold()
+//                    }
+//                    Spacer()
+//                }
                 .padding(.bottom)
                 
                 HStack {
                     SubmitButtonView(imageString: "arrow.trianglehead.counterclockwise", text: "reset", action: reset
                     )
                     .opacity(0.8)
-                    SubmitButtonView(imageString: "calendar.day.timeline.left", text: "set specific end", action: { eg.editField = .none })
+                    SubmitButtonView(imageString: "calendar.day.timeline.left", text: "set specific end", action: { goGranular = true })
                     .opacity(0.8)
-                    SubmitButtonView(imageString: "checkmark", text: "done", action: { goGranular = true })
+                    SubmitButtonView(imageString: "checkmark", text: "done", action: { eg.editField = .none })
                 }
                 .padding(.bottom)
                 
                 MetrixtSubdivider()
             }
             .monospaced()
+            .onDisappear { goGranular = false }
+            
         } else {
             EventMetricDateEditorView(gov: gov, eg: eg, target: .endDateMetric)
         }
@@ -89,6 +92,7 @@ struct EventEndDateEditorView: View {
     
     private func reset() {
         eg.metricEnd = metric.cal.update(time: eg.metricStart, component: .second, byAdding: 1)
+        eg.gregEnd = eg.metricEnd.toGreg()
         added = 1
     }
 }

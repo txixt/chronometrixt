@@ -72,7 +72,7 @@ struct EventEditMainView: View {
                                        target: .endDateGreg)
                         .padding(.bottom)
                     } else {
-                        EventGregDateEditorView(eg: eventGov, target: .endDateGreg)
+                        EventEndDateGregEditorView(gov: gov, eg: eventGov)
                     }
                     
                     if eventGov.editField != .alarms {

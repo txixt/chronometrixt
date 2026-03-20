@@ -151,14 +151,14 @@ struct MetricDateStepper: View {
                     HStack {
                         Spacer()
                         Text(String(i)).tag(i)
-                            .font(.caption)
+                            .font(.callout)
                             .bold()
                         Spacer()
                     }
                 }
             }
             .pickerStyle(.wheel)
-            .frame(width: label == "year" ? 70 : label == "min" ? 50 : 44, height: 90)
+            .frame(width: label == "year" ? 100 : label == "min" ? 60 : 44, height: 90)
             .clipped()
         }
     }
