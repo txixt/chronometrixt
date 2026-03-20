@@ -13,7 +13,7 @@ import SwiftUI
     var title: String
     var notes: String
     var location: String
-    var metricStart: MetrixtTime
+    var metricStart: MetrixtTime 
     var metricEnd: MetrixtTime
     var gregStart: Date
     var gregEnd: Date

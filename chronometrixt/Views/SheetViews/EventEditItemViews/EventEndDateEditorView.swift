@@ -7,7 +7,7 @@
 
 import SwiftUI
 
-struct EventEndDateView: View {
+struct EventEndDateEditorView: View {
     @Bindable var gov: Governor
     @Bindable var eg: EventGovernor
     @State var goGranular: Bool = false
@@ -26,15 +26,15 @@ struct EventEndDateView: View {
                 
                 HStack {
                     AddTimeButton(eg: eg, added: $added, text: "allday", value: 0)
-                    AddTimeButton(eg: eg, added: $added, text: "1min", value: 1)
-                    AddTimeButton(eg: eg, added: $added, text: "5min", value: 5)
-                    AddTimeButton(eg: eg, added: $added, text: "10min", value: 10)
+                    AddTimeButton(eg: eg, added: $added, text: "1mm", value: 1)
+                    AddTimeButton(eg: eg, added: $added, text: "5mm", value: 5)
+                    AddTimeButton(eg: eg, added: $added, text: "10mm", value: 10)
                 }
                 HStack {
-                    AddTimeButton(eg: eg, added: $added, text: "50min", value: 50)
-                    AddTimeButton(eg: eg, added: $added, text: "1hour", value: 100)
-                    AddTimeButton(eg: eg, added: $added, text: "1day", value: 1000)
-                    AddTimeButton(eg: eg, added: $added, text: "1week", value: 10000)
+                    AddTimeButton(eg: eg, added: $added, text: "50mm", value: 50)
+                    AddTimeButton(eg: eg, added: $added, text: "1mh", value: 100)
+                    AddTimeButton(eg: eg, added: $added, text: "1d", value: 1000)
+                    AddTimeButton(eg: eg, added: $added, text: "10d", value: 10000)
                 }
                 .padding(.bottom)
                 
@@ -42,7 +42,7 @@ struct EventEndDateView: View {
                     VStack(alignment: .leading) {
                         Text("start date: ")
                             .font(.caption)
-                        Text(eg.metricStart.fullDateTxt + (eg.isAllDay ? "" : " + \(added) ="))
+                        Text(eg.metricStart.fullDateTxt + (eg.isAllDay ? "" : " + \(added)mm ="))
                             .bold()
                     }
                     .foregroundStyle(.gray)
@@ -61,7 +61,7 @@ struct EventEndDateView: View {
                     VStack(alignment: .leading) {
                         Text("gregorian equivalent: ")
                             .font(.caption)
-                        Text(eg.isAllDay ? "all day" : eg.metricEnd.toGreg().formatted())
+                        Text(eg.isAllDay ? "all day" : eg.gregEnd.formatted())
                             .bold()
                     }
                     Spacer()
@@ -69,17 +69,27 @@ struct EventEndDateView: View {
                 .padding(.bottom)
                 
                 HStack {
-                    SetValueButtons(eg: eg, added: $added, goGranular: $goGranular, imageText: "arrow.trianglehead.counterclockwise", text: "reset")
-                    SetValueButtons(eg: eg, added: $added, goGranular: $goGranular, imageText: "calendar.day.timeline.left", text: "set specific end time")
-                    SetValueButtons(eg: eg, added: $added, goGranular: $goGranular, imageText: "checkmark", text: "done")
+                    SubmitButtonView(imageString: "arrow.trianglehead.counterclockwise", text: "reset", action: reset
+                    )
+                    .opacity(0.8)
+                    SubmitButtonView(imageString: "calendar.day.timeline.left", text: "set specific end", action: { eg.editField = .none })
+                    .opacity(0.8)
+                    SubmitButtonView(imageString: "checkmark", text: "done", action: { goGranular = true })
                 }
                 .padding(.bottom)
                 
                 MetrixtSubdivider()
             }
+            .monospaced()
         } else {
-            MetricDateEditorView(gov: gov, eg: eg, target: .endDateMetric)
+            EventMetricDateEditorView(gov: gov, eg: eg, target: .endDateMetric)
         }
+        
+    }
+    
+    private func reset() {
+        eg.metricEnd = metric.cal.update(time: eg.metricStart, component: .second, byAdding: 1)
+        added = 1
     }
 }
 
@@ -92,7 +102,7 @@ struct AddTimeButton: View {
     var body: some View {
         Button(action: setTheEnd) {
             Text(text)
-                .font(.default)
+                .font(.caption)
                 .foregroundColor(.primary)
                 .padding()
                 .frame(width: 80, height: 30)
@@ -104,50 +114,18 @@ struct AddTimeButton: View {
         if value == 0 { eg.isAllDay.toggle(); return }
         if value == 10000 {
             eg.metricEnd = metric.cal.update(time: eg.metricEnd, component: .week, byAdding: 1)
+            eg.gregEnd = eg.metricEnd.toGreg()
             added += value
-            return }
+            return
+        }
         eg.metricEnd = metric.cal.update(time: eg.metricEnd, component: .minute, byAdding: value)
+        eg.gregEnd = eg.metricEnd.toGreg()
         added += value
     }
 }
 
-struct SetValueButtons: View {
-    @Bindable var eg: EventGovernor
-    @Binding var added: Int
-    @Binding var goGranular: Bool
-    var imageText: String
-    var text: String
-    
-    var body: some View {
-        Button(action: doTheThings) {
-            HStack {
-                Image(systemName: imageText)
-                    .foregroundColor(.secondary)
-                Text(text)
-                .font(.caption)
-                .foregroundColor(.primary)
-            }
-            .padding()
-            .background(RoundedRectangle(cornerRadius: 10).fill(.gray).opacity(text == "done" ? 1.0 : 0.5))
-        }
-    }
-    
-    private func doTheThings() {
-        if text == "reset" {
-            eg.metricEnd = metric.cal.update(time: eg.metricStart, component: .second, byAdding: 1)
-            added = 1
-        }
-        if text == "done" {
-            eg.editField = .none
-        }
-        if text == "set specific end time" {
-            goGranular = true
-        }
-    }
-}
-
 #Preview {
-    EventEndDateView(
+    EventEndDateEditorView(
         gov: Governor(),
         eg: EventGovernor(
             title: "sample",

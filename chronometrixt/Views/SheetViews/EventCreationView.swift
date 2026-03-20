@@ -16,6 +16,7 @@ struct EventCreationView: View {
     enum FocusField { case initialTitle, title, location, notes }
     
     var body: some View {
+        
         VStack {
             SheetHeaderView(gov: gov, title: "new event", titleImage: "plus")
             
@@ -41,6 +42,7 @@ struct EventCreationView: View {
         }
         .padding()
         .monospaced()
+        
     }
     
     private func finishEditingTitle() {

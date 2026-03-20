@@ -89,12 +89,7 @@ struct SettingsView: View {
                 }
                 .padding(.bottom)
                 
-                ZStack {
-                    RoundedRectangle(cornerRadius: 1.5).frame(width: 100, height: 3)
-                        .foregroundColor(.gray)
-                    Divider()
-                }
-                .padding(.bottom)
+                MetrixtSubdivider()
                 
                 VStack(alignment: .leading) {
                     ZStack {

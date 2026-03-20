@@ -15,6 +15,7 @@ struct MetrixtSubdivider: View {
             Divider()
         }
         .padding(.bottom)
+        .padding(.vertical)
     }
 }
 

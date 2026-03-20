@@ -7,7 +7,7 @@
 
 import SwiftUI
 
-struct MetricDateEditorView: View {
+struct EventMetricDateEditorView: View {
     @Bindable var gov: Governor
     @Bindable var eg: EventGovernor
     var target: EventGovernor.EditingFields
@@ -23,7 +23,7 @@ struct MetricDateEditorView: View {
             MetrixtSubdivider()
             
             HStack {
-                Text(isStart ? "adjust metric end time:" : "adjust metric end time:")
+                Text(isStart ? "adjust metric start time:" : "adjust metric end time:")
                     .font(.caption)
                 Spacer()
             }
@@ -33,10 +33,12 @@ struct MetricDateEditorView: View {
                 MetricDateStepper(label: "year", value: time.year, range: 0...9999) { value in
                     if isStart {
                         eg.metricStart = metric.cal.replace(time: time, component: .year, with: value)
+                        eg.gregStart = eg.metricStart.toGreg()
                     } else {
                         eg.metricEnd = metric.cal.replace(time: time, component: .year, with: value)
-                        dateLimiter()
+                        eg.gregEnd = eg.metricEnd.toGreg()
                     }
+                    dateLimiter(isStart: isStart)
                 }
                 
                 Text(".").font(.caption).offset(y: 8)
@@ -44,28 +46,34 @@ struct MetricDateEditorView: View {
                 MetricDateStepper(label: "month", value: time.month, range: 0...3) { value in
                     if isStart {
                         eg.metricStart = metric.cal.replace(time: time, component: .month, with: value)
+                        eg.gregStart = eg.metricStart.toGreg()
                     } else {
                         eg.metricEnd = metric.cal.replace(time: time, component: .month, with: value)
-                        dateLimiter()
+                        eg.gregEnd = eg.metricEnd.toGreg()
                     }
+                    dateLimiter(isStart: isStart)
                 }
                 Text(":").font(.caption).offset(y: 8)
                 MetricDateStepper(label: "week", value: time.week, range: 0...weekMax) { value in
                     if isStart {
                         eg.metricStart = metric.cal.replace(time: time, component: .week, with: value)
+                        eg.gregStart = eg.metricStart.toGreg()
                     } else {
                         eg.metricEnd = metric.cal.replace(time: time, component: .week, with: value)
-                        dateLimiter()
+                        eg.gregEnd = eg.metricEnd.toGreg()
                     }
+                    dateLimiter(isStart: isStart)
                 }
                 Text(":").font(.caption).offset(y: 8)
                 MetricDateStepper(label: "day", value: time.day, range: 0...dayMax) { value in
                     if isStart {
                         eg.metricStart = metric.cal.replace(time: time, component: .day, with: value)
+                        eg.gregStart = eg.metricStart.toGreg()
                     } else {
                         eg.metricEnd = metric.cal.replace(time: time, component: .day, with: value)
-                        dateLimiter()
+                        eg.gregEnd = eg.metricEnd.toGreg()
                     }
+                    dateLimiter(isStart: isStart)
                 }
                 
                 Text(".").font(.caption).offset(y: 8)
@@ -73,19 +81,23 @@ struct MetricDateEditorView: View {
                 MetricDateStepper(label: "hour", value: time.hour, range: 0...9) { value in
                     if isStart {
                         eg.metricStart = metric.cal.replace(time: time, component: .hour, with: value)
+                        eg.gregStart = eg.metricStart.toGreg()
                     } else {
                         eg.metricEnd = metric.cal.replace(time: time, component: .hour, with: value)
-                        dateLimiter()
+                        eg.gregEnd = eg.metricEnd.toGreg()
                     }
+                    dateLimiter(isStart: isStart)
                 }
                 Text(":").font(.caption).offset(y: 8)
                 MetricDateStepper(label: "min", value: time.minute, range: 0...99) { value in
                     if isStart {
                         eg.metricStart = metric.cal.replace(time: time, component: .minute, with: value)
+                        eg.gregStart = eg.metricStart.toGreg()
                     } else {
                         eg.metricEnd = metric.cal.replace(time: time, component: .minute, with: value)
-                        dateLimiter()
+                        eg.gregEnd = eg.metricEnd.toGreg()
                     }
+                    dateLimiter(isStart: isStart)
                 }
             }
             .padding(.bottom)
@@ -94,37 +106,29 @@ struct MetricDateEditorView: View {
                 VStack(alignment: .leading) {
                     Text("gregorian equivalent: ")
                         .font(.caption)
-                    Text(isStart ? eg.metricStart.toGreg().formatted() : eg.metricEnd.toGreg().formatted())
+                    Text(isStart ? eg.gregStart.formatted() : eg.gregEnd.formatted())
                         .bold()
                 }
                 Spacer()
             }
             .padding(.bottom)
             
-            Button(action: { eg.editField = .none }) {
-                HStack {
-                    Image(systemName: "checkmark")
-                    Text("adjusted")
-                }
-                .font(.caption2)
-                .bold()
-                .foregroundColor(.primary)
-                .padding()
-                .background(RoundedRectangle(cornerRadius: 10).foregroundColor(.gray).opacity(0.5))
-                .shadow(radius: 3)
-            }
-            
+            SubmitButtonView(imageString: "checkmark", text: "adjusted", action: { eg.editField = .none })
+                .padding(.bottom)
             
             MetrixtSubdivider()
         }
         .monospaced()
     }
     
-    private func dateLimiter() {
+    private func dateLimiter(isStart: Bool) {
         if eg.metricStart.years >= eg.metricEnd.year && eg.metricStart.seconds >= eg.metricEnd.second {
             eg.metricEnd = metric.cal.replace(time: eg.metricStart, component: .second, with: eg.metricStart.second + 1)
-            gov.errorMessage = "end date must be after start date"
-            gov.alert = .error
+            eg.gregEnd = eg.metricEnd.toGreg()
+            if !isStart {
+                gov.errorMessage = "end date must be after start date"
+                gov.alert = .error
+            }
         }
     }
 }
@@ -161,7 +165,7 @@ struct MetricDateStepper: View {
 }
 
 #Preview {
-    MetricDateEditorView(
+    EventMetricDateEditorView(
         gov: Governor(),
         eg: EventGovernor(
             title: "sample",

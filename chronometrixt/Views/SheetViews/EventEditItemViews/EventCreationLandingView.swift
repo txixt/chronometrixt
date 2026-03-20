@@ -16,12 +16,13 @@ struct EventCreationLandingView: View {
     var body: some View {
         VStack(alignment: .leading) {
             Text("event title:")
-                .font(.caption2)
+                .font(.caption)
             TextField("event title", text: $eventTitle, prompt: Text("event title"))
                 .focused($focus, equals: .initialTitle)
                 .onChange(of: eventTitle) { _, new in
                     if new.count > 42 { eventTitle = String(new.prefix(42)) }
                 }
+                .autocapitalization(.none)
                 .padding()
                 .background(RoundedRectangle(cornerRadius: 10).fill(.gray.opacity(0.2)))
                 .onSubmit {
