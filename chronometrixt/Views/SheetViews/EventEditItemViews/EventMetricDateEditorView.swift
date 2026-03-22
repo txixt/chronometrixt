@@ -11,6 +11,7 @@ struct EventMetricDateEditorView: View {
     @Bindable var gov: Governor
     @Bindable var eg: EventGovernor
     var target: EventGovernor.EditingFields
+    let enforceEntropy: () -> Void
     
     var body: some View {
         let isStart = target == .startDateMetric
@@ -31,73 +32,31 @@ struct EventMetricDateEditorView: View {
             
             HStack(spacing: 0) {
                 MetricDateStepper(label: "year", value: time.year, range: 0...9999) { value in
-                    if isStart {
-                        eg.metricStart = metric.cal.replace(time: time, component: .year, with: value)
-                        eg.gregStart = eg.metricStart.toGreg()
-                    } else {
-                        eg.metricEnd = metric.cal.replace(time: time, component: .year, with: value)
-                        eg.gregEnd = eg.metricEnd.toGreg()
-                    }
-                    dateLimiter(isStart: isStart)
+                    setTime(isStart: isStart, time: time, component: .year, value: value)
                 }
                 
                 Text(".").font(.caption).offset(y: 8)
                 
                 MetricDateStepper(label: "month", value: time.month, range: 0...3) { value in
-                    if isStart {
-                        eg.metricStart = metric.cal.replace(time: time, component: .month, with: value)
-                        eg.gregStart = eg.metricStart.toGreg()
-                    } else {
-                        eg.metricEnd = metric.cal.replace(time: time, component: .month, with: value)
-                        eg.gregEnd = eg.metricEnd.toGreg()
-                    }
-                    dateLimiter(isStart: isStart)
+                    setTime(isStart: isStart, time: time, component: .month, value: value)
                 }
                 Text(":").font(.caption).offset(y: 8)
                 MetricDateStepper(label: "week", value: time.week, range: 0...weekMax) { value in
-                    if isStart {
-                        eg.metricStart = metric.cal.replace(time: time, component: .week, with: value)
-                        eg.gregStart = eg.metricStart.toGreg()
-                    } else {
-                        eg.metricEnd = metric.cal.replace(time: time, component: .week, with: value)
-                        eg.gregEnd = eg.metricEnd.toGreg()
-                    }
-                    dateLimiter(isStart: isStart)
+                    setTime(isStart: isStart, time: time, component: .week, value: value)
                 }
                 Text(":").font(.caption).offset(y: 8)
                 MetricDateStepper(label: "day", value: time.day, range: 0...dayMax) { value in
-                    if isStart {
-                        eg.metricStart = metric.cal.replace(time: time, component: .day, with: value)
-                        eg.gregStart = eg.metricStart.toGreg()
-                    } else {
-                        eg.metricEnd = metric.cal.replace(time: time, component: .day, with: value)
-                        eg.gregEnd = eg.metricEnd.toGreg()
-                    }
-                    dateLimiter(isStart: isStart)
+                    setTime(isStart: isStart, time: time, component: .day, value: value)
                 }
                 
                 Text(".").font(.caption).offset(y: 8)
                 
                 MetricDateStepper(label: "hour", value: time.hour, range: 0...9) { value in
-                    if isStart {
-                        eg.metricStart = metric.cal.replace(time: time, component: .hour, with: value)
-                        eg.gregStart = eg.metricStart.toGreg()
-                    } else {
-                        eg.metricEnd = metric.cal.replace(time: time, component: .hour, with: value)
-                        eg.gregEnd = eg.metricEnd.toGreg()
-                    }
-                    dateLimiter(isStart: isStart)
+                    setTime(isStart: isStart, time: time, component: .hour, value: value)
                 }
                 Text(":").font(.caption).offset(y: 8)
                 MetricDateStepper(label: "min", value: time.minute, range: 0...99) { value in
-                    if isStart {
-                        eg.metricStart = metric.cal.replace(time: time, component: .minute, with: value)
-                        eg.gregStart = eg.metricStart.toGreg()
-                    } else {
-                        eg.metricEnd = metric.cal.replace(time: time, component: .minute, with: value)
-                        eg.gregEnd = eg.metricEnd.toGreg()
-                    }
-                    dateLimiter(isStart: isStart)
+                    setTime(isStart: isStart, time: time, component: .minute, value: value)
                 }
             }
             .padding(.bottom)
@@ -121,15 +80,15 @@ struct EventMetricDateEditorView: View {
         .monospaced()
     }
     
-    private func dateLimiter(isStart: Bool) {
-        if eg.metricStart.years >= eg.metricEnd.year && eg.metricStart.seconds >= eg.metricEnd.second {
-            eg.metricEnd = metric.cal.replace(time: eg.metricStart, component: .second, with: eg.metricStart.second + 1)
+    private func setTime(isStart: Bool, time: MetrixtTime, component: MetrixtCalendar.Component, value: Int) {
+        if isStart {
+            eg.metricStart = metric.cal.replace(time: time, component: .minute, with: value)
+            eg.gregStart = eg.metricStart.toGreg()
+        } else {
+            eg.metricEnd = metric.cal.replace(time: time, component: .minute, with: value)
             eg.gregEnd = eg.metricEnd.toGreg()
-            if !isStart {
-                gov.errorMessage = "end date must be after start date"
-                gov.alert = .error
-            }
         }
+        enforceEntropy()
     }
 }
 
@@ -172,6 +131,14 @@ struct MetricDateStepper: View {
             starting: MetrixtTime(years: 5056, seconds: 12345678),
             ending: MetrixtTime(years: 5056, seconds: 1234579)
         ),
-        target: .startDateMetric
+        target: .startDateMetric,
+        enforceEntropy: EventEditMainView(
+            gov: Governor(),
+            eventGov: EventGovernor(
+                title: "sample",
+                starting: MetrixtTime(years: 5056, seconds: 12345678),
+                ending: MetrixtTime(years: 5056, seconds: 1234579)
+                )
+        ).enforceEntropy
     )
 }

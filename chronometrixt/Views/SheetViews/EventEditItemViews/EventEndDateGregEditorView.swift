@@ -12,6 +12,7 @@ struct EventEndDateGregEditorView: View {
     @Bindable var eg: EventGovernor
     @State var goGranular: Bool = false
     @State var added: Int = 0
+    let enforceEntropy: () -> Void 
     
     var body: some View {
         if !goGranular {
@@ -71,7 +72,7 @@ struct EventEndDateGregEditorView: View {
             .onDisappear { goGranular = false }
             
         } else {
-            EventGregDateEditorView(eg: eg, target: .endDateGreg)
+            EventGregDateEditorView(eg: eg, target: .endDateGreg, enforceEntropy: enforceEntropy)
         }
     }
     
@@ -80,6 +81,7 @@ struct EventEndDateGregEditorView: View {
         eg.gregEnd = eg.gregEnd.addingTimeInterval(TimeInterval(value * 60))
         eg.metricEnd = MetrixtTime(date: eg.gregEnd)
         added += value
+        enforceEntropy()
     }
     
     private func reset() {
@@ -113,6 +115,14 @@ struct AddGregTimeButton: View {
             title: "sample",
             starting: MetrixtTime(years: 5056, seconds: 12345678),
             ending: MetrixtTime(years: 5056, seconds: 1234579)
-            )
+            ),
+        enforceEntropy: EventEditMainView(
+            gov: Governor(),
+            eventGov: EventGovernor(
+                title: "sample",
+                starting: MetrixtTime(years: 5056, seconds: 12345678),
+                ending: MetrixtTime(years: 5056, seconds: 1234579)
+                )
+        ).enforceEntropy
     )
 }

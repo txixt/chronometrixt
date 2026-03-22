@@ -12,6 +12,7 @@ struct EventEndDateEditorView: View {
     @Bindable var eg: EventGovernor
     @State var goGranular: Bool = false
     @State var added: Int = 1
+    let enforceEntropy: () -> Void
     
     var body: some View {
         if !goGranular {
@@ -26,16 +27,16 @@ struct EventEndDateEditorView: View {
                 .padding(.bottom)
                 
                 HStack {
-                    AddTimeButton(eg: eg, added: $added, text: "allday", value: 0)
-                    AddTimeButton(eg: eg, added: $added, text: "1mm", value: 1)
-                    AddTimeButton(eg: eg, added: $added, text: "5mm", value: 5)
-                    AddTimeButton(eg: eg, added: $added, text: "10mm", value: 10)
+                    AddTimeButton(eg: eg, added: $added, text: "allday", setTheEnd: { setTheEnd(0) } )
+                    AddTimeButton(eg: eg, added: $added, text: "1mm", setTheEnd: { setTheEnd(1) } )
+                    AddTimeButton(eg: eg, added: $added, text: "5mm", setTheEnd: { setTheEnd(5) } )
+                    AddTimeButton(eg: eg, added: $added, text: "10mm", setTheEnd: { setTheEnd(10) } )
                 }
                 HStack {
-                    AddTimeButton(eg: eg, added: $added, text: "50mm", value: 50)
-                    AddTimeButton(eg: eg, added: $added, text: "1mh", value: 100)
-                    AddTimeButton(eg: eg, added: $added, text: "1d", value: 1000)
-                    AddTimeButton(eg: eg, added: $added, text: "10d", value: 10000)
+                    AddTimeButton(eg: eg, added: $added, text: "50mm", setTheEnd: { setTheEnd(50) } )
+                    AddTimeButton(eg: eg, added: $added, text: "1mh", setTheEnd: { setTheEnd(100)} )
+                    AddTimeButton(eg: eg, added: $added, text: "1d", setTheEnd: { setTheEnd(1_000) } )
+                    AddTimeButton(eg: eg, added: $added, text: "10d", setTheEnd: { setTheEnd(10_000) } )
                 }
                 .padding(.bottom)
                 
@@ -76,7 +77,7 @@ struct EventEndDateEditorView: View {
             .onDisappear { goGranular = false }
             
         } else {
-            EventMetricDateEditorView(gov: gov, eg: eg, target: .endDateMetric)
+            EventMetricDateEditorView(gov: gov, eg: eg, target: .endDateMetric, enforceEntropy: enforceEntropy)
         }
         
     }
@@ -86,13 +87,27 @@ struct EventEndDateEditorView: View {
         eg.gregEnd = eg.metricEnd.toGreg()
         added = 1
     }
+    
+    private func setTheEnd(_ value: Int) {
+        if value == 0 { eg.isAllDay.toggle(); return }
+        if value == 10000 {
+            eg.metricEnd = metric.cal.update(time: eg.metricEnd, component: .week, byAdding: 1)
+            eg.gregEnd = eg.metricEnd.toGreg()
+            added += value
+            return
+        }
+        eg.metricEnd = metric.cal.update(time: eg.metricEnd, component: .minute, byAdding: value)
+        eg.gregEnd = eg.metricEnd.toGreg()
+                added += value
+        enforceEntropy()
+    }
 }
 
 struct AddTimeButton: View {
     @Bindable var eg: EventGovernor
     @Binding var added: Int
     var text: String
-    var value: Int
+    let setTheEnd: () -> Void
     
     var body: some View {
         Button(action: setTheEnd) {
@@ -104,28 +119,24 @@ struct AddTimeButton: View {
                 .background(RoundedRectangle(cornerRadius: 10).fill(.gray).opacity(text == "allday" ? 0.2 : 0.3))
         }
     }
-    
-    private func setTheEnd() {
-        if value == 0 { eg.isAllDay.toggle(); return }
-        if value == 10000 {
-            eg.metricEnd = metric.cal.update(time: eg.metricEnd, component: .week, byAdding: 1)
-            eg.gregEnd = eg.metricEnd.toGreg()
-            added += value
-            return
-        }
-        eg.metricEnd = metric.cal.update(time: eg.metricEnd, component: .minute, byAdding: value)
-        eg.gregEnd = eg.metricEnd.toGreg()
-        added += value
-    }
 }
 
+
 #Preview {
-    EventEndDateEditorView(
+    EventEndDateGregEditorView(
         gov: Governor(),
         eg: EventGovernor(
             title: "sample",
             starting: MetrixtTime(years: 5056, seconds: 12345678),
             ending: MetrixtTime(years: 5056, seconds: 1234579)
-            )
+            ),
+        enforceEntropy: EventEditMainView(
+            gov: Governor(),
+            eventGov: EventGovernor(
+                title: "sample",
+                starting: MetrixtTime(years: 5056, seconds: 12345678),
+                ending: MetrixtTime(years: 5056, seconds: 1234579)
+                )
+        ).enforceEntropy
     )
 }

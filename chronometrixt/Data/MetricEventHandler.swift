@@ -722,9 +722,16 @@ enum EventStatus: String, Codable, Sendable {
     case cancelled = "CANCELLED"
 }
 
-struct RecurrenceRule: Codable, Sendable {
+
+
+
+///ADDED METRIC TO THIS - DEAL WITH ITERATION AND EXPORT IMPLICATIONS!!!
+///
+///  |
+///  V
+struct RecurrenceRule: Codable, Sendable, Hashable {
     enum Frequency: String, Codable, Sendable {
-        case daily, weekly, monthly, yearly, none
+        case daily, weekly, metricWeekly, monthly, metricMonthly, yearly, none
     }
     
     var frequency: Frequency
@@ -733,6 +740,62 @@ struct RecurrenceRule: Codable, Sendable {
     var until: Date? // or end on specific date
     
     static let none = RecurrenceRule(frequency: .none, interval: 1, count: nil, until: nil)
+    
+    // MARK: - Count ↔ Until Synchronization
+    
+    /// Compute how many occurrences fit between `startDate` and `untilDate`
+    /// for the current frequency/interval. Returns total count including the first occurrence.
+    static func countFromUntil(startDate: Date, untilDate: Date, frequency: Frequency, interval: Int = 1) -> Int {
+        guard frequency != .none, untilDate > startDate else { return 1 }
+        
+        var cal = Calendar(identifier: .gregorian)
+        cal.timeZone = .current
+        
+        let step = stepComponents(for: frequency, interval: interval)
+        
+        var count = 1 // the first occurrence (the parent)
+        var current = startDate
+        
+        while let next = cal.date(byAdding: step, to: current), next <= untilDate {
+            count += 1
+            current = next
+        }
+        
+        return count
+    }
+    
+    /// Compute the end date for a given count of occurrences from `startDate`
+    /// for the current frequency/interval. Returns the date of the last occurrence.
+    static func untilFromCount(startDate: Date, count: Int, frequency: Frequency, interval: Int = 1) -> Date {
+        guard frequency != .none, count > 1 else { return startDate }
+        
+        var cal = Calendar(identifier: .gregorian)
+        cal.timeZone = .current
+        
+        let step = stepComponents(for: frequency, interval: interval)
+        
+        var current = startDate
+        // count includes the first occurrence, so step (count - 1) times
+        for _ in 1..<count {
+            guard let next = cal.date(byAdding: step, to: current) else { break }
+            current = next
+        }
+        
+        return current
+    }
+    
+    /// DateComponents for one step of a given frequency
+    private static func stepComponents(for frequency: Frequency, interval: Int) -> DateComponents {
+        switch frequency {
+        case .daily:         return DateComponents(day: interval)
+        case .weekly:        return DateComponents(day: interval * 7)
+        case .metricWeekly:  return DateComponents(day: interval * 10)
+        case .monthly:       return DateComponents(month: interval)
+        case .metricMonthly: return DateComponents(day: interval * 100)
+        case .yearly:        return DateComponents(year: interval)
+        case .none:          return DateComponents()
+        }
+    }
     
     /// Convert to iCal RRULE format
     func toRRULE() -> String {
@@ -861,8 +924,12 @@ final class RecurrenceExpander: Sendable {
             components = DateComponents(day: rule.interval)
         case .weekly:
             components = DateComponents(day: rule.interval * 7)
+        case .metricWeekly:
+            components = DateComponents(day: rule.interval * 10)
         case .monthly:
             components = DateComponents(month: rule.interval)
+        case .metricMonthly:
+            components = DateComponents(day: rule.interval * 100)
         case .yearly:
             components = DateComponents(year: rule.interval)
         case .none:

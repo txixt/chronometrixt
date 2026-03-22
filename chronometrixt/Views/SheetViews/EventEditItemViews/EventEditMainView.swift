@@ -37,7 +37,7 @@ struct EventEditMainView: View {
                                        size: 2,
                                        target: .startDateMetric)
                     } else {
-                        EventMetricDateEditorView(gov: gov, eg: eventGov, target: .startDateMetric)
+                        EventMetricDateEditorView(gov: gov, eg: eventGov, target: .startDateMetric, enforceEntropy: { enforceEntropy() })
                     }
                     
                     if eventGov.editField != .startDateGreg {
@@ -49,7 +49,7 @@ struct EventEditMainView: View {
                                        target: .startDateGreg)
                         .padding(.bottom)
                     } else {
-                        EventGregDateEditorView(eg: eventGov, target: .startDateGreg)
+                        EventGregDateEditorView(eg: eventGov, target: .startDateGreg, enforceEntropy: { enforceEntropy() })
                     }
                     
                     if eventGov.editField != .endDateMetric {
@@ -60,7 +60,7 @@ struct EventEditMainView: View {
                                        size: 2,
                                        target: .endDateMetric)
                     } else {
-                        EventEndDateEditorView(gov: gov, eg: eventGov)
+                        EventEndDateEditorView(gov: gov, eg: eventGov, enforceEntropy: { enforceEntropy() })
                     }
                     
                     if eventGov.editField != .endDateGreg {
@@ -72,7 +72,7 @@ struct EventEditMainView: View {
                                        target: .endDateGreg)
                         .padding(.bottom)
                     } else {
-                        EventEndDateGregEditorView(gov: gov, eg: eventGov)
+                        EventEndDateGregEditorView(gov: gov, eg: eventGov, enforceEntropy: { enforceEntropy() })
                     }
                     
                     if eventGov.editField != .alarms {
@@ -90,12 +90,12 @@ struct EventEditMainView: View {
                         EventLabelView(eventGov: eventGov,
                                        label: "recurrence: ",
                                        value: String("\(eventGov.recurrence.frequency)"),
-                                       imageString: "slider.horizontal.3",
+                                       imageString: eventGov.recurrence.frequency == .none ? "square.stack.3d.down.right" : "square.stack.3d.down.right.fill",
                                        size: 4,
                                        target: .recurrence)
                         .padding(.bottom)
                     } else {
-                        EventRecurrenceEditor(eg: eventGov)
+                        EventRecurrenceEditorView(eg: eventGov, chronologyError: chronologyError)
                     }
                     
                     if eventGov.editField != .location {
@@ -171,9 +171,21 @@ struct EventEditMainView: View {
         }
     }
     
+    func enforceEntropy() {
+        if eventGov.metricEnd.years >= eventGov.metricStart.years && eventGov.metricEnd.seconds >= eventGov.metricStart.seconds {
+            eventGov.metricEnd = metric.cal.update(time: eventGov.metricStart, component: .second, byAdding: 1)
+            eventGov.gregEnd = eventGov.metricEnd.toGreg()
+        }
+    }
+    
     private func saveEvent() {
         let handler = EventHandler(modelContext: context)
         eventGov.itsADate(handler: handler, gov: gov)
+    }
+    
+    func chronologyError() {
+        gov.errorMessage = "effect must follow cause. please pick a date after origin."
+        gov.alert = .error
     }
 }
 
