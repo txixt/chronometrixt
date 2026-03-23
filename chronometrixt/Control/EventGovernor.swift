@@ -7,6 +7,7 @@
 
 import Foundation
 import SwiftUI
+import SwiftData
 
 @Observable final class EventGovernor {
     var id: String
@@ -91,6 +92,28 @@ import SwiftUI
         self.calendar = "mextrixt"
         self.calendarColor = "#015659"
         self.externalId = ""
+    }
+    
+    init(event: MetricEvent, context: ModelContext) {
+        let handler = EventHandler(modelContext: context)
+        self.id = event.id
+        self.title = event.title
+        self.notes = event.notes
+        self.location = event.location
+        self.metricStart = MetrixtTime(years: event.startYears, seconds: event.startSeconds)
+        self.metricEnd = MetrixtTime(years: event.endYears, seconds: event.endSeconds)
+        self.gregStart = MetrixtTime(years: event.startYears, seconds: event.startSeconds).toGreg()
+        self.gregEnd = MetrixtTime(years: event.endYears, seconds: event.endSeconds).toGreg()
+        self.isAllDay = event.isAllDay
+        self.status = .confirmed
+        self.sequence = event.sequence
+        self.recurrence = handler.recurrenceRule(for: event)
+        self.parent = event.recurringParentId
+        self.participants = handler.participants(for: event)
+        self.alarms = handler.alarms(for: event)
+        self.calendar = event.calendarId
+        self.calendarColor = event.calendarColor
+        self.externalId = event.externalId
     }
     
     init(
