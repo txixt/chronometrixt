@@ -6,9 +6,11 @@
 //
 
 import SwiftUI
+import SwiftData
 
 struct EventEditMainView: View {
     @Environment(\.modelContext) private var context
+    @Query var calendars: [MetricCalendar]
     @Bindable var gov: Governor
     @Bindable var eventGov: EventGovernor
     
@@ -22,7 +24,7 @@ struct EventEditMainView: View {
                                        value: eventGov.title,
                                        imageString: "square.and.pencil",
                                        size: 1,
-                                       titleColor: .green,
+                                       titleColor: Color(hex: eventGov.calendarColor),
                                        target: .title)
                         .padding(.bottom)
                     } else {
@@ -89,7 +91,11 @@ struct EventEditMainView: View {
                     if eventGov.editField != .recurrence {
                         EventLabelView(eventGov: eventGov,
                                        label: "recurrence: ",
-                                       value: String("\(eventGov.recurrence.frequency)"),
+                                       value: String(
+                                        "\(eventGov.recurrence.frequency)" +
+                                        (eventGov.recurrence.frequency == .none && eventGov.recurrence.count == nil ? "" :
+                                        (eventGov.recurrence.count == nil ? " x ∞" : " x \(eventGov.recurrence.count!)"))
+                                                    ),
                                        imageString: eventGov.recurrence.frequency == .none ? "square.stack.3d.down.right" : "square.stack.3d.down.right.fill",
                                        size: 4,
                                        target: .recurrence)
@@ -106,7 +112,7 @@ struct EventEditMainView: View {
                                        size: 4,
                                        target: .location)
                     } else {
-                        EventLocationEditor(eg: eventGov)
+                        EventLocationEditorView(eg: eventGov)
                     }
                     
                     if eventGov.editField != .notes {
@@ -118,32 +124,36 @@ struct EventEditMainView: View {
                                        target: .notes)
                         .padding(.bottom)
                     } else {
-                        EventNotesEditor(eg: eventGov)
+                        EventNotesEditorView(eg: eventGov)
                     }
                     
-                    if eventGov.editField != .calendar {
-                        EventLabelView(eventGov: eventGov,
-                                       label: "calendar: ",
-                                       value: eventGov.calendar.isEmpty ? "none" : eventGov.calendar,
-                                       imageString: "slider.horizontal.3",
-                                       size: 4,
-                                       labelColor: .gray,
-                                       target: .calendar)
-                    } else {
-                        EventCalendarEditor(eg: eventGov)
+                    if calendars.count > 1 {
+                        if eventGov.editField != .calendar {
+                            EventLabelView(eventGov: eventGov,
+                                           label: "calendar: ",
+                                           value: eventGov.calendar.isEmpty ? "none" : eventGov.calendar,
+                                           imageString: "slider.horizontal.3",
+                                           size: 4,
+                                           labelColor: .gray,
+                                           target: .calendar)
+                        } else {
+                            EventCalendarEditorView(eg: eventGov)
+                        }
                     }
-                    
-                    if eventGov.editField != .participants {
-                        EventLabelView(eventGov: eventGov,
-                                       label: "participants: ",
-                                       value: eventGov.participants.isEmpty ? "none" : "\(eventGov.participants.count)",
-                                       imageString: "square.and.pencil",
-                                       size: 4,
-                                       labelColor: .gray,
-                                       target: .participants)
-                        .padding(.bottom)
-                    } else {
-                        EventParticipantEditor(eg: eventGov)
+
+                    if !eventGov.participants.isEmpty {
+                        if eventGov.editField != .participants {
+                            EventLabelView(eventGov: eventGov,
+                                           label: "participants: ",
+                                           value: "\(eventGov.participants.count)",
+                                           imageString: "eye",
+                                           size: 4,
+                                           labelColor: .gray,
+                                           target: .participants)
+                            .padding(.bottom)
+                        } else {
+                            EventParticipantView(eg: eventGov)
+                        }
                     }
                 }
                 .padding(.bottom, 150)
@@ -233,3 +243,17 @@ struct EventLabelView: View {
             ending: MetrixtTime(years: 5056, seconds: 123459))
     )
 }
+
+//struct PreviewWrapper: View {
+//    @FocusState var focus: EventCreationView.FocusField?
+//    var body: some View {
+//        EventTitleEditorView(
+//            eg: EventGovernor(
+//                title: "sample",
+//                starting: MetrixtTime(years: 5056, seconds: 123456),
+//                ending: MetrixtTime(years: 5056, seconds: 123459)),
+//            focus: $focus
+//        )
+//    }
+//}
+//return PreviewWrapper()

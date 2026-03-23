@@ -29,7 +29,8 @@ final class EventHandler {
         participants: [EventParticipant] = [],
         alarms: [EventAlarm] = [],
         recurrenceRule: RecurrenceRule? = nil,
-        calendarId: String = "METRIXT"
+        calendarId: String = "METRIXT",
+        calendarColor: String = "015659"
     ) throws -> MetricEvent {
         // 1. Validate inputs
         guard !title.isEmpty else {
@@ -71,6 +72,7 @@ final class EventHandler {
             participantsJson: participantsJson,
             alarmsJson: alarmsJson,
             calendarId: calendarId,
+            calendarColor: calendarColor,
             externalId: "NONE"
         )
         
@@ -424,6 +426,7 @@ final class EventHandler {
             participantsJson: participants != nil ? (try encodeToJson(participants!)) : oldParent.participantsJson,
             alarmsJson: alarms != nil ? (try encodeToJson(alarms!)) : oldParent.alarmsJson,
             calendarId: oldParent.calendarId,
+            calendarColor: oldParent.calendarColor,
             externalId: "NONE",
             extendedProperties: oldParent.extendedProperties
         )
@@ -488,6 +491,7 @@ final class EventHandler {
                 participantsJson: p.participantsJson,
                 alarmsJson: p.alarmsJson,
                 calendarId: p.calendarId,
+                calendarColor: p.calendarColor,
                 externalId: p.externalId,
                 extendedProperties: p.extendedProperties
             )
@@ -564,6 +568,7 @@ final class EventHandler {
                 participantsJson: parent.participantsJson,
                 alarmsJson: parent.alarmsJson,
                 calendarId: parent.calendarId,
+                calendarColor: parent.calendarColor,
                 externalId: "NONE",
                 extendedProperties: parent.extendedProperties
             )

@@ -36,6 +36,7 @@ final class EventBatchHandler: Sendable {
         let participantsJson: String
         let alarmsJson: String
         let calendarId: String
+        let calendarColor: String
         let externalId: String
         let extendedProperties: String
         
@@ -59,6 +60,7 @@ final class EventBatchHandler: Sendable {
             self.participantsJson = event.participantsJson
             self.alarmsJson = event.alarmsJson
             self.calendarId = event.calendarId
+            self.calendarColor = event.calendarColor
             self.externalId = event.externalId
             self.extendedProperties = event.extendedProperties
         }
@@ -84,6 +86,7 @@ final class EventBatchHandler: Sendable {
         let participantsJson: String
         let alarmsJson: String
         let calendarId: String
+        let calendarColor: String
         let externalId: String
         let extendedProperties: String
     }
@@ -230,6 +233,11 @@ final class EventBatchHandler: Sendable {
         let rrule = props["RRULE"] ?? "NONE"
         let uid = props["UID"] ?? UUID().uuidString
         
+        // Extract color from iCal COLOR or X-APPLE-CALENDAR-COLOR property, fall back to random
+        let calendarColor = props["COLOR"]
+            ?? props["X-APPLE-CALENDAR-COLOR"]?.replacingOccurrences(of: "#", with: "")
+            ?? randomHex()
+        
         return ParsedEvent(
             id: UUID().uuidString,
             title: unescapeICalText(summary),
@@ -249,6 +257,7 @@ final class EventBatchHandler: Sendable {
             participantsJson: participantsJson,
             alarmsJson: alarmsJson,
             calendarId: "IMPORTED",
+            calendarColor: calendarColor,
             externalId: uid,
             extendedProperties: "{}"
         )
@@ -314,11 +323,12 @@ final class EventBatchHandler: Sendable {
                 }
             }
             
-            // Include metric time as X-properties for lossless round-trip
+            // Include metric time and color as X-properties for lossless round-trip
             lines.append("X-METRIXT-START-YEARS:\(event.startYears)")
             lines.append("X-METRIXT-START-SECONDS:\(event.startSeconds)")
             lines.append("X-METRIXT-END-YEARS:\(event.endYears)")
             lines.append("X-METRIXT-END-SECONDS:\(event.endSeconds)")
+            lines.append("X-APPLE-CALENDAR-COLOR:#\(event.calendarColor)")
             
             lines.append("END:VEVENT")
         }
@@ -462,6 +472,11 @@ final class EventBatchHandler: Sendable {
             
             let gcalId = (item["id"] as? String) ?? UUID().uuidString
             
+            // Extract color from GCal backgroundColor or colorId, fall back to random
+            let calendarColor = (item["backgroundColor"] as? String)?.replacingOccurrences(of: "#", with: "")
+                ?? (item["colorId"] as? String)
+                ?? randomHex()
+            
             events.append(ParsedEvent(
                 id: UUID().uuidString,
                 title: summary,
@@ -481,6 +496,7 @@ final class EventBatchHandler: Sendable {
                 participantsJson: participantsJson,
                 alarmsJson: alarmsJson,
                 calendarId: "GCAL",
+                calendarColor: calendarColor,
                 externalId: gcalId,
                 extendedProperties: "{}"
             ))
@@ -550,6 +566,9 @@ final class EventBatchHandler: Sendable {
                 }
                 item["reminders"] = ["useDefault": false, "overrides": overrides] as [String: Any]
             }
+            
+            // Include calendar color
+            item["backgroundColor"] = "#\(event.calendarColor)"
             
             // Preserve metric time as extended properties
             item["extendedProperties"] = [
@@ -702,5 +721,10 @@ final class EventBatchHandler: Sendable {
             .replacingOccurrences(of: "\n", with: "\\n")
             .replacingOccurrences(of: ",", with: "\\,")
             .replacingOccurrences(of: ";", with: "\\;")
+    }
+    
+    /// Generate a random hex color string (e.g. "A3F04B")
+    static func randomHex() -> String {
+        String(format: "%06X", Int.random(in: 0...0xFFFFFF))
     }
 }

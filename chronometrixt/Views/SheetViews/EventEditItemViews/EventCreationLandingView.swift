@@ -10,41 +10,42 @@ import SwiftUI
 struct EventCreationLandingView: View {
     @Bindable var gov: Governor
     @Binding var eventTitle: String
-    @FocusState.Binding var focus: EventCreationView.FocusField?
+    @FocusState private var isFocused: Bool
     var onSubmit: () -> Void
     
     var body: some View {
         VStack(alignment: .leading) {
             Text("event title:")
                 .font(.caption)
+                .padding(.bottom)
+            
             TextField("event title", text: $eventTitle, prompt: Text("event title"))
-                .focused($focus, equals: .initialTitle)
-                .onChange(of: eventTitle) { _, new in
-                    if new.count > 42 { eventTitle = String(new.prefix(42)) }
-                }
+                .focused($isFocused)
                 .autocapitalization(.none)
                 .padding()
-                .background(RoundedRectangle(cornerRadius: 10).fill(.gray.opacity(0.2)))
+                .background(RoundedRectangle(cornerRadius: 10).stroke(.gray))
                 .onSubmit {
-                    focus = nil
+                    isFocused = false
                     onSubmit()
                 }
                 .padding(.bottom)
-                .onAppear { focus = .initialTitle }
+            
             VStack(alignment: .leading) {
                 Text("metric:")
                 Text(gov.finiteNotNow?.fullDateTxt ?? gov.eternalNow.time.fullDateTxt)
                     .font(.title2).bold()
             }
+            
             VStack(alignment: .leading) {
                 Text("gregorian:")
                 Text(gov.finiteNotNow?.toGreg().formatted() ?? gov.eternalNow.time.toGreg().formatted())
                     .font(.title2).bold()
             }
         }
+        .onAppear { isFocused = true }
     }
 }
 
-//#Preview {
-//    EventCreationLandingView(gov: Governor(), eventTitle: .constant(""), focus: EventCreationView.FocusField.initialTitle)
-//}
+#Preview {
+    EventCreationLandingView(gov: Governor(), eventTitle: .constant(""), onSubmit: {})
+}

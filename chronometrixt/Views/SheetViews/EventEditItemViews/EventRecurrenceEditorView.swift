@@ -44,6 +44,11 @@ struct EventRecurrenceEditorView: View {
             .tint(.primary)
             .padding(.bottom)
             
+            .onChange(of: eg.recurrence.frequency) {
+                eg.recurrence.count = nil
+                eg.recurrence.until = nil
+            }
+            
             Spacer()
             
             if eg.recurrence.frequency != .none {

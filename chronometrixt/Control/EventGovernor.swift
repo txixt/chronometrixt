@@ -25,6 +25,7 @@ import SwiftUI
     var participants: [EventParticipant]
     var alarms: [EventAlarm]
     var calendar: String
+    var calendarColor: String
     var externalId: String
     
     var editField: EditingFields = .none
@@ -88,6 +89,7 @@ import SwiftUI
         self.participants = []
         self.alarms = []
         self.calendar = "mextrixt"
+        self.calendarColor = "#015659"
         self.externalId = ""
     }
     
@@ -111,6 +113,7 @@ import SwiftUI
         participants: [EventParticipant],
         alarms: [EventAlarm],
         calendarId: String,
+        calendarColor: String,
         externalId: String,
     ) {
         self.id = id
@@ -129,6 +132,7 @@ import SwiftUI
         self.participants = participants
         self.alarms = alarms
         self.calendar = calendarId
+        self.calendarColor = calendarColor
         self.externalId = externalId
     }
     

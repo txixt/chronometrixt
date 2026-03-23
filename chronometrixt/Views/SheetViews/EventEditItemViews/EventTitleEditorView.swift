@@ -18,21 +18,22 @@ struct EventTitleEditorView: View {
             VStack {
                 
                 HStack {
-                    
                     Text("title:")
                         .font(.caption)
                     Spacer()
                 }
-                
-                HStack {
-                    TextField("event title", text: $eg.title )
-                        .padding()
-                        .focused($isFocused)
-                        .onSubmit { isFocused = false; eg.editField = .none }
-                        .autocapitalization(.none)
-                        .background(RoundedRectangle(cornerRadius: 10).fill(.gray.opacity(0.2)))
-                }
                 .padding(.bottom)
+                
+                TextField("event title", text: $eg.title)
+                    .focused($isFocused)
+                    .autocapitalization(.none)
+                    .padding()
+                    .onSubmit {
+                        isFocused = false
+                        eg.editField = .none
+                    }
+                    .background(RoundedRectangle(cornerRadius: 10).stroke(.gray))
+                    .padding(.bottom)
                 
                 SubmitButtonView(imageString: "checkmark", text: "adjusted", action: { isFocused = false; eg.editField = .none })
                 
@@ -40,6 +41,7 @@ struct EventTitleEditorView: View {
             
             MetrixtSubdivider()
         }
+        .onAppear { isFocused = true }
     }
 }
 
@@ -47,8 +49,7 @@ struct EventTitleEditorView: View {
     EventTitleEditorView(
         eg: EventGovernor(
             title: "sample",
-            starting: MetrixtTime(years: 5056, seconds: 12345678),
-            ending: MetrixtTime(years: 5056, seconds: 1234579)
-        )
+            starting: MetrixtTime(years: 5056, seconds: 123456),
+            ending: MetrixtTime(years: 5056, seconds: 123459))
     )
 }

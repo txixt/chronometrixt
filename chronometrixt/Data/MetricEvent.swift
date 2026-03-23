@@ -28,6 +28,7 @@ import SwiftData
     var participantsJson: String // EventHandler will serialize/deserialize
     var alarmsJson: String // EventHandler will serialize/deserialize
     var calendarId: String
+    var calendarColor: String
     var externalId: String // "NONE" if no external source
     var extendedProperties: String // JSON dictionary for future features, default "{}"
     
@@ -50,6 +51,7 @@ import SwiftData
          participantsJson: String,
          alarmsJson: String,
          calendarId: String,
+         calendarColor: String,
          externalId: String,
          extendedProperties: String = "{}"
     ) {
@@ -72,6 +74,7 @@ import SwiftData
         self.participantsJson = participantsJson
         self.alarmsJson = alarmsJson
         self.calendarId = calendarId
+        self.calendarColor = calendarColor
         self.externalId = externalId
         self.extendedProperties = extendedProperties
     }
