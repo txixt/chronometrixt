@@ -64,9 +64,10 @@ struct TimeControlView: View {
                     }
                     .frame(height: 120)
                     .monospaced()
-                    .padding(5)
+                    
+                    Spacer()
                 }
-                .padding(.horizontal)
+                .padding()
             }
             .glassEffect(.clear)
         }
