@@ -11,31 +11,51 @@ struct ErrorAlertView: View {
     @Bindable var gov: Governor
     
     var body: some View {
-        if !gov.errorMessage.isEmpty {
-            GeometryReader { geo in
-                ZStack {
-                    RoundedRectangle(cornerRadius: 30).fill(.background)
+        GeometryReader { geo in
+            ZStack {
+                HStack{
+                    Spacer()
                     VStack {
                         Spacer()
-                        ZStack {
-                            Divider()
-                            Image(systemName: "ant")
-                                .font(.largeTitle)
+                        
+                        
+                        VStack {
+                            Spacer()
+                            ZStack {
+                                Divider()
+                                Image(systemName: "ant")
+                                    .font(.largeTitle)
+                            }
+                            
+                            Spacer()
+                            
+                            Text(gov.errorMessage.isEmpty ? "oops. some random thing went wrong." : gov.errorMessage)
+                            
+                            Spacer()
+                            
+                            Button(action: { gov.alert = nil }) {
+                                Image(systemName: "plus")
+                                    .tint(.primary)
+                                    .rotationEffect(Angle(degrees: 45))
+                                    .shadow(color: .gray, radius: 3)
+                                    .bold()
+                            }
+                            
+                            
+                            
+                            Spacer()
                         }
+                        .padding()
+                        .monospaced()
+                        .background(RoundedRectangle(cornerRadius: 30).fill(.gray.opacity(0.2)))
+                        .frame(width: geo.size.width * 0.5, height: geo.size.height * 0.5)
+                        .task { await lifeIsShort() }
+        
+                        
                         Spacer()
-                        
-                        Text(gov.errorMessage)
-                        
-                        Button(action: { gov.alert = nil }) {
-                            Image(systemName: "plus")
-                                .rotationEffect(Angle(degrees: 45))
-                                .bold()
-                        }
                     }
-                    .padding()
+                    Spacer()
                 }
-                .frame(width: geo.size.width * 0.5, height: geo.size.height * 0.5)
-                .task { await lifeIsShort() }
             }
         }
     }

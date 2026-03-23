@@ -64,7 +64,7 @@ struct TimeControlView: View {
                     }
                     .frame(height: 120)
                     .monospaced()
-                    .padding()
+                    .padding(5)
                 }
                 .padding(.horizontal)
             }

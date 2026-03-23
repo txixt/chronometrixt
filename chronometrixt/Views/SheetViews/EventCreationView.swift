@@ -29,7 +29,7 @@ struct EventCreationView: View {
                     }
                     
                     if eventGov != nil {
-                        EventEditMainView(gov: gov, eventGov: eventGov!)
+                        EventEditMainView(gov: gov, eventGov: eventGov!, update: false)
                     } else {
                         Spacer()
                     }

@@ -293,7 +293,8 @@ struct GregPickerView: View {
         ), chronologyError: EventEditMainView(gov: Governor(),
                                               eventGov: EventGovernor(title: "sample",
                                                                       starting: MetrixtTime(years: 5056, seconds: 123456),
-                                                                      ending: MetrixtTime(years: 5056, seconds: 1234590))
+                                                                      ending: MetrixtTime(years: 5056, seconds: 1234590)),
+                                              update: false 
         ).chronologyError
     )
 }

@@ -136,7 +136,8 @@ struct AddTimeButton: View {
                 title: "sample",
                 starting: MetrixtTime(years: 5056, seconds: 12345678),
                 ending: MetrixtTime(years: 5056, seconds: 1234579)
-                )
+            ),
+            update: false
         ).enforceEntropy
     )
 }

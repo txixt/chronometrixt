@@ -20,7 +20,7 @@ import SwiftUI
     var errorMessage: String = ""
     enum CalendarScale { case eon, year, month, week, day }
     enum SheetView: Identifiable { var id: Self { self }; case makeEvent, editEvent, showEvent, findEvent, timers, settings }
-    enum AlertView: Identifiable { var id: Self { self }; case error, destroyAllEvents }
+    enum AlertView: Identifiable { var id: Self { self }; case error, destroyEvent, destroyAllEvents }
 
     init() {
         eternalNow = MetrixtEntropy()

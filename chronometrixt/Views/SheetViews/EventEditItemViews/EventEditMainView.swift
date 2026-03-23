@@ -13,6 +13,7 @@ struct EventEditMainView: View {
     @Query var calendars: [MetricCalendar]
     @Bindable var gov: Governor
     @Bindable var eventGov: EventGovernor
+    let update: Bool
     
     var body: some View {
         ZStack {
@@ -156,10 +157,29 @@ struct EventEditMainView: View {
                         }
                     }
                 }
-                .padding(.bottom, 150)
+//                .padding(.bottom, 150)
                 
                 Spacer()
 
+                
+                if update {
+                    ZStack {
+                        Divider()
+                        HStack {
+                            Text("destroy event")
+                                .font(.title3)
+                                .foregroundStyle(.secondary)
+                                .bold()
+                            Spacer()
+                            Button(action: destroyEvent) {
+                                Image(systemName: "trash")
+                            }
+                            .tint(.red)
+                            .shadow(color: .red, radius: 3)
+                        }
+                    }
+                }
+                Spacer()
             }
             
             VStack {
@@ -169,7 +189,7 @@ struct EventEditMainView: View {
                     HStack {
                         Spacer()
                         Image(systemName: "square.and.arrow.down")
-                        Text("save")
+                        Text(update ? "update" : "save")
                         Spacer()
                     }
                     .foregroundColor(.black)
@@ -178,6 +198,7 @@ struct EventEditMainView: View {
                     .background(RoundedRectangle(cornerRadius: 10).fill(.metricOrange))
                 }
             }
+            .safeAreaPadding(.bottom)
         }
     }
     
@@ -186,6 +207,10 @@ struct EventEditMainView: View {
             eventGov.metricEnd = metric.cal.update(time: eventGov.metricStart, component: .second, byAdding: 1)
             eventGov.gregEnd = eventGov.metricEnd.toGreg()
         }
+    }
+    
+    private func destroyEvent() {
+        gov.alert = .destroyEvent
     }
     
     private func saveEvent() {
@@ -240,7 +265,8 @@ struct EventLabelView: View {
         eventGov: EventGovernor(
             title: "sample",
             starting: MetrixtTime(years: 5056, seconds: 123456),
-            ending: MetrixtTime(years: 5056, seconds: 123459))
+            ending: MetrixtTime(years: 5056, seconds: 123459)),
+        update: true
     )
 }
 
