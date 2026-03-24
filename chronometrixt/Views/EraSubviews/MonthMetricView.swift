@@ -38,22 +38,22 @@ struct MonthMetricView: View {
                                     
                                     HStack {
                                         ForEach(0..<10, id: \.self) { day in
+                                            let isToday = month.year == gov.eternalNow.time.year && month.month == gov.eternalNow.time.month && month.week == week && month.day == day
                                             let isLeapYear = metric.cal.isLeapYear(month.year)
                                             let pastEndOfYear = ((month.month * 100) + (week * 10) + day) > (isLeapYear ? 364 : 365)
                                             
                                             ZStack {
                                                 Text("\(day)")
                                                     .font(.caption)
-                                                    .foregroundColor(month.year == gov.eternalNow.time.year && month.month == gov.eternalNow.time.month && month.week == week && month.day == day ? .metricOrange : .primary)
+                                                    .foregroundColor(isToday ? .metricOrange : .primary)
                                                     .bold()
                                                 RoundedRectangle(cornerRadius: 8)
-                                                    .foregroundColor(month.year == gov.eternalNow.time.year && month.month == gov.eternalNow.time.month && month.week == week && month.day == day ? .metricOrange : .secondary).opacity(0.2)
+                                                    .foregroundColor(isToday ? .metricOrange : .secondary).opacity(isToday ? 0.5 : 0.2)
                                                     .frame(width: geo.size.width * 0.068, height: 22)
 
                                             }
                                             .onTapGesture(count: 1) { goToDayOrWeekView(week: week, day: day) }
                                             .opacity(pastEndOfYear ? 0 : 1)
-                                            
                                         }
                                     }
                                 }

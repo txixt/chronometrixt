@@ -58,16 +58,16 @@ struct TimeControlView: View {
                             }
                             Spacer()
                         }
-                        
-
+                        .onTapGesture(count: 1) { resetGov() }
                         
                         Spacer()
                     }
                     .frame(height: 120)
                     .monospaced()
-                    .padding()
+                    
+                    Spacer()
                 }
-                .padding(.horizontal)
+                .padding()
             }
             .glassEffect(.clear)
         }

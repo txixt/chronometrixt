@@ -111,7 +111,7 @@ extension MetrixtTime: CustomStringConvertible {
 }
 
 typealias metric = MetrixtCalendar
-class MetrixtCalendar {
+@MainActor final class MetrixtCalendar {
     static let cal = MetrixtCalendar()
     
     ///Basic replacement of components clamped to acceptable values
