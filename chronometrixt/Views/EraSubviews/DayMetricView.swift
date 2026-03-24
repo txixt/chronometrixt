@@ -9,10 +9,9 @@ import SwiftUI
 import SwiftData
 
 struct DayMetricView: View {
+    @Query private var allEvents: [MetricEvent]
     @Bindable var gov: Governor
     var day: MetrixtTime?
-    
-    @Query private var allEvents: [MetricEvent]
     
     private var eventsByHour: [[EventSegment]] {
         var hourBuckets: [[EventSegment]] = Array(repeating: [], count: 10)
@@ -20,7 +19,8 @@ struct DayMetricView: View {
             guard let span = gov.span else { return [] }
             let targetYear = (day ?? gov.finiteNotNow ?? gov.eternalNow.time).year
     ///CHANGE THIS TO allEvents AFTER DEBUGGING!
-            return dummyMetricEvents.filter { event in
+    ///change back to dummyMetricEvents for debugging
+            return allEvents.filter { event in
                 guard event.startYears == targetYear else { return false }
                 return span.contains(event.startSeconds)
             }
@@ -158,8 +158,8 @@ struct DayMetricView: View {
     }
     
     private func selectEvent(id: String) {
-        // Use dummyMetricEvents for debugging, switch to allEvents when ready
-        gov.event = dummyMetricEvents.first { $0.id == id } ?? allEvents.first { $0.id == id }
+        /// Use dummyMetricEvents for debugging, switch to allEvents when ready
+        gov.event = allEvents.first { $0.id == id } ?? allEvents.first { $0.id == id }
         gov.sheet = .showEvent
     }
     

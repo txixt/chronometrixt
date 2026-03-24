@@ -59,8 +59,8 @@ struct MapInsetView: View {
                     cameraPosition = .region(
                         MKCoordinateRegion(
                             center: first.location.coordinate,
-                            latitudinalMeters: 10000,
-                            longitudinalMeters: 10000
+                            latitudinalMeters: 10000000,
+                            longitudinalMeters: 10000000
                         )
                     )
                 }
