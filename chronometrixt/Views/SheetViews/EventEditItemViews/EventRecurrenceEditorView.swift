@@ -145,7 +145,7 @@ struct IterationPickerView: View {
                 }
             }
             .pickerStyle(.wheel)
-            .frame(width: 80)
+            .frame(width: 80, height: 120)
             .clipped()
             .tint(.primary)
             .onChange(of: eg.recurrence.count) {
@@ -285,16 +285,14 @@ struct GregPickerView: View {
 }
 
 #Preview {
+    let gov = Governor()
+    let eg = PreviewEG().eg()
     EventRecurrenceEditorView(
-        eg: EventGovernor(
-        title: "sample",
-        starting: MetrixtTime(years: 5056, seconds: 123456),
-        ending: MetrixtTime(years: 5056, seconds: 1234590)
-        ), chronologyError: EventEditMainView(gov: Governor(),
-                                              eventGov: EventGovernor(title: "sample",
-                                                                      starting: MetrixtTime(years: 5056, seconds: 123456),
-                                                                      ending: MetrixtTime(years: 5056, seconds: 1234590)),
-                                              update: false 
+        eg: eg,
+        chronologyError: EventEditMainView(
+            gov: gov,
+            eventGov: eg,
+            update: false
         ).chronologyError
     )
 }

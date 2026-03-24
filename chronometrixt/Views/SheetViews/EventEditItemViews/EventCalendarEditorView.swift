@@ -41,9 +41,5 @@ struct EventCalendarEditorView: View {
 }
 
 #Preview {
-    EventCalendarEditorView(eg: EventGovernor(
-        title: "sample",
-        starting: MetrixtTime(years: 5056, seconds: 123456),
-        ending: MetrixtTime(years: 5056, seconds: 123459))
-    )
+    EventCalendarEditorView(eg: PreviewEG().eg())
 }

@@ -27,15 +27,15 @@ import SwiftUI
     }
     
     func populateTimes() {
-        if finiteNotNow == nil { finiteNotNow = eternalNow.time }
+        let anchor = finiteNotNow ?? eternalNow.time
         var newTimes: [MetrixtTime] = []
         
         switch scale {
-        case .eon: for i in -1...1 { newTimes.append(metric.cal.update(time: finiteNotNow!, component: .year, byAdding: i * 100)) }
-        case .year: for i in -1...1 { newTimes.append(metric.cal.update(time: finiteNotNow!, component: .year, byAdding: i)) }
-        case .month: for i in -1...1 { newTimes.append(metric.cal.update(time: finiteNotNow!, component: .month, byAdding: i)) }
-        case .week: for i in -1...1 { newTimes.append(metric.cal.update(time: finiteNotNow!, component: .week, byAdding: i)) }
-        case .day: for i in -1...1 { newTimes.append(metric.cal.update(time: finiteNotNow!, component: .day, byAdding: i)) }
+        case .eon: for i in -1...1 { newTimes.append(metric.cal.update(time: anchor, component: .year, byAdding: i * 100)) }
+        case .year: for i in -1...1 { newTimes.append(metric.cal.update(time: anchor, component: .year, byAdding: i)) }
+        case .month: for i in -1...1 { newTimes.append(metric.cal.update(time: anchor, component: .month, byAdding: i)) }
+        case .week: for i in -1...1 { newTimes.append(metric.cal.update(time: anchor, component: .week, byAdding: i)) }
+        case .day: for i in -1...1 { newTimes.append(metric.cal.update(time: anchor, component: .day, byAdding: i)) }
         }
         
         someTimes = newTimes
@@ -43,17 +43,17 @@ import SwiftUI
     }
     
     private func setSpan() {
-        if finiteNotNow == nil { finiteNotNow = eternalNow.time }
+        let anchor = finiteNotNow ?? eternalNow.time
         
         switch scale {
-        case .eon: span = (finiteNotNow!.year - 50)...(finiteNotNow!.year + 49)
-        case .year: span = finiteNotNow!.year...(finiteNotNow!.year + 1)
-        case .month: span = (finiteNotNow!.month * 10_000_000)...(finiteNotNow!.month * 10_000_000) + ((finiteNotNow!.month + 1) * (finiteNotNow!.month != 3 ? 10_000_000 : leapSeconds()))
-        case .week: span = ((finiteNotNow!.mwd / 10) * 1_000_000)...(((finiteNotNow!.mwd / 10) + 1) * (finiteNotNow!.month != 3 ? 1_000_000 : leapSeconds()))
-        case .day: span = (finiteNotNow!.mwd * 100_000)...((finiteNotNow!.mwd + 1) * 100_000)
+        case .eon: span = (anchor.year - 50)...(anchor.year + 49)
+        case .year: span = anchor.year...(anchor.year + 1)
+        case .month: span = (anchor.month * 10_000_000)...((anchor.month * 10_000_000) + ((anchor.month + 1) * (anchor.month != 3 ? 10_000_000 : leapSeconds())))
+        case .week: span = ((anchor.mwd / 10) * 1_000_000)...(((anchor.mwd / 10) + 1) * (anchor.month != 3 ? 1_000_000 : leapSeconds()))
+        case .day: span = (anchor.mwd * 100_000)...((anchor.mwd + 1) * 100_000)
         }
         
-        func leapSeconds() -> Int { return metric.cal.isLeapYear(finiteNotNow!.year) ? 300_000 : 200_000 }
+        func leapSeconds() -> Int { return metric.cal.isLeapYear(anchor.year) ? 300_000 : 200_000 }
     }
 }
 

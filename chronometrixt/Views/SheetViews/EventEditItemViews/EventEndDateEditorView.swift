@@ -123,20 +123,14 @@ struct AddTimeButton: View {
 
 
 #Preview {
+    let gov = Governor()
+    let eg = PreviewEG().eg()
     EventEndDateGregEditorView(
-        gov: Governor(),
-        eg: EventGovernor(
-            title: "sample",
-            starting: MetrixtTime(years: 5056, seconds: 12345678),
-            ending: MetrixtTime(years: 5056, seconds: 1234579)
-            ),
+        gov: gov,
+        eg: eg,
         enforceEntropy: EventEditMainView(
-            gov: Governor(),
-            eventGov: EventGovernor(
-                title: "sample",
-                starting: MetrixtTime(years: 5056, seconds: 12345678),
-                ending: MetrixtTime(years: 5056, seconds: 1234579)
-            ),
+            gov: gov,
+            eventGov: eg,
             update: false
         ).enforceEntropy
     )

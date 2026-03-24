@@ -97,7 +97,7 @@ struct EventAlarmEditorView: View {
             .padding(.bottom)
             .monospaced()
          
-            SubmitButtonView(imageString: "checkmark", text: "adjusted",action: {eg.editField = .none})
+            SubmitButtonView(imageString: "checkmark", text: "alarmed",action: {eg.editField = .none})
             
             MetrixtSubdivider()
         }
@@ -106,9 +106,6 @@ struct EventAlarmEditorView: View {
 
 #Preview {
     EventAlarmEditorView(
-        eg: EventGovernor(
-            title: "sample",
-            starting: MetrixtTime(years: 5056, seconds: 123456),
-            ending: MetrixtTime(years: 5056, seconds: 123459))
+        eg: PreviewEG().eg()
     )
 }

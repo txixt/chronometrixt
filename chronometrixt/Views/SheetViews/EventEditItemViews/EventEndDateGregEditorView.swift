@@ -80,8 +80,10 @@ struct EventEndDateGregEditorView: View {
         if value == 0 { eg.isAllDay.toggle(); return }
         eg.gregEnd = eg.gregEnd.addingTimeInterval(TimeInterval(value * 60))
         eg.metricEnd = MetrixtTime(date: eg.gregEnd)
+        print("gregEnd/metrixEnd before enforce Entropy \(eg.gregEnd.formatted()), \(eg.metricEnd.fullDateTxt)")
         added += value
         enforceEntropy()
+        print("gregEnd/metrixEnd after enforce Entropy \(eg.gregEnd.formatted()), \(eg.metricEnd.fullDateTxt)")
     }
     
     private func reset() {
@@ -109,20 +111,14 @@ struct AddGregTimeButton: View {
 }
 
 #Preview {
+    let gov = Governor()
+    let eg = PreviewEG().eg()
     EventEndDateGregEditorView(
-        gov: Governor(),
-        eg: EventGovernor(
-            title: "sample",
-            starting: MetrixtTime(years: 5056, seconds: 12345678),
-            ending: MetrixtTime(years: 5056, seconds: 1234579)
-            ),
+        gov: gov,
+        eg: eg,
         enforceEntropy: EventEditMainView(
-            gov: Governor(),
-            eventGov: EventGovernor(
-                title: "sample",
-                starting: MetrixtTime(years: 5056, seconds: 12345678),
-                ending: MetrixtTime(years: 5056, seconds: 1234579)
-                ),
+            gov: gov,
+            eventGov: eg,
             update: false
         ).enforceEntropy
     )

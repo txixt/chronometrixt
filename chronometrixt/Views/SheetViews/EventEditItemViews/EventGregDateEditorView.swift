@@ -61,20 +61,14 @@ struct EventGregDateEditorView: View {
 }
 
 #Preview {
+    let gov = Governor()
+    let eg = PreviewEG().eg()
     EventGregDateEditorView(
-        eg: EventGovernor(
-            title: "sample",
-            starting: MetrixtTime(years: 5056, seconds: 12345678),
-            ending: MetrixtTime(years: 5056, seconds: 1234579)
-            ),
+        eg: eg,
         target: .startDateGreg,
         enforceEntropy: EventEditMainView(
-            gov: Governor(),
-            eventGov: EventGovernor(
-                title: "sample",
-                starting: MetrixtTime(years: 5056, seconds: 12345678),
-                ending: MetrixtTime(years: 5056, seconds: 1234579)
-                ),
+            gov: gov,
+            eventGov: eg,
             update: false
         ).enforceEntropy
     )

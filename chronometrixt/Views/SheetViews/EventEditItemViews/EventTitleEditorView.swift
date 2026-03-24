@@ -47,9 +47,6 @@ struct EventTitleEditorView: View {
 
 #Preview {
     EventTitleEditorView(
-        eg: EventGovernor(
-            title: "sample",
-            starting: MetrixtTime(years: 5056, seconds: 123456),
-            ending: MetrixtTime(years: 5056, seconds: 123459))
+        eg: PreviewEG().eg()
     )
 }

@@ -9,7 +9,6 @@ import SwiftUI
 import SwiftData
 
 struct PortraitView: View {
-//    @Query var events: [MetricEvent]
     
     @Environment(\.modelContext) private var context
     @Bindable var gov: Governor
@@ -26,7 +25,10 @@ struct PortraitView: View {
                 if gov.alert != nil {
                     switch gov.alert {
                     case .error: ErrorAlertView(gov: gov)
-                    case .destroyEvent: DestroyEventAlertView(gov: gov)
+                    case .destroyEvent:
+                        if let eg {
+                            DestroyEventAlertView(gov: gov, eg: eg)
+                        }
                     default: EmptyView()
                     }
                 }
@@ -54,7 +56,7 @@ struct PortraitView: View {
                 }
                 Spacer()
                 if gov.finiteNotNow != nil {
-                    Button(action: { gov.sheet = .makeEvent }) {
+                    Button(action: { eg = nil; gov.sheet = .makeEvent }) {
                         Image(systemName: "plus")
                     }
                 } else {
@@ -65,16 +67,16 @@ struct PortraitView: View {
         }
         .sheet(item: $gov.sheet) { sheet in
             switch sheet {
-            case .makeEvent: EventCreationView(gov: gov).alertHost(gov: gov)
+            case .makeEvent: EventCreationView(gov: gov, eventGov: $eg).alertHost(gov: gov, eg: eg)
             case .editEvent:
                 if let eg {
-                    EventEditView(gov: gov, eg: eg).alertHost(gov: gov)
+                    EventEditView(gov: gov, eg: eg).alertHost(gov: gov, eg: eg)
                 } else {
                     EmptyView().onAppear { gov.sheet = nil }
                 }
             case .showEvent:
                 if let eg {
-                    EventDisplayView(gov: gov, eg: eg).alertHost(gov: gov)
+                    EventDisplayView(gov: gov, eg: eg).alertHost(gov: gov, eg: eg)
                 } else {
                     EmptyView().onAppear { gov.sheet = nil }
                 }
@@ -82,16 +84,18 @@ struct PortraitView: View {
             default: EmptyView()
             }
         }
-        .onChange(of: gov.event) { eg = gov.event != nil ? EventGovernor(event: gov.event!, context: context) : nil }
+        .onChange(of: gov.event) { eg = gov.event != nil ? EventGovernor(event: gov.event!, context: context, gov: gov) : nil }
     }
 }
 
 struct AlertHost<Content: View>: View {
     @Bindable var gov: Governor
+    var eg: EventGovernor?
     let content: Content
 
-    init(gov: Governor, @ViewBuilder content: () -> Content) {
+    init(gov: Governor, eg: EventGovernor? = nil, @ViewBuilder content: () -> Content) {
         self.gov = gov
+        self.eg = eg
         self.content = content()
     }
 
@@ -100,25 +104,23 @@ struct AlertHost<Content: View>: View {
             content
             if let alert = gov.alert {
                 switch alert {
-                case .error:
-                    ErrorAlertView(gov: gov)
+                case .error: ErrorAlertView(gov: gov)
                 case .destroyEvent:
-                    DestroyEventAlertView(gov: gov)
-                default:
-                    EmptyView()
+                    if let eg {
+                        DestroyEventAlertView(gov: gov, eg: eg)
+                    }
+                default: EmptyView().onAppear { gov.alert = nil }
                 }
             }
         }
     }
 }
 extension View {
-    func alertHost(gov: Governor) -> some View {
-        AlertHost(gov: gov) { self }
+    func alertHost(gov: Governor, eg: EventGovernor? = nil) -> some View {
+        AlertHost(gov: gov, eg: eg) { self }
     }
 }
 
 #Preview {
     PortraitView(gov: Governor())
 }
-
-

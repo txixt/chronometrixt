@@ -124,21 +124,15 @@ struct MetricDateStepper: View {
 }
 
 #Preview {
+    let gov = Governor()
+    let eg = PreviewEG().eg()
     EventMetricDateEditorView(
-        gov: Governor(),
-        eg: EventGovernor(
-            title: "sample",
-            starting: MetrixtTime(years: 5056, seconds: 12345678),
-            ending: MetrixtTime(years: 5056, seconds: 1234579)
-        ),
+        gov: gov,
+        eg: eg,
         target: .startDateMetric,
         enforceEntropy: EventEditMainView(
-            gov: Governor(),
-            eventGov: EventGovernor(
-                title: "sample",
-                starting: MetrixtTime(years: 5056, seconds: 12345678),
-                ending: MetrixtTime(years: 5056, seconds: 1234579)
-                ),
+            gov: gov,
+            eventGov: eg,
             update: false
         ).enforceEntropy
     )

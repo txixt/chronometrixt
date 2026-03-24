@@ -6,11 +6,12 @@
 //
 
 import SwiftUI
+import SwiftData
 
 struct EventCreationView: View {
     @Environment(\.modelContext) private var context
     @Bindable var gov: Governor
-    @State var eventGov: EventGovernor? = nil
+    @Binding var eventGov: EventGovernor?
     @State var eventTitle: String = ""
     
     var body: some View {
@@ -18,23 +19,21 @@ struct EventCreationView: View {
         VStack {
             SheetHeaderView(gov: gov, title: "new event", titleImage: "plus")
             
-            ScrollView {
-                VStack {
-                    
-                    if eventGov == nil {
-                        EventCreationLandingView(
-                            gov: gov,
-                            eventTitle: $eventTitle,
-                            onSubmit: finishEditingTitle)
-                    }
-                    
-                    if eventGov != nil {
-                        EventEditMainView(gov: gov, eventGov: eventGov!, update: false)
-                    } else {
-                        Spacer()
-                    }
-                    
+            VStack {
+                
+                if eventGov == nil {
+                    EventCreationLandingView(
+                        gov: gov,
+                        eventTitle: $eventTitle,
+                        onSubmit: finishEditingTitle)
                 }
+                
+                if eventGov != nil {
+                    EventEditMainView(gov: gov, eventGov: eventGov!, update: false)
+                } else {
+                    Spacer()
+                }
+                
             }
         }
         .padding()
@@ -56,20 +55,26 @@ struct EventCreationView: View {
         eventGov = EventGovernor(
             title: eventTitle,
             starting: gov.finiteNotNow!,
-            ending: metric.cal.update(time: gov.finiteNotNow!, component: .second, byAdding: 1)
+            ending: metric.cal.update(time: gov.finiteNotNow!, component: .second, byAdding: 1),
+            context: context,
+            gov: gov
         )
     }
-//    
-//    private func saveEvent() {
-//        guard let eg = eventGov else { return }
-//        let handler = EventHandler(modelContext: context)
-//        eg.itsADate(handler: handler, gov: gov)
-//    }
 }
 
 
 #Preview {
-    EventCreationView(gov: Governor())
+    let context = PreviewEG.previewContainer.mainContext
+    let gov = Governor()
+    EventCreationView(gov: gov, eventGov: .constant(EventGovernor(
+            title: "sample",
+            starting: MetrixtTime(years: 5056, seconds: 123456),
+            ending: MetrixtTime(years: 5056, seconds: 123459),
+            context: context,
+            gov: gov
+            )
+        )
+    )
 }
 
 //struct EventLabelView: View {
