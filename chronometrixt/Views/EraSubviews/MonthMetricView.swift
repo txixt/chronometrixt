@@ -72,10 +72,10 @@ struct MonthMetricView: View {
                                                     let pipNo = monthEvents[(week * 10) + day]
                                                     VStack {
                                                         Spacer()
-                                                        HStack{
+                                                        HStack(spacing: 0) {
                                                             ForEach (0..<pipNo, id: \.self) { _ in
                                                                 Circle().fill(.primary).frame(width: 3, height: 3)
-                                                                    .padding(1)
+                                                                    .padding(.horizontal, 2)
                                                             }
                                                         }
                                                     }
