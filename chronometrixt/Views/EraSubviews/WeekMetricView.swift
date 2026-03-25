@@ -62,7 +62,7 @@ struct WeekMetricView: View {
                     HStack {
                         ForEach(0..<10, id: \.self) { day in
                             let isToday = someTime.year == gov.eternalNow.time.year && someTime.month == gov.eternalNow.time.month && someTime.week == gov.eternalNow.time.week && someTime.day == day
-                            let beforeYearEnd = someTime.mwd < 360 && day <= (metric.cal.isLeapYear(someTime.year) ? 5 : 4)
+                            let beforeYearEnd = (someTime.month * 100) + (someTime.week * 10) + day < (metric.cal.isLeapYear(someTime.year) ? 366 : 365)
                             
                             VStack {
                                 Text("\(day)")
@@ -92,7 +92,7 @@ struct WeekMetricView: View {
                                             if gov.finiteNotNow != nil && gov.finiteNotNow == week && !eventMarkers[day].isEmpty {
                                                 ForEach(eventMarkers[day]) { em in
                                                     Circle().fill(em.color).frame(width: 25, height: 25)
-                                                        .offset(y: em.offset * 250)
+                                                        .offset(y: (em.offset * 250) + 15)
                                                         .opacity(0.5)
                                                         .onTapGesture {
                                                             viewEvent(id: em.id)
@@ -106,6 +106,7 @@ struct WeekMetricView: View {
                                 }
                                 .frame(height: 250)
                             }
+                            .opacity(beforeYearEnd ? 1 : 0)
                             if day != 9 { Spacer() }
                         }
                     }
@@ -147,7 +148,7 @@ struct prePreview {
     }
 }
 #Preview {
-    WeekMetricView(gov: prePreview().gov, week: MetrixtTime(date: nil))
+    WeekMetricView(gov: prePreview().gov, week: MetrixtTime(years: 5056, seconds: 36_400_000))
 }
 
 //let someTime = week ?? gov.finiteNotNow ?? gov.eternalNow.time

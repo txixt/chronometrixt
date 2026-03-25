@@ -87,16 +87,6 @@ struct DayMetricView: View {
                             .foregroundColor(someTime.year == gov.eternalNow.time.year && someTime.mwd == gov.eternalNow.time.mwd ? .metricOrange : .primary)
                             .onTapGesture { goToYearView() }
                         Spacer()
-//                        VStack(alignment: .trailing) {
-//                            Text("📅 \(dayEvents.count)")
-//                                .font(.caption)
-//                                .foregroundColor(.secondary)
-//                            if let span = gov.span {
-//                                Text("span: \(span.lowerBound)...\(span.upperBound)")
-//                                    .font(.caption2)
-//                                    .foregroundColor(.secondary)
-//                            }
-//                        }
                     }
                     
                     Divider()
@@ -158,7 +148,7 @@ struct DayMetricView: View {
                 }
                 .padding()
                 .monospaced()
-                .opacity(someTime.year == govTime.year && someTime.month == govTime.month && someTime.week == govTime.week && someTime.day == govTime.day ? 1 : 0.2)
+                .opacity(someTime.year == govTime.year && someTime.mwd == govTime.mwd ? 1 : 0.2)
             }
             .frame(width: geo.size.width, height: geo.size.width)
         }

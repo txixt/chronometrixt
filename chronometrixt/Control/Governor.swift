@@ -27,9 +27,20 @@ import SwiftUI
     }
     
     func populateTimes() {
+        ///reset anchor to start of week to avoid truncated calendar weeks and days if the start day is > 4 or 5
+//        let thisTime = finiteNotNow ?? eternalNow.time
+//        let anchor = metric.cal.update(time: thisTime, component: .day, byAdding: -(thisTime.day))
+        ///UNRESOLVED BUG ISSUE WITH WEEK NOT HAVING A 36 IF CURRENT DAY > 4/5  (EG. NO TARGET DAY IN THAT WEEK) or something else...
+        ///this doesn't work:
+//        if scale == .month {
+//        anchor = metric.cal.update(time: anchor, component: .day, byAdding: -(anchor.day))
+//        print("adjusted anchor to: \(anchor.fullDateTxt)")
+//    }
+        
         let anchor = finiteNotNow ?? eternalNow.time
         var newTimes: [MetrixtTime] = []
         
+
         switch scale {
         case .eon: for i in -1...1 { newTimes.append(metric.cal.update(time: anchor, component: .year, byAdding: i * 100)) }
         case .year: for i in -1...1 { newTimes.append(metric.cal.update(time: anchor, component: .year, byAdding: i)) }

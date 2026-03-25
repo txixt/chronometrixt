@@ -134,6 +134,7 @@ typealias metric = MetrixtCalendar
     ///So this is how we deal with that. If just adding D, H, Mi, or Se, we can add the value and normalize to the year.
     ///For months and weeks we have to adjust what we add according to the different lengths of weeks and months as we do below.
     func update(time: MetrixtTime, component: Component, byAdding value: Int) -> MetrixtTime {
+//        if time.mwd == 365 && component == .day && value > 0 { return MetrixtTime(years: time.year + value, seconds: time.seconds) }///this avoids problems. fucking leap years.
         let secondsToAdd: Int
         switch component {
         case .year: return addYears(to: time, value: value)
@@ -209,11 +210,11 @@ typealias metric = MetrixtCalendar
          
         while normalSeconds < 0 {
             normalYears -= 1
-            normalSeconds += yearSeconds(normalYears)
+            normalSeconds += yearSeconds(normalYears)///evaluate the year that you're moving into.
         }
         while normalSeconds >= yearSeconds(normalYears) {
+            normalSeconds -= yearSeconds(normalYears)///evaluate the year you're leaving.
             normalYears += 1
-            normalSeconds -= yearSeconds(normalYears)
         }
         
         return MetrixtTime(years: normalYears, seconds: normalSeconds)
@@ -229,6 +230,7 @@ typealias metric = MetrixtCalendar
     private func monthSeconds(_ month: Int, inYear year: Int) -> Int {
         return month != 3 ? 10_000_000 : isLeapYear(year) ? 6_500_000 : 6_400_000
     }
+    ///
     private func yearSeconds(_ year: Int) -> Int {
         return isLeapYear(year) ? 36_600_000 : 36_500_000
     }
