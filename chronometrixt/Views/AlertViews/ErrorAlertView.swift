@@ -47,7 +47,7 @@ struct ErrorAlertView: View {
                         }
                         .padding()
                         .monospaced()
-                        .background(RoundedRectangle(cornerRadius: 30).fill(.background.opacity(0.8)))
+                        .background(RoundedRectangle(cornerRadius: 30).fill(.background.opacity(0.9)))
                         .frame(width: geo.size.width * 0.5, height: geo.size.height * 0.5)
                         .task { await lifeIsShort() }
         

@@ -6,10 +6,42 @@
 //
 
 import SwiftUI
+import SwiftData
 
 struct WeekMetricView: View {
+    @Query private var allEvents: [MetricEvent]
     @Bindable var gov: Governor
     var week: MetrixtTime?
+    
+    
+    private var weekEvents: [MetricEvent] {
+        print("\(String(describing: gov.span?.description))")
+        guard !allEvents.isEmpty else { return [] }
+        guard let span = gov.span else { return [] }
+        let govTime = gov.finiteNotNow ?? gov.eternalNow.time
+        let targetYear = (week ?? govTime).year
+///DEV SWITCH WITH allEvents.filter / dummyMetricEvents
+        return allEvents.filter { event in
+            guard event.startYears == targetYear else { return false }
+            return span.contains(event.startSeconds)
+        }
+    }
+    private var eventMarkers: [[EventMarker]] {
+        var dayBuckets: [[EventMarker]] = Array(repeating: [], count: 10)
+        for event in weekEvents {
+            let eventDay = (event.startSeconds / 100_000) % 10
+            let eventOffset: CGFloat = CGFloat(event.startSeconds % 100_000) / 100_000.0
+            let em = EventMarker(id: event.id, offset: eventOffset, color: Color(hex: event.calendarColor))
+            dayBuckets[eventDay].insert(em, at: 0)
+        }
+        
+        return dayBuckets
+    }
+    private struct EventMarker: Identifiable {
+        let id: String
+        var offset: CGFloat
+        var color: Color
+    }
     
     var body: some View {
         let govTime = gov.finiteNotNow ?? gov.eternalNow.time
@@ -23,6 +55,7 @@ struct WeekMetricView: View {
                             .font(.largeTitle).bold()
                             .foregroundColor(someTime.year == gov.eternalNow.time.year && someTime.month == gov.eternalNow.time.month && someTime.week == gov.eternalNow.time.week ? .metricOrange : .primary)
                         Spacer()
+                        Text("\(eventMarkers.count)")
                     }
                     .onTapGesture(count: 1) { goToYearView() }
                     
@@ -41,20 +74,33 @@ struct WeekMetricView: View {
                                 ZStack {
 
                                     VStack {
-                                        
                                         ForEach(0..<10, id: \.self) { hour in
                                             Text("\(hour)")
                                                 .font(.caption)
                                                 .foregroundColor(isToday ? .primary : .gray)
                                                 .onTapGesture(count: 1) { goToDayView(day: day, hour: hour)  }
                                                 .padding(.vertical, 2.5)
+                                            }
+                                        }
+                                        .padding(10)
+                                        .padding(.bottom, 3)
+                                        .background(RoundedRectangle(cornerRadius: 815)
+                                        .foregroundColor(isToday ? .metricOrange : .primary).opacity(isToday ? 0.5 : 0.2))
+                                    
+                                    VStack {
+                                        
+                                        ZStack{
+                                            if !eventMarkers[day].isEmpty {
+                                                ForEach(eventMarkers[day]) { em in
+                                                    Circle().fill(em.color).frame(width: 22, height: 22)
+                                                        .offset(y: em.offset * 300)
+                                                }
+                                            }
                                         }
                                         
+                                        Spacer()
                                     }
-                                    .padding(10)
-                                    .padding(.bottom, 3)
-                                    .background(RoundedRectangle(cornerRadius: 8)
-                                        .foregroundColor(isToday ? .metricOrange : .primary).opacity(isToday ? 0.5 : 0.2))
+                                    
                                 }
                             }
                             if day != 9 { Spacer() }
@@ -67,6 +113,11 @@ struct WeekMetricView: View {
             }
             .frame(width: geo.size.width, height: geo.size.width)
         }
+    }
+    
+    private func viewEvent(id: String) {
+        gov.event = allEvents.first { $0.id == id } ?? allEvents.first { $0.id == id}
+        gov.sheet = .showEvent
     }
     
     private func goToYearView() {
@@ -84,8 +135,16 @@ struct WeekMetricView: View {
     }
 }
 
+struct prePreview {
+    let gov = Governor()
+    
+    init() {
+        gov.scale = .week
+        gov.populateTimes()
+    }
+}
 #Preview {
-    WeekMetricView(gov: Governor())
+    WeekMetricView(gov: prePreview().gov, week: MetrixtTime(date: nil))
 }
 
 //let someTime = week ?? gov.finiteNotNow ?? gov.eternalNow.time

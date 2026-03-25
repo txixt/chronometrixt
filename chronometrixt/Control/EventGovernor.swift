@@ -45,9 +45,9 @@ import SwiftData
         self.notes = ""
         self.location = ""
         self.metricStart = starting
-        self.metricEnd = ending ?? metric.cal.update(time: starting, component: .second, byAdding: 2)
+        self.metricEnd = ending ?? metric.cal.update(time: starting, component: .minute, byAdding: 1)
         self.gregStart = starting.toGreg()
-        self.gregEnd = ending?.toGreg() ?? metric.cal.update(time: starting, component: .second, byAdding: 2).toGreg()
+        self.gregEnd = ending?.toGreg() ?? metric.cal.update(time: starting, component: .minute, byAdding: 1).toGreg()
         self.isAllDay = false
         self.status = .confirmed
         self.sequence = 0
