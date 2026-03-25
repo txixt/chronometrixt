@@ -58,6 +58,7 @@ struct MapInsetView: View {
                     HStack() {
                         Text(location)
                         .font(.title2)
+                        .padding(.leading)
                         Spacer()
                     }
                     Spacer()

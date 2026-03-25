@@ -14,6 +14,7 @@ struct DayMetricView: View {
     var day: MetrixtTime?
     
     private var eventsByHour: [[EventSegment]] {
+        if gov.finiteNotNow != nil && gov.finiteNotNow != day { return [[]] }
         var hourBuckets: [[EventSegment]] = Array(repeating: [], count: 10)
         var dayEvents: [MetricEvent] {
             guard let span = gov.span else { return [] }
@@ -63,6 +64,7 @@ struct DayMetricView: View {
         
         return hourBuckets
     }
+    
     private struct EventSegment: Identifiable {
         var id: String { eventId }
         let eventId: String
@@ -101,21 +103,25 @@ struct DayMetricView: View {
 
                     VStack {
                         ForEach(0..<10, id: \.self) { hour in
+                            let isTodayHasEvents: Bool = gov.finiteNotNow != nil && gov.finiteNotNow == day && !eventsByHour[hour].isEmpty
+                            
                             ZStack {
                                 RoundedRectangle(cornerRadius: 12.5)
                                     .frame(width: geo.size.width * 0.9, height: 25)
                                     .foregroundColor(.gray).opacity(0.2)
                                 
-                                ForEach(eventsByHour[hour]) { segment in
-                                    RoundedRectangle(cornerRadius: 12.5)
-                                        .fill(segment.color.opacity(0.2))
-                                        .frame(
-                                            width: geo.size.width * 0.9 * (segment.endPercent - segment.startPercent),
-                                            height: 22
-                                        )
-                                        .offset(x: (geo.size.width * 0.9 * (segment.startPercent + segment.endPercent - 1.0) / 2.0))
+                                if isTodayHasEvents {
+                                    ForEach(eventsByHour[hour]) { segment in
+                                        RoundedRectangle(cornerRadius: 12.5)
+                                            .fill(segment.color.opacity(0.2))
+                                            .frame(
+                                                width: geo.size.width * 0.9 * (segment.endPercent - segment.startPercent),
+                                                height: 22
+                                            )
+                                            .offset(x: (geo.size.width * 0.9 * (segment.startPercent + segment.endPercent - 1.0) / 2.0))
+                                    }
                                 }
-            
+
                                 HStack {
                                     Text("\(hour)")
                                         .bold()
@@ -132,18 +138,19 @@ struct DayMetricView: View {
                                     }
                                 }
                                 
-                                HStack {
-                                    if !eventsByHour[hour].isEmpty {
+                                if isTodayHasEvents {
+                                    HStack {
                                         ForEach(eventsByHour[hour]) { event in
                                             Circle().fill(event.color)
                                                 .onTapGesture {
                                                     selectEvent(id: event.eventId)
-                                                }
+                                            }
                                         }
-                                    }
                                     Spacer()
+                                    }
+                                    .padding(.leading)
                                 }
-                                .padding(.leading)
+
 
                             }
                         }

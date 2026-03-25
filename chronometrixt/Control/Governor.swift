@@ -44,16 +44,15 @@ import SwiftUI
     
     private func setSpan() {
         let anchor = finiteNotNow ?? eternalNow.time
+        let leapYearSeconds: Int = metric.cal.isLeapYear(anchor.year) ? 36_500_000 : 36_400_000
         
         switch scale {
         case .eon: span = (anchor.year - 50)...(anchor.year + 49)
         case .year: span = anchor.year...(anchor.year + 1)
-        case .month: span = (anchor.month * 10_000_000)...((anchor.month * 10_000_000) + ((anchor.month + 1) * (anchor.month != 3 ? 10_000_000 : leapSeconds())))
-        case .week: span = ((anchor.mwd / 10) * 1_000_000)...(((anchor.mwd / 10) + 1) * (anchor.month != 3 ? 1_000_000 : leapSeconds()))
+        case .month: span = (anchor.month * 10_000_000)...min(((anchor.month + 1) * 10_000_000), leapYearSeconds)
+        case .week: span = ((anchor.mwd / 10) * 1_000_000)...min((((anchor.mwd / 10) + 1) * 1_000_000), leapYearSeconds)
         case .day: span = (anchor.mwd * 100_000)...((anchor.mwd + 1) * 100_000)
         }
-        
-        func leapSeconds() -> Int { return metric.cal.isLeapYear(anchor.year) ? 300_000 : 200_000 }
     }
 }
 

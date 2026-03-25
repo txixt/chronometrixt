@@ -45,7 +45,7 @@ struct YearMetricView: View {
                                                 ForEach(0..<10, id: \.self) { day in
                                                     let isToday = someTime.year == gov.eternalNow.time.year && someTime.month == month && someTime.week == week && someTime.day == day
                                                     let isLeapYear = metric.cal.isLeapYear(someTime.year)
-                                                    let pastEndOfYear = ((month * 100) + (week * 10) + day) > (isLeapYear ? 364 : 365)
+                                                    let pastEndOfYear = ((month * 100) + (week * 10) + day) >= (isLeapYear ? 365 : 364)
                                                     RoundedRectangle(cornerRadius: 2)
                                                         .foregroundColor(isToday ? .metricOrange : .primary)
                                                         .frame(width: geo.size.width * 0.07, height: 4)

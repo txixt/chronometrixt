@@ -40,7 +40,7 @@ struct MonthMetricView: View {
                                         ForEach(0..<10, id: \.self) { day in
                                             let isToday = month.year == gov.eternalNow.time.year && month.month == gov.eternalNow.time.month && month.week == week && month.day == day
                                             let isLeapYear = metric.cal.isLeapYear(month.year)
-                                            let pastEndOfYear = ((month.month * 100) + (week * 10) + day) > (isLeapYear ? 364 : 365)
+                                            let pastEndOfYear = ((month.month * 100) + (week * 10) + day) > (isLeapYear ? 365 : 364)
                                             
                                             ZStack {
                                                 Text("\(day)")
@@ -81,5 +81,5 @@ struct MonthMetricView: View {
 }
 
 #Preview {
-    MonthMetricView(gov: Governor(), month: MetrixtTime(date: nil))
+    MonthMetricView(gov: Governor(), month: MetrixtTime(years: 5056, seconds: 36300000))
 }

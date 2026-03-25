@@ -15,7 +15,6 @@ struct WeekMetricView: View {
     
     
     private var weekEvents: [MetricEvent] {
-        print("\(String(describing: gov.span?.description))")
         guard !allEvents.isEmpty else { return [] }
         guard let span = gov.span else { return [] }
         let govTime = gov.finiteNotNow ?? gov.eternalNow.time
@@ -55,7 +54,6 @@ struct WeekMetricView: View {
                             .font(.largeTitle).bold()
                             .foregroundColor(someTime.year == gov.eternalNow.time.year && someTime.month == gov.eternalNow.time.month && someTime.week == gov.eternalNow.time.week ? .metricOrange : .primary)
                         Spacer()
-                        Text("\(eventMarkers.count)")
                     }
                     .onTapGesture(count: 1) { goToYearView() }
                     
@@ -64,6 +62,7 @@ struct WeekMetricView: View {
                     HStack {
                         ForEach(0..<10, id: \.self) { day in
                             let isToday = someTime.year == gov.eternalNow.time.year && someTime.month == gov.eternalNow.time.month && someTime.week == gov.eternalNow.time.week && someTime.day == day
+                            let beforeYearEnd = someTime.mwd < 360 && day <= (metric.cal.isLeapYear(someTime.year) ? 5 : 4)
                             
                             VStack {
                                 Text("\(day)")
@@ -72,7 +71,7 @@ struct WeekMetricView: View {
                                     .onTapGesture(count: 1) { goToDayView(day: day, hour: nil) }
 
                                 ZStack {
-
+                                    
                                     VStack {
                                         ForEach(0..<10, id: \.self) { hour in
                                             Text("\(hour)")
@@ -84,24 +83,28 @@ struct WeekMetricView: View {
                                         }
                                         .padding(10)
                                         .padding(.bottom, 3)
-                                        .background(RoundedRectangle(cornerRadius: 815)
+                                        .background(RoundedRectangle(cornerRadius: 15)
                                         .foregroundColor(isToday ? .metricOrange : .primary).opacity(isToday ? 0.5 : 0.2))
                                     
+                                    
                                     VStack {
-                                        
                                         ZStack{
-                                            if !eventMarkers[day].isEmpty {
+                                            if gov.finiteNotNow != nil && gov.finiteNotNow == week && !eventMarkers[day].isEmpty {
                                                 ForEach(eventMarkers[day]) { em in
-                                                    Circle().fill(em.color).frame(width: 22, height: 22)
-                                                        .offset(y: em.offset * 300)
+                                                    Circle().fill(em.color).frame(width: 25, height: 25)
+                                                        .offset(y: em.offset * 250)
+                                                        .opacity(0.5)
+                                                        .onTapGesture {
+                                                            viewEvent(id: em.id)
+                                                        }
                                                 }
                                             }
                                         }
-                                        
                                         Spacer()
                                     }
                                     
                                 }
+                                .frame(height: 250)
                             }
                             if day != 9 { Spacer() }
                         }
