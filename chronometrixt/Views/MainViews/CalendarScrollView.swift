@@ -13,11 +13,11 @@ struct CalendarScrollView: View {
     
     var body: some View {
         GeometryReader { geo in
-            VStack {
+            LazyVStack {
                 Spacer()
                 HStack(alignment: .center) {
                     if gov.someTimes.count == 3 {
-                        VStack(spacing: 0) {
+                        LazyVStack(spacing: 0) {
                             
                             ForEach(gov.someTimes.indices, id: \.self) { timeIndex in
                                 switch gov.scale {
@@ -38,7 +38,6 @@ struct CalendarScrollView: View {
                 Spacer()
             }
             .frame(maxWidth: .infinity, maxHeight: .infinity)
-            .ignoresSafeArea()
             .offset(y: -(geo.size.height * 0.5) + scrollControl)
             .gesture(
                 DragGesture()

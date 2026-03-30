@@ -20,9 +20,11 @@ struct ContentView: View {
         ZStack {
 #if os(iOS)
             MobileView(gov: gov)
+                .monospaced()
 #endif
 #if os(macOS)
             ComputerView(gov: gov)
+                .monospaced()
 #endif
         }
         .onChange(of: scene) { _, new in
