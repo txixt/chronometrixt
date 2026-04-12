@@ -22,10 +22,20 @@ struct CalendarScrollView: View {
                             ForEach(gov.someTimes.indices, id: \.self) { timeIndex in
                                 switch gov.scale {
                                 case .eon: YearMetricView(gov: gov, year: gov.someTimes[timeIndex]).opacity(timeIndex == 1 ? 1.0 : 0.2)
-                                case .year: YearMetricView(gov: gov, year: gov.someTimes[timeIndex]).opacity(timeIndex == 1 ? 1.0 : 0.2)
+                                case .year:
+                                    if timeIndex == 1 {
+                                        YearFocusView(gov: gov, year: gov.someTimes[timeIndex])
+                                    } else {
+                                        YearBasicView(gov: gov, year: gov.someTimes[timeIndex]).opacity(0.2)
+                                    }
                                 case .month: MonthMetricView(gov: gov, month: gov.someTimes[timeIndex]).opacity(timeIndex == 1 ? 1.0 : 0.2)
                                 case .week: WeekMetricView(gov: gov, week: gov.someTimes[timeIndex]).opacity(timeIndex == 1 ? 1.0 : 0.2)
-                                case .day: DayMetricView(gov: gov, day: gov.someTimes[timeIndex]).opacity(timeIndex == 1 ? 1.0 : 0.5)
+                                case .day:
+                                    if timeIndex == 1 {
+                                        DayFocusView(gov: gov, day: gov.someTimes[timeIndex])
+                                    } else {
+                                        DayBasicView(gov: gov, day: gov.someTimes[timeIndex]).opacity(0.2)
+                                    }
                                 }
                             }
                             .frame(height: geo.size.width)

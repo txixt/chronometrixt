@@ -148,7 +148,6 @@ struct DayMetricView: View {
                 }
                 .padding()
                 .monospaced()
-                .opacity(someTime.year == govTime.year && someTime.mwd == govTime.mwd ? 1 : 0.2)
             }
             .frame(width: geo.size.width, height: geo.size.width)
         }

@@ -61,7 +61,7 @@ struct YearMetricView: View {
                                     
                                     VStack(spacing: 3) {
                                         ForEach(0..<10, id: \.self) { week in
-                                            HStack() {
+                                            HStack {
                                                 ForEach(0..<10, id: \.self) { day in
                                                     let isToday = someTime.year == gov.eternalNow.time.year && someTime.month == month && someTime.week == week && someTime.day == day
                                                     let isLeapYear = metric.cal.isLeapYear(someTime.year)
