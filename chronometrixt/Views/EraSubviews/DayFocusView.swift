@@ -26,19 +26,33 @@ struct DayFocusView: View {
         }
         
         for event in dayEvents {
-            let startInDay = event.startSeconds % 100_000
-            let endInDay = min(event.endSeconds % 100_000, 99_999)
+            let dayStart = span.lowerBound
+            let dayEndExclusive = span.upperBound
+            let visibleStart = max(event.startSeconds, dayStart)
+            let visibleEnd = min(event.endSeconds, dayEndExclusive - 1)
+            guard visibleStart <= visibleEnd else { continue }
+            let startInDay = visibleStart - dayStart
+            let endInDay = visibleEnd - dayStart
             let startHour = min(startInDay / 10_000, 9)
             let endHour = min(endInDay / 10_000, 9)
+            
             for hour in startHour...endHour {
                 guard hour >= 0 && hour < 10 else { continue }
                 let topOTheHour = hour * 10_000
                 let endOTheHour = (hour + 1) * 10_000
-                let topOTheSegment = max(startHour, topOTheHour)
-                let endOTheSegment = max(endInDay, endOTheHour - 1)
+                let topOTheSegment = max(startInDay, topOTheHour)
+                let endOTheSegment = min(endInDay + 1, endOTheHour)
                 let startPercent = CGFloat(topOTheSegment - topOTheHour) / 10_000.0
-                let endPercent = CGFloat(endOTheSegment - endOTheHour + 1) / 10_000.0
-                let segment = EventSegment(eventId: event.id, startPercent: startPercent, endPercent: endPercent, color: Color(hex: event.calendarColor))
+                let endPercent = CGFloat(endOTheSegment - topOTheHour) / 10_000.0
+                guard endPercent > startPercent else { continue }
+                
+                let segment = EventSegment(
+                    eventId: event.id,
+                    startPercent: startPercent,
+                    endPercent: endPercent,
+                    color: Color(hex: event.calendarColor)
+                )
+
                 hourBuckets[hour].insert(segment, at: 0)
             }
         }
@@ -90,10 +104,11 @@ struct DayFocusView: View {
                                 
                                 Spacer()
                                 
-                                ForEach(0...9, id: \.self) { minutes in
-                                    Text(":\(minutes)0")
+                                ForEach(0...9, id: \.self) { minute in
+                                    Text(":\(minute)0")
                                         .font(.caption)
                                         .foregroundColor(.gray)
+                                        .onTapGesture(count: 1) { selectTime(hours: hour, minutes: minute)}
                                     Spacer()
                                 }
                             }
