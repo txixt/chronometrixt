@@ -12,7 +12,7 @@ struct SimpleYearView: View {
     
     var body: some View {
         VStack {
-            ForEach(0...4, id: \.self) { monthIndex in
+            ForEach(0...3, id: \.self) { monthIndex in
                 VStack {
                     if monthIndex != gov.eternalNow.time.month {
 
