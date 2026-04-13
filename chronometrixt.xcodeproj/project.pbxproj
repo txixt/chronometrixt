@@ -67,6 +67,7 @@
 				CalendarSubviews/SimpleScrollView.swift,
 				CalendarSubviews/YearMetricScrollView.swift,
 				ControlView.swift,
+				DayMetricView.swift,
 				DayScrollView.swift,
 				FunctionalScrollView.swift,
 				GregDateSelector.swift,
@@ -74,9 +75,11 @@
 				MetricCalendarView.swift,
 				MetricDateEditView.swift,
 				MetricLogic.swift,
+				MonthMetricView.swift,
 				MonthScrollView.swift,
 				MonthSubScrollView.swift,
 				WeekScrollView.swift,
+				YearMetricView.swift,
 				YearScrollView.swift,
 			);
 			target = C1362A122F0496A500F2B467 /* chronometrixt */;
@@ -94,6 +97,7 @@
 				CalendarSubviews/SimpleScrollView.swift,
 				CalendarSubviews/YearMetricScrollView.swift,
 				ControlView.swift,
+				DayMetricView.swift,
 				DayScrollView.swift,
 				FunctionalScrollView.swift,
 				GregDateSelector.swift,
@@ -101,9 +105,11 @@
 				MetricCalendarView.swift,
 				MetricDateEditView.swift,
 				MetricLogic.swift,
+				MonthMetricView.swift,
 				MonthScrollView.swift,
 				MonthSubScrollView.swift,
 				WeekScrollView.swift,
+				YearMetricView.swift,
 				YearScrollView.swift,
 			);
 			target = C1501DAD2F20853B00521DF6 /* MetricWatchWidgitExtension */;

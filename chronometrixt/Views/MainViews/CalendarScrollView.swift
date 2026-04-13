@@ -34,7 +34,12 @@ struct CalendarScrollView: View {
                                     } else {
                                         MonthBasicView(gov: gov, month: gov.someTimes[timeIndex]).opacity(0.2)
                                     }
-                                case .week: WeekMetricView(gov: gov, week: gov.someTimes[timeIndex]).opacity(timeIndex == 1 ? 1.0 : 0.2)
+                                case .week:
+                                    if timeIndex == 1 {
+                                        WeekFocusView(gov: gov, week: gov.someTimes[timeIndex])
+                                    } else {
+                                        WeekBasicView(gov: gov, week: gov.someTimes[timeIndex]).opacity(0.2)
+                                    }
                                 case .day:
                                     if timeIndex == 1 {
                                         DayFocusView(gov: gov, day: gov.someTimes[timeIndex])
