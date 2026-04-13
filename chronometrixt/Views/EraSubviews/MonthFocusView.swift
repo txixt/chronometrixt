@@ -60,7 +60,7 @@ struct MonthFocusView: View {
                             HStack {
                                 ForEach(0...9, id: \.self) { day in
                                     let isThisDay = isThisWeek && month.day == day
-                                    let yearEnded = ((month.month*100) + (week*10) + day) > (metric.cal.isLeapYear(month.year) ? 365 : 354)
+                                    let yearEnded = ((month.month*100) + (week*10) + day) > (metric.cal.isLeapYear(month.year) ? 365 : 364)
 
                                     ZStack {
                                         RoundedRectangle(cornerRadius: 11)

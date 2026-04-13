@@ -83,13 +83,16 @@ struct EventEndDateEditorView: View {
     }
     
     private func reset() {
-        eg.metricEnd = metric.cal.update(time: eg.metricStart, component: .second, byAdding: 1)
+        eg.metricEnd = metric.cal.update(time: eg.metricStart, component: .minute, byAdding: 1)
         eg.gregEnd = eg.metricEnd.toGreg()
         added = 1
     }
     
     private func setTheEnd(_ value: Int) {
-        if value == 0 { eg.isAllDay.toggle(); return }
+        if value == 0 {
+            eg.isAllDay.toggle()
+            return
+        }
         if value == 10000 {
             eg.metricEnd = metric.cal.update(time: eg.metricEnd, component: .week, byAdding: 1)
             eg.gregEnd = eg.metricEnd.toGreg()
