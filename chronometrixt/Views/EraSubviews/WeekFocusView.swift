@@ -82,11 +82,17 @@ struct WeekFocusView: View {
                                 .opacity(yearEnded ? 0:1)
                                 
                                 if !weekEvents.isEmpty {
-                                    ForEach(weekEvents[day]) { em in
-                                        Circle()
-                                            .fill(em.color).opacity(0.5)
-                                            .offset(y: geo.size.height * 0.7 * em.offset)
-                                            .onTapGesture(count: 1) { viewEvent(id: em.id) }
+                                    VStack {
+                                        ZStack {
+                                            ForEach(weekEvents[day]) { em in
+                                                Circle()
+                                                    .fill(em.color).opacity(0.5)
+                                                    .frame(width: geo.size.width * 0.07, height: geo.size.width * 0.07)
+                                                    .offset(y: geo.size.height * 0.63 * em.offset) //0.7 - 0.07
+                                                    .onTapGesture(count: 1) { viewEvent(id: em.id) }
+                                            }
+                                        }
+                                        Spacer()
                                     }
                                 }
                             }

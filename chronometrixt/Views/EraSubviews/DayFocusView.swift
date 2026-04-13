@@ -92,22 +92,19 @@ struct DayFocusView: View {
                             if !eventsByHour[hour].isEmpty {
                                 ForEach(eventsByHour[hour]) { segment in
                                     RoundedRectangle(cornerRadius: 11)
-                                        .fill(segment.color.opacity(0.5))
-                                        .frame(width: geo.size.width * 0.9 * (segment.endPercent - segment.startPercent), height: 22)
+                                        .fill(segment.color.opacity(0.2))
+                                        .frame(width: max(geo.size.width * 0.9 * (segment.endPercent - segment.startPercent), 22), height: 22)
                                         .offset(x: (geo.size.width * 0.9 * (segment.startPercent + segment.endPercent - 1.0) / 2.0))
                                 }
                             }
                             
-                            HStack {
+                            HStack(spacing: 0) {
                                 Text("\(hour)")
                                     .bold()
-                                
-                                Spacer()
                                 
                                 ForEach(0...9, id: \.self) { minute in
                                     Text(":\(minute)0")
                                         .font(.caption)
-                                        .foregroundColor(.gray)
                                         .onTapGesture(count: 1) { selectTime(hours: hour, minutes: minute)}
                                     Spacer()
                                 }
@@ -118,6 +115,7 @@ struct DayFocusView: View {
                                     
                                     ForEach(eventsByHour[hour]) { event in
                                         Circle().fill(event.color).frame(width: 22, height: 22)
+                                            .opacity(0.5)
                                             .onTapGesture { selectEvent(id: event.eventId) }
                                     }
                                     
@@ -143,7 +141,7 @@ struct DayFocusView: View {
 
     private func selectTime(hours: Int, minutes: Int) {
         gov.finiteNotNow = metric.cal.replace(time: day, component: .hour, with: hours)
-        gov.finiteNotNow = metric.cal.replace(time: gov.finiteNotNow!, component: .minute, with: minutes)
+        gov.finiteNotNow = metric.cal.replace(time: gov.finiteNotNow!, component: .minute, with: (minutes*10))
         gov.finiteNotNow = metric.cal.replace(time: gov.finiteNotNow!, component: .second, with: 0)
     }
 }

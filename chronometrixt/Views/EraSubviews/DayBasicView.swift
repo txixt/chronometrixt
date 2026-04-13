@@ -32,16 +32,13 @@ struct DayBasicView: View {
                                 .frame(width: geo.size.width * 0.9, height: 22)
                                 .foregroundColor(.gray).opacity(0.2)
                             
-                            HStack {
+                            HStack(spacing: 0) {
                                 Text("\(hour)")
                                     .bold()
-                                
-                                Spacer()
                                 
                                 ForEach(0...9, id: \.self) { minutes in
                                     Text(":\(minutes)0")
                                         .font(.caption)
-                                        .foregroundColor(.gray)
                                     Spacer()
                                 }
                             }

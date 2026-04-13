@@ -33,7 +33,7 @@ struct WeekMetricView: View {
             let em = EventMarker(id: event.id, offset: eventOffset, color: Color(hex: event.calendarColor))
             dayBuckets[eventDay].insert(em, at: 0)
         }
-        
+        print(dayBuckets.description)
         return dayBuckets
     }
     private struct EventMarker: Identifiable {

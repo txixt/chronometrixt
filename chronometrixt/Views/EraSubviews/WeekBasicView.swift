@@ -46,7 +46,6 @@ struct WeekBasicView: View {
                                     ForEach(0...9, id: \.self) { hour in
                                         Text("\(hour)")
                                             .font(.caption)
-                                        
                                         Spacer()
                                     }
                                 }
