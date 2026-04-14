@@ -37,18 +37,28 @@ struct MapInsetView: View {
                 Group {
                     if let mapItem {
                         let coordinate = mapItem.location.coordinate
-                        Map(position: $cameraPosition) {
-                            Marker(mapItem.name ?? location, coordinate: coordinate)
-                        }
-                        .labelsHidden()
-                        .mapStyle(.imagery(elevation: .realistic))
-                        .clipShape(RoundedRectangle(cornerRadius: 10))
-                        .opacity(0.5)
-                        .onTapGesture {
-                            mapItem.openInMaps(launchOptions: [
-                                MKLaunchOptionsMapCenterKey: NSValue(mkCoordinate: coordinate),
-                                MKLaunchOptionsMapSpanKey: NSValue(mkCoordinateSpan: MKCoordinateSpan(latitudeDelta: 0.05, longitudeDelta: 0.05))
-                            ])
+                        
+                        ZStack {
+                            Map(position: $cameraPosition) {
+                                Marker(mapItem.name ?? location, coordinate: coordinate)
+                            }
+                            .labelsHidden()
+                            .mapStyle(.imagery(elevation: .realistic))
+                            .clipShape(RoundedRectangle(cornerRadius: 10))
+                            .opacity(0.5)
+                            .onTapGesture {
+                                mapItem.openInMaps(launchOptions: [
+                                    MKLaunchOptionsMapCenterKey: NSValue(mkCoordinate: coordinate),
+                                    MKLaunchOptionsMapSpanKey: NSValue(mkCoordinateSpan: MKCoordinateSpan(latitudeDelta: 0.05, longitudeDelta: 0.05))
+                                ])
+                            }
+                            
+                            HStack {
+                                Rectangle().frame(height: 0.5).opacity(0.5)
+                            }
+                            VStack {
+                                Rectangle().frame(width: 0.5, height: 50).opacity(0.5)
+                            }
                         }
                     } else if didSearch {
                         EmptyView()

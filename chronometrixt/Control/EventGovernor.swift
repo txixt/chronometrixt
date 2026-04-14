@@ -164,13 +164,20 @@ import SwiftData
         gregEnd = metricEnd.toGreg()
     }
     
+    func enforceEntropy() {
+        if metricEnd.years <= metricStart.years && metricEnd.seconds <= metricStart.seconds {
+            metricEnd = metric.cal.update(time: metricStart, component: .minute, byAdding: 1)
+            gregEnd = metricEnd.toGreg()
+        }
+    }
+    
     func allDayToggle() {
         if isAllDay {
             originalStart = metricStart
             metricStart = metric.cal.replace(time: metricStart, component: .hour, with: 0)
             metricStart = metric.cal.replace(time: metricStart, component: .minute, with: 0)
             metricStart = metric.cal.replace(time: metricStart, component: .second, with: 0)
-            metricEnd = metric.cal.replace(time: metricEnd, component: .hour, with: 9)
+            metricEnd = metric.cal.replace(time: metricStart, component: .hour, with: 9)
             metricEnd = metric.cal.replace(time: metricEnd, component: .minute, with: 99)
             metricEnd = metric.cal.replace(time: metricEnd, component: .second, with: 99)
             isAllDay.toggle()

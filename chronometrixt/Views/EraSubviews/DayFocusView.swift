@@ -92,7 +92,7 @@ struct DayFocusView: View {
                             if !eventsByHour[hour].isEmpty {
                                 ForEach(eventsByHour[hour]) { segment in
                                     RoundedRectangle(cornerRadius: 11)
-                                        .fill(segment.color.opacity(0.2))
+                                        .fill(segment.color.opacity(0.5))
                                         .frame(width: max(geo.size.width * 0.9 * (segment.endPercent - segment.startPercent), 22), height: 22)
                                         .offset(x: (geo.size.width * 0.9 * (segment.startPercent + segment.endPercent - 1.0) / 2.0))
                                 }
@@ -115,7 +115,8 @@ struct DayFocusView: View {
                                     
                                     ForEach(eventsByHour[hour]) { event in
                                         Circle().fill(event.color).frame(width: 22, height: 22)
-                                            .opacity(0.5)
+                                            .opacity(0.8)
+                                            .shadow(color: event.color, radius: 3)
                                             .onTapGesture { selectEvent(id: event.eventId) }
                                     }
                                     
