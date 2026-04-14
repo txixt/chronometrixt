@@ -17,23 +17,66 @@ struct MapInsetView: View {
     
     var body: some View {
         VStack {
-            Group {
+            
+            HStack {
+                Text("at:")
+                    .font(.caption)
+                Spacer()
+                
                 if let mapItem {
-                    let coordinate = mapItem.location.coordinate
-                    Map(position: $cameraPosition) {
-                        Marker(mapItem.name ?? location, coordinate: coordinate)
+                    let string = String(format: "%.6f, %.6f", mapItem.location.coordinate.latitude, mapItem.location.coordinate.longitude)
+                    Button(action: { UIPasteboard.general.string = string; print(string) }) {
+                        Image(systemName: "square.on.square")
                     }
-                    .labelsHidden()
-//                    .mapStyle(.standard(elevation: .flat))
-                    .mapStyle(.imagery(elevation: .realistic))
-                    .frame(height: 150)
-                    .clipShape(RoundedRectangle(cornerRadius: 10))
-                    .opacity(0.5)
-                } else if didSearch {
-                    EmptyView()
+                    .tint(.primary)
+                    .shadow(color: .gray, radius: 3)
                 }
             }
+            
+            ZStack {
+                Group {
+                    if let mapItem {
+                        let coordinate = mapItem.location.coordinate
+                        
+                        ZStack {
+                            Map(position: $cameraPosition) {
+                                Marker(mapItem.name ?? location, coordinate: coordinate)
+                            }
+                            .labelsHidden()
+                            .mapStyle(.imagery(elevation: .realistic))
+                            .clipShape(RoundedRectangle(cornerRadius: 10))
+                            .opacity(0.5)
+                            .onTapGesture {
+                                mapItem.openInMaps(launchOptions: [
+                                    MKLaunchOptionsMapCenterKey: NSValue(mkCoordinate: coordinate),
+                                    MKLaunchOptionsMapSpanKey: NSValue(mkCoordinateSpan: MKCoordinateSpan(latitudeDelta: 0.05, longitudeDelta: 0.05))
+                                ])
+                            }
+                            
+                            HStack {
+                                Rectangle().frame(height: 0.5).opacity(0.5)
+                            }
+                            VStack {
+                                Rectangle().frame(width: 0.5, height: 50).opacity(0.5)
+                            }
+                        }
+                    } else if didSearch {
+                        EmptyView()
+                    }
+                }
+                VStack {
+                    HStack() {
+                        Text(location)
+                        .font(.title2)
+                        .padding(.leading)
+                        Spacer()
+                    }
+                    Spacer()
+                }
+            }
+            .frame(height: 150)
         }
+        .monospaced()
         .onAppear { print("this exists now. ")}
         .task(id: location) {
             let trimmed = location.trimmingCharacters(in: .whitespacesAndNewlines)
@@ -59,8 +102,8 @@ struct MapInsetView: View {
                     cameraPosition = .region(
                         MKCoordinateRegion(
                             center: first.location.coordinate,
-                            latitudinalMeters: 10000,
-                            longitudinalMeters: 10000
+                            latitudinalMeters: 3000000,
+                            longitudinalMeters: 3000000
                         )
                     )
                 }

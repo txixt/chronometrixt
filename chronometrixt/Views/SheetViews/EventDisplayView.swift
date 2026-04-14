@@ -43,13 +43,21 @@ struct EventDisplayView: View {
                     }
                     .padding(.bottom)
                     
+                    VStack(alignment: .leading) {
+                        if !eg.location.isEmpty {
+                            MapInsetView(location: eg.location)
+                                .tint(.primary)
+                        } else {
+                            Text("none")
+                        }
+                    }
+                    
                     MetrixtSubdivider()
                     
                     HStack(alignment: .top, spacing: 0) {
                         HStack {
                             Spacer()
                             Text("recurrence: ")
-                                .font(.caption)
                         }
                         .frame(width: 100)
                         VStack(alignment: .leading) {
@@ -64,38 +72,21 @@ struct EventDisplayView: View {
                             }
                         }
                     }
+                    .font(.caption)
 
                     HStack(alignment: .top, spacing: 0) {
                         HStack {
                             Spacer()
                             Text("alarms: ")
-                                .font(.caption)
                         }
                         .frame(width: 100)
                         VStack(alignment: .leading) {
                             Text("\(eg.alarms.count.description)")
                         }
                     }
+                    .font(.caption)
                     .padding(.bottom)
                     
-                    HStack(alignment: .top, spacing: 0) {
-                        HStack {
-                            Spacer()
-                            Text("location: ")
-                                .font(.caption)
-                        }
-                        .frame(width: 100)
-                        VStack(alignment: .leading) {
-                            
-                            if !eg.location.isEmpty {
-                                Text(eg.location)
-                                MapInsetView(location: eg.location)
-                                    .tint(.primary)
-                            } else {
-                                Text("none")
-                            }
-                        }
-                    }
                     HStack(alignment: .top, spacing: 0) {
                         HStack {
                             Spacer()
@@ -104,24 +95,27 @@ struct EventDisplayView: View {
                         }
                         .frame(width: 100)
                         VStack(alignment: .leading) {
-                            Text(eg.notes.isEmpty ? "none" : eg.notes)
+                            ScrollView {
+                                Text(eg.notes.isEmpty ? "none" : eg.notes)
+                            }
+                            .frame(maxHeight: 150)
                         }
                     }
                     .padding(.bottom)
                     
-                    HStack(alignment: .top, spacing: 0) {
-                        HStack {
-                            Spacer()
-                            Text("calendar: ")
-                                .font(.caption)
-                        }
-                        .frame(width: 100)
-                        VStack(alignment: .leading) {
-                            Text(eg.calendar)
-                                .font(.caption)
-                        }
-                    }
-                    .foregroundStyle(.gray)
+//                    HStack(alignment: .top, spacing: 0) {
+//                        HStack {
+//                            Spacer()
+//                            Text("calendar: ")
+//                                .font(.caption)
+//                        }
+//                        .frame(width: 100)
+//                        VStack(alignment: .leading) {
+//                            Text(eg.calendar)
+//                                .font(.caption)
+//                        }
+//                    }
+//                    .foregroundStyle(.gray)
                 }
                 .bold()
                 

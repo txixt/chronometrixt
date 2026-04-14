@@ -29,6 +29,7 @@ import SwiftData
     var calendarColor: String
     var externalId: String
     
+    var originalStart: MetrixtTime? = nil
     var modelContext: ModelContext
     var gov: Governor
     
@@ -45,9 +46,9 @@ import SwiftData
         self.notes = ""
         self.location = ""
         self.metricStart = starting
-        self.metricEnd = ending ?? metric.cal.update(time: starting, component: .second, byAdding: 2)
+        self.metricEnd = ending ?? metric.cal.update(time: starting, component: .minute, byAdding: 1)
         self.gregStart = starting.toGreg()
-        self.gregEnd = ending?.toGreg() ?? metric.cal.update(time: starting, component: .second, byAdding: 2).toGreg()
+        self.gregEnd = ending?.toGreg() ?? metric.cal.update(time: starting, component: .minute, byAdding: 1).toGreg()
         self.isAllDay = false
         self.status = .confirmed
         self.sequence = 0
@@ -161,6 +162,32 @@ import SwiftData
         let secs = month * 10_000_000 + week * 1_000_000 + day * 100_000 + hour * 10_000 + minute * 100 + second
         metricEnd = MetrixtTime(years: year, seconds: secs)
         gregEnd = metricEnd.toGreg()
+    }
+    
+    func enforceEntropy() {
+        if metricEnd.years <= metricStart.years && metricEnd.seconds <= metricStart.seconds {
+            metricEnd = metric.cal.update(time: metricStart, component: .minute, byAdding: 1)
+            gregEnd = metricEnd.toGreg()
+        }
+    }
+    
+    func allDayToggle() {
+        if isAllDay {
+            originalStart = metricStart
+            metricStart = metric.cal.replace(time: metricStart, component: .hour, with: 0)
+            metricStart = metric.cal.replace(time: metricStart, component: .minute, with: 0)
+            metricStart = metric.cal.replace(time: metricStart, component: .second, with: 0)
+            metricEnd = metric.cal.replace(time: metricStart, component: .hour, with: 9)
+            metricEnd = metric.cal.replace(time: metricEnd, component: .minute, with: 99)
+            metricEnd = metric.cal.replace(time: metricEnd, component: .second, with: 99)
+            isAllDay.toggle()
+            return
+        }
+        if !isAllDay {
+            metricStart = originalStart ?? gov.finiteNotNow ?? gov.eternalNow.time
+            metricEnd = metric.cal.update(time: metricStart, component: .minute, byAdding: 1)
+            isAllDay.toggle()
+        }
     }
     
     /// After changing gregStart via DatePicker, rebuild metricStart

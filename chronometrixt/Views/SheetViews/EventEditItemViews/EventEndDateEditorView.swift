@@ -10,113 +10,70 @@ import SwiftUI
 struct EventEndDateEditorView: View {
     @Bindable var gov: Governor
     @Bindable var eg: EventGovernor
-    @State var goGranular: Bool = false
-    @State var added: Int = 1
-    let enforceEntropy: () -> Void
     
     var body: some View {
-        if !goGranular {
-            
-            VStack {
-                MetrixtSubdivider()
-                HStack {
-                    Text("make event all day or tap to add metric values to end time:")
-                        .font(.caption)
-                    Spacer()
-                }
-                .padding(.bottom)
-                
-                HStack {
-                    AddTimeButton(eg: eg, added: $added, text: "allday", setTheEnd: { setTheEnd(0) } )
-                    AddTimeButton(eg: eg, added: $added, text: "1mm", setTheEnd: { setTheEnd(1) } )
-                    AddTimeButton(eg: eg, added: $added, text: "5mm", setTheEnd: { setTheEnd(5) } )
-                    AddTimeButton(eg: eg, added: $added, text: "10mm", setTheEnd: { setTheEnd(10) } )
-                }
-                HStack {
-                    AddTimeButton(eg: eg, added: $added, text: "50mm", setTheEnd: { setTheEnd(50) } )
-                    AddTimeButton(eg: eg, added: $added, text: "1mh", setTheEnd: { setTheEnd(100)} )
-                    AddTimeButton(eg: eg, added: $added, text: "1d", setTheEnd: { setTheEnd(1_000) } )
-                    AddTimeButton(eg: eg, added: $added, text: "10d", setTheEnd: { setTheEnd(10_000) } )
-                }
-                .padding(.bottom)
-                
-                HStack {
-                    VStack(alignment: .leading) {
-                        Text("start date: ")
-                            .font(.caption)
-                        Text(eg.metricStart.fullDateTxt + (eg.isAllDay ? "" : " + \(added)mm ="))
-                            .bold()
-                    }
-                    .foregroundStyle(.gray)
-                    Spacer()
-                }
-                HStack {
-                    VStack(alignment: .leading) {
-                        Text("end date: ")
-                            .font(.caption)
-                        Text(eg.isAllDay ? "all day" : eg.metricEnd.fullDateTxt)
-                            .bold()
-                    }
-                    Spacer()
-                }
-                .padding(.bottom)
-                
-                HStack {
-                    SubmitButtonView(imageString: "arrow.trianglehead.counterclockwise", text: "reset", action: reset
-                    )
-                    .opacity(0.8)
-                    SubmitButtonView(imageString: "calendar.day.timeline.left", text: "set specific end", action: { goGranular = true })
-                    .opacity(0.8)
-                    SubmitButtonView(imageString: "checkmark", text: "done", action: { eg.editField = .none })
-                }
-                .padding(.bottom)
-                
-                MetrixtSubdivider()
+        VStack {
+            MetrixtSubdivider()
+            HStack {
+                Text("set duration:")
+                    .font(.caption)
+                Spacer()
             }
-            .monospaced()
-            .onDisappear { goGranular = false }
+            .padding(.bottom, 5)
+            HStack {
+                AddTimeButton(eg: eg, text: "all day", setTheEnd: { setTheEnd(0) } )
+                AddTimeButton(eg: eg, text: "1mm", setTheEnd: { setTheEnd(1) } )
+                AddTimeButton(eg: eg, text: "5mm", setTheEnd: { setTheEnd(5) } )
+                AddTimeButton(eg: eg, text: "10mm", setTheEnd: { setTheEnd(10) } )
+                AddTimeButton(eg: eg, text: "25mm", setTheEnd: { setTheEnd(25) } )
+            }
+            HStack {
+                AddTimeButton(eg: eg, text: "50mm", setTheEnd: { setTheEnd(50) } )
+                AddTimeButton(eg: eg, text: "75mm", setTheEnd: { setTheEnd(75) } )
+                AddTimeButton(eg: eg, text: "1mh", setTheEnd: { setTheEnd(100)} )
+                AddTimeButton(eg: eg, text: "2mh", setTheEnd: { setTheEnd(200) } )
+                AddTimeButton(eg: eg, text: "3mh", setTheEnd: { setTheEnd(300) } )
+            }
+            .padding(.bottom)
             
-        } else {
-            EventMetricDateEditorView(gov: gov, eg: eg, target: .endDateMetric, enforceEntropy: enforceEntropy)
+            HStack {
+                Text("end time:")
+                    .font(.caption)
+                Spacer()
+            }
+            .padding(.bottom, 5)
+            
+            MetricDateSteppers(gov: gov, eg: eg, target: .endDateMetric)
+            
+
+            SubmitButtonView(imageString: "checkmark", text: "ended", action: { eg.editField = .none })
+            .padding(.bottom)
+            
+            MetrixtSubdivider()
         }
-        
-    }
-    
-    private func reset() {
-        eg.metricEnd = metric.cal.update(time: eg.metricStart, component: .second, byAdding: 1)
-        eg.gregEnd = eg.metricEnd.toGreg()
-        added = 1
+        .monospaced()
     }
     
     private func setTheEnd(_ value: Int) {
-        if value == 0 { eg.isAllDay.toggle(); return }
-        if value == 10000 {
-            eg.metricEnd = metric.cal.update(time: eg.metricEnd, component: .week, byAdding: 1)
-            eg.gregEnd = eg.metricEnd.toGreg()
-            added += value
-            return
-        }
-        eg.metricEnd = metric.cal.update(time: eg.metricEnd, component: .minute, byAdding: value)
+        if value == 0 { eg.allDayToggle(); return }
+        eg.metricEnd = metric.cal.update(time: eg.metricStart, component: .minute, byAdding: value)
         eg.gregEnd = eg.metricEnd.toGreg()
-                added += value
-        enforceEntropy()
+        eg.enforceEntropy()
     }
 }
 
 struct AddTimeButton: View {
     @Bindable var eg: EventGovernor
-    @Binding var added: Int
     var text: String
     let setTheEnd: () -> Void
     
     var body: some View {
         Button(action: setTheEnd) {
             Text(text)
-                .font(.caption)
+                .font(.caption2)
                 .foregroundColor(.primary)
-                .padding()
-                .frame(width: 80, height: 30)
-                .background(RoundedRectangle(cornerRadius: 10).fill(.gray).opacity(text == "allday" ? 0.2 : 0.3))
+                .frame(width: 60, height: 30)
+                .background(RoundedRectangle(cornerRadius: 10).fill(.gray).opacity(text == "all day" ? 0.2 : 0.3))
         }
     }
 }
@@ -125,13 +82,5 @@ struct AddTimeButton: View {
 #Preview {
     let gov = Governor()
     let eg = PreviewEG().eg()
-    EventEndDateGregEditorView(
-        gov: gov,
-        eg: eg,
-        enforceEntropy: EventEditMainView(
-            gov: gov,
-            eventGov: eg,
-            update: false
-        ).enforceEntropy
-    )
+    EventEndDateEditorView(gov: gov, eg: eg)
 }

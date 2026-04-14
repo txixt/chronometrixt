@@ -35,6 +35,7 @@ struct EventCreationView: View {
                 }
                 
             }
+
         }
         .padding()
         .monospaced()
@@ -55,7 +56,7 @@ struct EventCreationView: View {
         eventGov = EventGovernor(
             title: eventTitle,
             starting: gov.finiteNotNow!,
-            ending: metric.cal.update(time: gov.finiteNotNow!, component: .second, byAdding: 1),
+            ending: metric.cal.update(time: gov.finiteNotNow!, component: .minute, byAdding: 1),
             context: context,
             gov: gov
         )

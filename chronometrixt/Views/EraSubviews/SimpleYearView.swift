@@ -12,7 +12,7 @@ struct SimpleYearView: View {
     
     var body: some View {
         VStack {
-            ForEach(MetricLogic.months.indices, id: \.self) { monthIndex in
+            ForEach(0...3, id: \.self) { monthIndex in
                 VStack {
                     if monthIndex != gov.eternalNow.time.month {
 
@@ -23,9 +23,9 @@ struct SimpleYearView: View {
                     } else {
                         
                         VStack {
-                            ForEach(MetricLogic.weeks.indices, id: \.self) { weekIndex in
+                            ForEach(0...9, id: \.self) { weekIndex in
                                 HStack {
-                                    ForEach(MetricLogic.days.indices, id: \.self) { dayIndex in
+                                    ForEach(0...9, id: \.self) { dayIndex in
                                         let yearDay = (monthIndex * 100) + (weekIndex * 10) + dayIndex
                                         let finalDay = metric.cal.isLeapYear(gov.eternalNow.time.year) ? 365 : 364
                                         let isToday = gov.eternalNow.time.mwd == yearDay

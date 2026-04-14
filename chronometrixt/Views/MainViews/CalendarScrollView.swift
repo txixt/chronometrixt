@@ -13,19 +13,39 @@ struct CalendarScrollView: View {
     
     var body: some View {
         GeometryReader { geo in
-            VStack {
+            LazyVStack {
                 Spacer()
                 HStack(alignment: .center) {
                     if gov.someTimes.count == 3 {
-                        VStack(spacing: 0) {
+                        LazyVStack(spacing: 0) {
                             
                             ForEach(gov.someTimes.indices, id: \.self) { timeIndex in
                                 switch gov.scale {
                                 case .eon: YearMetricView(gov: gov, year: gov.someTimes[timeIndex]).opacity(timeIndex == 1 ? 1.0 : 0.2)
-                                case .year: YearMetricView(gov: gov, year: gov.someTimes[timeIndex]).opacity(timeIndex == 1 ? 1.0 : 0.2)
-                                case .month: MonthMetricView(gov: gov, month: gov.someTimes[timeIndex]).opacity(timeIndex == 1 ? 1.0 : 0.2)
-                                case .week: WeekMetricView(gov: gov, week: gov.someTimes[timeIndex]).opacity(timeIndex == 1 ? 1.0 : 0.2)
-                                case .day: DayMetricView(gov: gov, day: gov.someTimes[timeIndex]).opacity(timeIndex == 1 ? 1.0 : 0.5)
+                                case .year:
+                                    if timeIndex == 1 {
+                                        YearFocusView(gov: gov, year: gov.someTimes[timeIndex])
+                                    } else {
+                                        YearBasicView(gov: gov, year: gov.someTimes[timeIndex]).opacity(0.2)
+                                    }
+                                case .month:
+                                    if timeIndex == 1 {
+                                        MonthFocusView(gov: gov, month: gov.someTimes[timeIndex])
+                                    } else {
+                                        MonthBasicView(gov: gov, month: gov.someTimes[timeIndex]).opacity(0.2)
+                                    }
+                                case .week:
+                                    if timeIndex == 1 {
+                                        WeekFocusView(gov: gov, week: gov.someTimes[timeIndex])
+                                    } else {
+                                        WeekBasicView(gov: gov, week: gov.someTimes[timeIndex]).opacity(0.2)
+                                    }
+                                case .day:
+                                    if timeIndex == 1 {
+                                        DayFocusView(gov: gov, day: gov.someTimes[timeIndex])
+                                    } else {
+                                        DayBasicView(gov: gov, day: gov.someTimes[timeIndex]).opacity(0.2)
+                                    }
                                 }
                             }
                             .frame(height: geo.size.width)
@@ -38,7 +58,6 @@ struct CalendarScrollView: View {
                 Spacer()
             }
             .frame(maxWidth: .infinity, maxHeight: .infinity)
-            .ignoresSafeArea()
             .offset(y: -(geo.size.height * 0.5) + scrollControl)
             .gesture(
                 DragGesture()

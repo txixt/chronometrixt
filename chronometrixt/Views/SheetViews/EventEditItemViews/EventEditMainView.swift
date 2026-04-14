@@ -16,199 +16,188 @@ struct EventEditMainView: View {
     
     var body: some View {
         GeometryReader { geo in
-            
-            ZStack {
-                VStack {
-                    VStack {
-                        if eventGov.editField != .title {
-                            EventLabelView(eventGov: eventGov,
-                                           label: nil,
-                                           value: eventGov.title,
-                                           imageString: "square.and.pencil",
-                                           size: 1,
-                                           titleColor: Color(hex: eventGov.calendarColor),
-                                           target: .title)
-                            .padding(.bottom)
-                        } else {
-                            EventTitleEditorView(eg: eventGov)
-                        }
-                        
-                        if eventGov.editField != .startDateMetric {
-                            EventLabelView(eventGov: eventGov,
-                                           label: "metric start: ",
-                                           value: eventGov.metricStart.fullDateTxt,
-                                           imageString: "wrench",
-                                           size: 2,
-                                           target: .startDateMetric)
-                        } else {
-                            EventMetricDateEditorView(gov: gov, eg: eventGov, target: .startDateMetric, enforceEntropy: { enforceEntropy() })
-                        }
-                        
-                        if eventGov.editField != .startDateGreg {
-                            EventLabelView(eventGov: eventGov,
-                                           label: "gregorian start: ",
-                                           value: eventGov.metricStart.toGreg().formatted(),
-                                           imageString: "wrench",
-                                           size: 2,
-                                           target: .startDateGreg)
-                            .padding(.bottom)
-                        } else {
-                            EventGregDateEditorView(eg: eventGov, target: .startDateGreg, enforceEntropy: { enforceEntropy() })
-                        }
-                        
-                        if eventGov.editField != .endDateMetric {
-                            EventLabelView(eventGov: eventGov,
-                                           label: "metric end: ",
-                                           value: eventGov.isAllDay ? "all day" : eventGov.metricEnd.fullDateTxt,
-                                           imageString: "wrench",
-                                           size: 2,
-                                           target: .endDateMetric)
-                        } else {
-                            EventEndDateEditorView(gov: gov, eg: eventGov, enforceEntropy: { enforceEntropy() })
-                        }
-                        
-                        if eventGov.editField != .endDateGreg {
-                            EventLabelView(eventGov: eventGov,
-                                           label: "gregorian end: ",
-                                           value: eventGov.isAllDay ? "all day" : eventGov.metricEnd.toGreg().formatted(),
-                                           imageString: "wrench",
-                                           size: 2,
-                                           target: .endDateGreg)
-                            .padding(.bottom)
-                        } else {
-                            EventEndDateGregEditorView(gov: gov, eg: eventGov, enforceEntropy: { enforceEntropy() })
-                        }
-                        
-                        if eventGov.editField != .alarms {
-                            EventLabelView(eventGov: eventGov,
-                                           label: "alarms: ",
-                                           value: eventGov.alarms.count.description,
-                                           imageString: eventGov.alarms.isEmpty ? "bell" : "bell.fill",
-                                           size: 4,
-                                           target: .alarms)
-                        } else {
-                            EventAlarmEditorView(eg: eventGov)
-                        }
-                        
-                        if eventGov.editField != .recurrence {
-                            EventLabelView(eventGov: eventGov,
-                                           label: "recurrence: ",
-                                           value: String(
-                                            "\(eventGov.recurrence.frequency)" +
-                                            (eventGov.recurrence.frequency == .none && eventGov.recurrence.count == nil ? "" :
-                                            (eventGov.recurrence.count == nil ? " x ∞" : " x \(eventGov.recurrence.count!)"))
-                                                        ),
-                                           imageString: eventGov.recurrence.frequency == .none ? "square.stack.3d.down.right" : "square.stack.3d.down.right.fill",
-                                           size: 4,
-                                           target: .recurrence)
-                            .padding(.bottom)
-                        } else {
-                            EventRecurrenceEditorView(eg: eventGov, chronologyError: chronologyError)
-                        }
-                        
-                        if eventGov.editField != .location {
-                            EventLabelView(eventGov: eventGov,
-                                           label: "location: ",
-                                           value: eventGov.location.isEmpty ? "none" : eventGov.location,
-                                           imageString: "square.and.pencil",
-                                           size: 4,
-                                           target: .location)
-                        } else {
-                            EventLocationEditorView(eg: eventGov)
-                        }
-                        
-                        if eventGov.editField != .notes {
-                            EventLabelView(eventGov: eventGov,
-                                           label: "notes: ",
-                                           value: eventGov.notes.isEmpty ? "none" : eventGov.notes,
-                                           imageString: "square.and.pencil",
-                                           size: 4,
-                                           target: .notes)
-                            .padding(.bottom)
-                        } else {
-                            EventNotesEditorView(eg: eventGov)
-                        }
-                        
-                        if calendars.count > 1 {
-                            if eventGov.editField != .calendar {
+            VStack {
+                ScrollView {
+                        VStack {
+                            if eventGov.editField != .title {
                                 EventLabelView(eventGov: eventGov,
-                                               label: "calendar: ",
-                                               value: eventGov.calendar.isEmpty ? "none" : eventGov.calendar,
-                                               imageString: "slider.horizontal.3",
-                                               size: 4,
-                                               labelColor: .gray,
-                                               target: .calendar)
-                            } else {
-                                EventCalendarEditorView(eg: eventGov)
-                            }
-                        }
-
-                        if !eventGov.participants.isEmpty {
-                            if eventGov.editField != .participants {
-                                EventLabelView(eventGov: eventGov,
-                                               label: "participants: ",
-                                               value: "\(eventGov.participants.count)",
-                                               imageString: "eye",
-                                               size: 4,
-                                               labelColor: .gray,
-                                               target: .participants)
+                                               label: nil,
+                                               value: eventGov.title,
+                                               imageString: "square.and.pencil",
+                                               size: 1,
+                                               titleColor: Color(hex: eventGov.calendarColor),
+                                               target: .title)
                                 .padding(.bottom)
                             } else {
-                                EventParticipantView(eg: eventGov)
+                                EventTitleEditorView(eg: eventGov)
                             }
-                        }
-                    }
-    //                .padding(.bottom, 150)
-                    
-                    Spacer()
-
-                    
-                    if update {
-                        ZStack {
-                            Divider()
-                            HStack {
-                                Text("destroy event")
-                                    .font(.title3)
-                                    .foregroundStyle(.secondary)
-                                    .bold()
-                                Spacer()
-                                Button(action: destroyEvent) {
-                                    Image(systemName: "trash")
+                            
+                            if eventGov.editField != .startDateMetric {
+                                EventLabelView(eventGov: eventGov,
+                                               label: "metric start: ",
+                                               value: eventGov.metricStart.fullDateTxt,
+                                               imageString: "wrench",
+                                               size: 2,
+                                               target: .startDateMetric)
+                            } else {
+                                EventMetricDateEditorView(gov: gov, eg: eventGov, target: .startDateMetric)
+                            }
+                            
+                            if eventGov.editField != .startDateGreg {
+                                EventLabelView(eventGov: eventGov,
+                                               label: "gregorian start: ",
+                                               value: eventGov.metricStart.toGreg().formatted(),
+                                               imageString: "wrench",
+                                               size: 2,
+                                               target: .startDateGreg)
+                                .padding(.bottom)
+                            } else {
+                                EventGregDateEditorView(eg: eventGov, target: .startDateGreg)
+                            }
+                            
+                            if eventGov.editField != .endDateMetric {
+                                EventLabelView(eventGov: eventGov,
+                                               label: "metric end: ",
+                                               value: eventGov.isAllDay ? "all day" : eventGov.metricEnd.fullDateTxt,
+                                               imageString: "wrench",
+                                               size: 2,
+                                               target: .endDateMetric)
+                            } else {
+                                EventEndDateEditorView(gov: gov, eg: eventGov)
+                            }
+                            
+                            if eventGov.editField != .endDateGreg {
+                                EventLabelView(eventGov: eventGov,
+                                               label: "gregorian end: ",
+                                               value: eventGov.isAllDay ? "all day" : eventGov.metricEnd.toGreg().formatted(),
+                                               imageString: "wrench",
+                                               size: 2,
+                                               target: .endDateGreg)
+                                .padding(.bottom)
+                            } else {
+                                EventEndDateGregEditorView(gov: gov, eg: eventGov)
+                            }
+                            
+                            if eventGov.editField != .alarms {
+                                EventLabelView(eventGov: eventGov,
+                                               label: "alarms: ",
+                                               value: eventGov.alarms.count.description,
+                                               imageString: eventGov.alarms.isEmpty ? "bell" : "bell.fill",
+                                               size: 4,
+                                               target: .alarms)
+                            } else {
+                                EventAlarmEditorView(eg: eventGov)
+                            }
+                            
+                            if eventGov.editField != .recurrence {
+                                EventLabelView(eventGov: eventGov,
+                                               label: "recurrence: ",
+                                               value: String(
+                                                "\(eventGov.recurrence.frequency)" +
+                                                (eventGov.recurrence.frequency == .none && eventGov.recurrence.count == nil ? "" :
+                                                (eventGov.recurrence.count == nil ? " x ∞" : " x \(eventGov.recurrence.count!)"))
+                                                            ),
+                                               imageString: eventGov.recurrence.frequency == .none ? "square.stack.3d.down.right" : "square.stack.3d.down.right.fill",
+                                               size: 4,
+                                               target: .recurrence)
+                                .padding(.bottom)
+                            } else {
+                                EventRecurrenceEditorView(eg: eventGov, chronologyError: chronologyError)
+                            }
+                            
+                            if eventGov.editField != .location {
+                                EventLabelView(eventGov: eventGov,
+                                               label: "location: ",
+                                               value: eventGov.location.isEmpty ? "none" : eventGov.location,
+                                               imageString: "square.and.pencil",
+                                               size: 4,
+                                               target: .location)
+                            } else {
+                                EventLocationEditorView(eg: eventGov)
+                            }
+                            
+                            if eventGov.editField != .notes {
+                                EventLabelView(eventGov: eventGov,
+                                               label: "notes: ",
+                                               value: eventGov.notes.isEmpty ? "none" : eventGov.notes,
+                                               imageString: "square.and.pencil",
+                                               size: 4,
+                                               target: .notes)
+                                .padding(.bottom)
+                            } else {
+                                EventNotesEditorView(eg: eventGov)
+                            }
+                            
+                            if calendars.count > 1 {
+                                if eventGov.editField != .calendar {
+                                    EventLabelView(eventGov: eventGov,
+                                                   label: "calendar: ",
+                                                   value: eventGov.calendar.isEmpty ? "none" : eventGov.calendar,
+                                                   imageString: "slider.horizontal.3",
+                                                   size: 4,
+                                                   labelColor: .gray,
+                                                   target: .calendar)
+                                } else {
+                                    EventCalendarEditorView(eg: eventGov)
                                 }
-                                .tint(.red)
-                                .shadow(color: .red, radius: 3)
+                            }
+
+                            if !eventGov.participants.isEmpty {
+                                if eventGov.editField != .participants {
+                                    EventLabelView(eventGov: eventGov,
+                                                   label: "participants: ",
+                                                   value: "\(eventGov.participants.count)",
+                                                   imageString: "eye",
+                                                   size: 4,
+                                                   labelColor: .gray,
+                                                   target: .participants)
+                                    .padding(.bottom)
+                                } else {
+                                    EventParticipantView(eg: eventGov)
+                                }
+                            }
+                        }
+                        .padding(.bottom, 50)
+                        
+                        Spacer()
+                        
+                        if update {
+                            ZStack {
+                                Divider()
+                                HStack {
+                                    Text("destroy event")
+                                        .font(.title3)
+                                        .foregroundStyle(.secondary)
+                                        .bold()
+                                    Spacer()
+                                    Button(action: destroyEvent) {
+                                        Image(systemName: "trash")
+                                    }
+                                    .tint(.red)
+                                    .shadow(color: .red, radius: 3)
+                                }
                             }
                         }
                     }
-                    Spacer()
-                    Spacer()
-                    
-                    Button(action: update ? updateEvent : saveEvent) {
-                        HStack {
-                            Spacer()
-                            Image(systemName: "square.and.arrow.down")
-                            Text(update ? "update" : "save")
-                            Spacer()
-                        }
-                        .foregroundColor(.black)
-                        .bold()
-                        .padding()
-                        .background(RoundedRectangle(cornerRadius: 10).fill(.metricOrange))
+                
+                Spacer()
+                
+                Button(action: update ? updateEvent : saveEvent) {
+                    HStack {
+                        Spacer()
+                        Image(systemName: "square.and.arrow.down")
+                        Text(update ? "update" : "save")
+                        Spacer()
                     }
-                    .padding(.bottom)
+                    .foregroundColor(.black)
+                    .bold()
+                    .padding()
+                    .background(RoundedRectangle(cornerRadius: 10).fill(.metricOrange))
                 }
+                .padding(.bottom)
                 
             }
             .frame(height: geo.size.height)
-            
-        }
-    }
-    
-    func enforceEntropy() {
-        if eventGov.metricEnd.years < eventGov.metricStart.years ||
-           (eventGov.metricEnd.years == eventGov.metricStart.years && eventGov.metricEnd.seconds <= eventGov.metricStart.seconds) {
-            eventGov.metricEnd = metric.cal.update(time: eventGov.metricStart, component: .minute, byAdding: 1)
-            eventGov.gregEnd = eventGov.metricEnd.toGreg()
         }
     }
     
@@ -225,7 +214,7 @@ struct EventEditMainView: View {
     }
     
     func chronologyError() {
-        gov.errorMessage = "effect must follow cause. please pick a date after origin."
+        gov.errorMessage = "the arrow of time is immutable. please pick a date after origin."
         gov.alert = .error
     }
 }

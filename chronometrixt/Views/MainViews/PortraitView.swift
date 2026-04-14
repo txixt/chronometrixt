@@ -9,16 +9,17 @@ import SwiftUI
 import SwiftData
 
 struct PortraitView: View {
-    
     @Environment(\.modelContext) private var context
     @Bindable var gov: Governor
     @State var eg: EventGovernor?
     
     var body: some View {
         NavigationStack {
+            
             ZStack {
                 
                 CalendarScrollView(gov: gov)
+                    .ignoresSafeArea()
                 
                 TimeControlView(gov: gov)
                 
@@ -34,10 +35,29 @@ struct PortraitView: View {
                 }
                 
             }
-            .monospaced()
+            .sheet(item: $gov.sheet) { sheet in
+                switch sheet {
+                case .makeEvent: EventCreationView(gov: gov, eventGov: $eg).alertHost(gov: gov, eg: eg)
+                case .editEvent:
+                    if let eg {
+                        EventEditView(gov: gov, eg: eg).alertHost(gov: gov, eg: eg)
+                    } else {
+                        EmptyView().onAppear { gov.sheet = nil }
+                    }
+                case .showEvent:
+                    if let eg {
+                        EventDisplayView(gov: gov, eg: eg).alertHost(gov: gov, eg: eg)
+                    } else {
+                        EmptyView().onAppear { gov.sheet = nil }
+                    }
+                case .settings: SettingsView(gov: gov)
+                default: EmptyView()
+                }
+            }
+            .onChange(of: gov.event) { eg = gov.event != nil ? EventGovernor(event: gov.event!, context: context, gov: gov) : nil }
         }
         .toolbar {
-            ToolbarItemGroup(placement: .bottomBar) {
+            ToolbarItem(placement: .bottomBar) {
                 Menu("settings, alarm, search", systemImage: "gear") {
                     Group {
                         Button(action: { gov.sheet = .settings }) {
@@ -54,37 +74,15 @@ struct PortraitView: View {
                         }
                     }
                 }
-                Spacer()
-                if gov.finiteNotNow != nil {
-                    Button(action: { eg = nil; gov.sheet = .makeEvent }) {
-                        Image(systemName: "plus")
-                    }
-                } else {
+            }
+            ToolbarSpacer(placement: .bottomBar)
+            ToolbarItem(placement: .bottomBar) {
+                Button(action: { eg = nil; gov.sheet = .makeEvent }) {
                     Image(systemName: "plus")
-                        .opacity(0.5)
                 }
+                .disabled(gov.finiteNotNow == nil)
             }
         }
-        .sheet(item: $gov.sheet) { sheet in
-            switch sheet {
-            case .makeEvent: EventCreationView(gov: gov, eventGov: $eg).alertHost(gov: gov, eg: eg)
-            case .editEvent:
-                if let eg {
-                    EventEditView(gov: gov, eg: eg).alertHost(gov: gov, eg: eg)
-                } else {
-                    EmptyView().onAppear { gov.sheet = nil }
-                }
-            case .showEvent:
-                if let eg {
-                    EventDisplayView(gov: gov, eg: eg).alertHost(gov: gov, eg: eg)
-                } else {
-                    EmptyView().onAppear { gov.sheet = nil }
-                }
-            case .settings: SettingsView(gov: gov)
-            default: EmptyView()
-            }
-        }
-        .onChange(of: gov.event) { eg = gov.event != nil ? EventGovernor(event: gov.event!, context: context, gov: gov) : nil }
     }
 }
 

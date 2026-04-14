@@ -27,9 +27,20 @@ import SwiftUI
     }
     
     func populateTimes() {
+        ///reset anchor to start of week to avoid truncated calendar weeks and days if the start day is > 4 or 5
+//        let thisTime = finiteNotNow ?? eternalNow.time
+//        let anchor = metric.cal.update(time: thisTime, component: .day, byAdding: -(thisTime.day))
+        ///UNRESOLVED BUG ISSUE WITH WEEK NOT HAVING A 36 IF CURRENT DAY > 4/5  (EG. NO TARGET DAY IN THAT WEEK) or something else...
+        ///this doesn't work:
+//        if scale == .month {
+//        anchor = metric.cal.update(time: anchor, component: .day, byAdding: -(anchor.day))
+//        print("adjusted anchor to: \(anchor.fullDateTxt)")
+//    }
+        
         let anchor = finiteNotNow ?? eternalNow.time
         var newTimes: [MetrixtTime] = []
         
+
         switch scale {
         case .eon: for i in -1...1 { newTimes.append(metric.cal.update(time: anchor, component: .year, byAdding: i * 100)) }
         case .year: for i in -1...1 { newTimes.append(metric.cal.update(time: anchor, component: .year, byAdding: i)) }
@@ -44,16 +55,15 @@ import SwiftUI
     
     private func setSpan() {
         let anchor = finiteNotNow ?? eternalNow.time
+        let leapYearSeconds: Int = metric.cal.isLeapYear(anchor.year) ? 36_500_000 : 36_400_000
         
         switch scale {
         case .eon: span = (anchor.year - 50)...(anchor.year + 49)
         case .year: span = anchor.year...(anchor.year + 1)
-        case .month: span = (anchor.month * 10_000_000)...((anchor.month * 10_000_000) + ((anchor.month + 1) * (anchor.month != 3 ? 10_000_000 : leapSeconds())))
-        case .week: span = ((anchor.mwd / 10) * 1_000_000)...(((anchor.mwd / 10) + 1) * (anchor.month != 3 ? 1_000_000 : leapSeconds()))
+        case .month: span = (anchor.month * 10_000_000)...min(((anchor.month + 1) * 10_000_000), leapYearSeconds)
+        case .week: span = ((anchor.mwd / 10) * 1_000_000)...min((((anchor.mwd / 10) + 1) * 1_000_000), leapYearSeconds)
         case .day: span = (anchor.mwd * 100_000)...((anchor.mwd + 1) * 100_000)
         }
-        
-        func leapSeconds() -> Int { return metric.cal.isLeapYear(anchor.year) ? 300_000 : 200_000 }
     }
 }
 

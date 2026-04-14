@@ -46,16 +46,23 @@ struct TimeControlView: View {
                             Spacer()
                             if gov.finiteNotNow != nil {
                                 Text("now: ")
-                                    .font(.footnote)
-                            }
-                            VStack {
+                                        .font(.footnote)
                                 Text(gov.eternalNow.time.fullDateTxt)
                                     .bold()
                                     .foregroundColor(.metricOrange)
                                     .lineLimit(1)
                                 Text(gov.eternalNow.time.toGreg().formatted())
                                     .font(.caption)
+                                
+                            } else {
+                                Text(gov.eternalNow.time.yearTxt + "." + gov.eternalNow.time.monthWeekDayTxt)
+                                    .font(.title).bold().foregroundColor(.metricOrange)
+                                Text(gov.eternalNow.time.hourMinuteSecondTxt)
+                                    .font(.title).bold().foregroundColor(.metricOrange)
+                                Text(gov.eternalNow.time.toGreg().formatted())
+                                    .bold()
                             }
+
                             Spacer()
                         }
                         .onTapGesture(count: 1) { resetGov() }
