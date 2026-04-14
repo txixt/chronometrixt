@@ -157,10 +157,9 @@ struct EventEditMainView: View {
                                 }
                             }
                         }
-        //                .padding(.bottom, 150)
+                        .padding(.bottom, 50)
                         
                         Spacer()
-
                         
                         if update {
                             ZStack {
@@ -215,7 +214,7 @@ struct EventEditMainView: View {
     }
     
     func chronologyError() {
-        gov.errorMessage = "effect must follow cause. please pick a date after origin."
+        gov.errorMessage = "the arrow of time is immutable. please pick a date after origin."
         gov.alert = .error
     }
 }

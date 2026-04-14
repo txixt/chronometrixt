@@ -58,7 +58,7 @@ struct EventEndDateGregEditorView: View {
             
             HStack {
 
-                SubmitButtonView(imageString: "checkmark", text: "done", action: { eg.editField = .none })
+                SubmitButtonView(imageString: "checkmark", text: "ended", action: { eg.editField = .none })
             }
             
             MetrixtSubdivider()

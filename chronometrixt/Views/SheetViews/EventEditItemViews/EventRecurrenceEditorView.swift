@@ -40,6 +40,7 @@ struct EventRecurrenceEditorView: View {
                     Text(name).tag(rule)
                 }
             }
+            .font(.body.monospacedDigit())
             .labelsHidden()
             .tint(.primary)
             .padding(.bottom)
@@ -61,7 +62,7 @@ struct EventRecurrenceEditorView: View {
                 Spacer()
             }
 
-            SubmitButtonView(imageString: "checkmark", text: "adjusted", action: { eg.editField = .none })
+            SubmitButtonView(imageString: "checkmark", text: "iterated", action: { eg.editField = .none })
                 .padding(.top)
             
             MetrixtSubdivider()
