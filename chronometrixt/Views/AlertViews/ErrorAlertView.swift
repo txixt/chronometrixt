@@ -47,7 +47,7 @@ struct ErrorAlertView: View {
                         }
                         .padding()
                         .monospaced()
-                        .background(RoundedRectangle(cornerRadius: 30).fill(.gray.opacity(0.2)))
+                        .background(RoundedRectangle(cornerRadius: 30).fill(.background.opacity(0.8)))
                         .frame(width: geo.size.width * 0.5, height: geo.size.height * 0.5)
                         .task { await lifeIsShort() }
         
@@ -62,6 +62,7 @@ struct ErrorAlertView: View {
     
     private func lifeIsShort() async {
         try? await Task.sleep(for: .seconds(2))
+        gov.errorMessage = ""
         gov.alert = nil
     }
 }

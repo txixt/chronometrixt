@@ -21,7 +21,7 @@ struct EventDisplayView: View {
             HStack {
                 VStack(alignment: .leading) {
                     Text(eg.title)
-                        .tint(Color(hex: eg.calendarColor))
+                        .foregroundStyle(Color(hex: eg.calendarColor))
                         .font(.title)
                         .padding(.bottom)
                     
@@ -86,12 +86,11 @@ struct EventDisplayView: View {
                         }
                         .frame(width: 100)
                         VStack(alignment: .leading) {
+                            
                             if !eg.location.isEmpty {
-                                if MapInsetView(location: eg.location).didSearch == true {
-                                    MapInsetView(location: eg.location)
-                                } else {
-                                    Text(eg.location)
-                                }
+                                Text(eg.location)
+                                MapInsetView(location: eg.location)
+                                    .tint(.primary)
                             } else {
                                 Text("none")
                             }

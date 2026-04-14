@@ -19,6 +19,7 @@ struct EventEditView: View {
             
             EventEditMainView(gov: gov, eventGov: eg, update: true)
         }
+        .padding()
     }
 }
 

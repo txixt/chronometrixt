@@ -8,8 +8,8 @@
 import SwiftUI
 
 struct DestroyEventAlertView: View {
-    @Environment(\.modelContext) private var context
     @Bindable var gov: Governor
+    @Bindable var eg: EventGovernor
     
     var body: some View {
         GeometryReader { geo in
@@ -31,7 +31,7 @@ struct DestroyEventAlertView: View {
                             Spacer()
                             
                             if gov.event != nil {
-                                Button(action: {}) {
+                                Button(action: { eg.destroySingle() }) {
                                     VStack {
                                         Image(systemName: "trash")
                                         Text("destroy this event?")
@@ -41,8 +41,10 @@ struct DestroyEventAlertView: View {
                                 }
                             }
                             
-                            if gov.event != nil && gov.event!.recurrenceRule.count > 0 {
-                                Button(action: {}) {
+                            if gov.event != nil && gov.event!.recurrenceRule != "NONE" {
+                                Spacer()
+                                
+                                Button(action: { eg.destroyThisAndFuture() }) {
                                     VStack {
                                         HStack {
                                             Image(systemName: "trash")
@@ -72,7 +74,7 @@ struct DestroyEventAlertView: View {
                         }
                         .padding()
                         .monospaced()
-                        .background(RoundedRectangle(cornerRadius: 30).fill(.gray.opacity(0.2)))
+                        .background(RoundedRectangle(cornerRadius: 30).fill(.background.opacity(0.8)))
                         .frame(width: geo.size.width * 0.5, height: geo.size.height * 0.5)
         
                         Spacer()
@@ -82,18 +84,8 @@ struct DestroyEventAlertView: View {
             }
         }
     }
-    
-    private func destroyEvent() {
-        let handler = EventHandler(modelContext: context)
-        handler.destroySingleEvent(gov.event!)
-    }
-    
-    private func destroyAllEvents() {
-        let handler = EventHandler(modelContext: context)
-        handler.destroyThisAndFuture(gov.event!)
-    }
 }
 
 #Preview {
-    DestroyEventAlertView(gov: Governor())
+    DestroyEventAlertView(gov: Governor(), eg: PreviewEG().eg())
 }

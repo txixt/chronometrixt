@@ -24,7 +24,7 @@ struct LandscapeView: View {
                 
                 HStack {
                     VStack {
-                        Text(gov.eternalNow.time.description)
+                        Text(gov.eternalNow.time.fullDateTxt)
                             .font(.largeTitle).bold()
                             .lineLimit(1)
                             .foregroundColor(.metricOrange)

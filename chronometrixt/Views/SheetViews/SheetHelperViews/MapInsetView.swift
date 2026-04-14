@@ -7,30 +7,38 @@
 
 import SwiftUI
 import MapKit
+
 struct MapInsetView: View {
     let location: String
  
     @State private var mapItem: MKMapItem?
     @State private var cameraPosition: MapCameraPosition = .automatic
-    @State private var searchTask: Task<Void, Never>?
-    @State var didSearch: Bool = false
+    @State private var didSearch: Bool = false
     
     var body: some View {
-        Group {
-            if let mapItem {
-                Map(position: $cameraPosition) {
-                    Marker(mapItem.name ?? location, coordinate: mapItem.location.coordinate)
+        VStack {
+            Group {
+                if let mapItem {
+                    let coordinate = mapItem.location.coordinate
+                    Map(position: $cameraPosition) {
+                        Marker(mapItem.name ?? location, coordinate: coordinate)
+                    }
+                    .labelsHidden()
+//                    .mapStyle(.standard(elevation: .flat))
+                    .mapStyle(.imagery(elevation: .realistic))
+                    .frame(height: 150)
+                    .clipShape(RoundedRectangle(cornerRadius: 10))
+                    .opacity(0.5)
+                } else if didSearch {
+                    EmptyView()
                 }
-                .mapStyle(.standard(elevation: .flat))
-                .frame(width: 200, height: 200)
-                .clipShape(RoundedRectangle(cornerRadius: 10))
-            } else if didSearch {
-                EmptyView()
             }
         }
+        .onAppear { print("this exists now. ")}
         .task(id: location) {
             let trimmed = location.trimmingCharacters(in: .whitespacesAndNewlines)
             guard !trimmed.isEmpty else {
+                print("trimmed is empty")
                 mapItem = nil
                 didSearch = false
                 return
@@ -39,37 +47,30 @@ struct MapInsetView: View {
             mapItem = nil
             didSearch = false
 
-            searchTask?.cancel()
-            searchTask = Task {
-                guard !Task.isCancelled else { return }
+            let request = MKLocalSearch.Request()
+            request.naturalLanguageQuery = trimmed
+            let search = MKLocalSearch(request: request)
+            print(request)
 
-                let request = MKLocalSearch.Request()
-                request.naturalLanguageQuery = trimmed
-                let search = MKLocalSearch(request: request)
-
-                do {
-                    let response = try await search.start()
-                    if let first = response.mapItems.first {
-                        await MainActor.run {
-                            mapItem = first
-                            cameraPosition = .region(
-                                MKCoordinateRegion(
-                                    center: first.location.coordinate,
-                                    latitudinalMeters: 1000,
-                                    longitudinalMeters: 1000
-                                )
-                            )
-                            didSearch = true
-                        }
-                    } else {
-                        await MainActor.run { didSearch = true }
-                    }
-                } catch {
-                    await MainActor.run { didSearch = true }
+            do {
+                let response = try await search.start()
+                if let first = response.mapItems.first {
+                    mapItem = first
+                    cameraPosition = .region(
+                        MKCoordinateRegion(
+                            center: first.location.coordinate,
+                            latitudinalMeters: 10000,
+                            longitudinalMeters: 10000
+                        )
+                    )
                 }
+            } catch {
+                print("no mudville in joy")
             }
+            didSearch = true
         }
     }
+        
 }
 
 #Preview {

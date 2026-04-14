@@ -28,18 +28,19 @@ struct EventNotesEditorView: View {
                 .padding()
                 .background(RoundedRectangle(cornerRadius: 10).stroke(.gray))
                 .padding(.bottom)
+                .onSubmit { focus = false; eg.editField = .none }
+                .onAppear { focus = true }
             
             SubmitButtonView(imageString: "music.note", text: "noted", action: { eg.editField = .none })
             
             MetrixtSubdivider()
         }
+        .onTapGesture {
+            focus.toggle()
+        }
     }
 }
 
 #Preview {
-    EventNotesEditorView(eg: EventGovernor(
-                                title: "sample",
-                                starting: MetrixtTime(years: 5056, seconds: 123456),
-                                ending: MetrixtTime(years: 5056, seconds: 123459))
-                        )
+    EventNotesEditorView(eg: PreviewEG().eg())
 }
