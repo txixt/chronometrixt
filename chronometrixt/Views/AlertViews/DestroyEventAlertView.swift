@@ -1,14 +1,15 @@
 //
-//  ErrorAlertView.swift
+//  DestroyEventAlertView.swift
 //  chronometrixt
 //
-//  Created by Becket Bowes on 3/17/26.
+//  Created by Becket on 3/23/26.
 //
 
 import SwiftUI
 
-struct ErrorAlertView: View {
+struct DestroyEventAlertView: View {
     @Bindable var gov: Governor
+    @Bindable var eg: EventGovernor
     
     var body: some View {
         GeometryReader { geo in
@@ -23,13 +24,39 @@ struct ErrorAlertView: View {
                             Spacer()
                             ZStack {
                                 Divider()
-                                Image(systemName: "ant")
+                                Text("💣")
                                     .font(.largeTitle)
                             }
                             
                             Spacer()
                             
-                            Text(gov.errorMessage.isEmpty ? "oops. some random thing went wrong." : gov.errorMessage)
+                            if gov.event != nil {
+                                Button(action: { eg.destroySingle() }) {
+                                    VStack {
+                                        Image(systemName: "trash")
+                                        Text("destroy this event?")
+                                    }
+                                    .tint(.red)
+                                    .shadow(color: .red, radius: 3)
+                                }
+                            }
+                            
+                            if gov.event != nil && gov.event!.recurrenceRule != "NONE" {
+                                Spacer()
+                                
+                                Button(action: { eg.destroyThisAndFuture() }) {
+                                    VStack {
+                                        HStack {
+                                            Image(systemName: "trash")
+                                            Image(systemName: "trash")
+                                            Image(systemName: "trash")
+                                        }
+                                        Text("destroy this and future events?")
+                                    }
+                                    .tint(.red)
+                                    .shadow(color: .red, radius: 3)
+                                }
+                            }
                             
                             Spacer()
                             
@@ -49,9 +76,7 @@ struct ErrorAlertView: View {
                         .monospaced()
                         .background(RoundedRectangle(cornerRadius: 30).fill(.background.opacity(0.8)))
                         .frame(width: geo.size.width * 0.5, height: geo.size.height * 0.5)
-                        .task { await lifeIsShort() }
         
-                        
                         Spacer()
                     }
                     Spacer()
@@ -59,14 +84,8 @@ struct ErrorAlertView: View {
             }
         }
     }
-    
-    private func lifeIsShort() async {
-        try? await Task.sleep(for: .seconds(2))
-        gov.errorMessage = ""
-        gov.alert = nil
-    }
 }
 
 #Preview {
-    ErrorAlertView(gov: Governor())
+    DestroyEventAlertView(gov: Governor(), eg: PreviewEG().eg())
 }

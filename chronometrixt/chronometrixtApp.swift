@@ -12,8 +12,8 @@ import SwiftData
 struct chronometrixtApp: App {
     var sharedModelContainer: ModelContainer = {
         let schema = Schema([
-            Item.self,
             MetricEvent.self,
+            MetricCalendar.self
         ])
         let modelConfiguration = ModelConfiguration(schema: schema, isStoredInMemoryOnly: false)
 

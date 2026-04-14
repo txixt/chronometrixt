@@ -12,23 +12,7 @@ struct SettingsView: View {
     
     var body: some View {
         VStack {
-            HStack {
-                Image(systemName: "gear")
-                Text("settings")
-                Spacer()
-                Button(action: { gov.sheet = .none } ) {
-                    Image(systemName: "plus")
-                        .rotationEffect(Angle(degrees: 45))
-                        .shadow(color: .gray, radius: 3)
-                }
-            }
-            .font(.largeTitle.bold())
-            .foregroundColor(.primary)
-            
-            ZStack {
-                RoundedRectangle(cornerRadius: 2.5).frame(width: 100, height: 5)
-                Divider()
-            }
+            SheetHeaderView(gov: gov, title: "settings", titleImage: "gear")
             
             VStack {
                 ZStack {
@@ -105,12 +89,7 @@ struct SettingsView: View {
                 }
                 .padding(.bottom)
                 
-                ZStack {
-                    RoundedRectangle(cornerRadius: 1.5).frame(width: 100, height: 3)
-                        .foregroundColor(.gray)
-                    Divider()
-                }
-                .padding(.bottom)
+                MetrixtSubdivider()
                 
                 VStack(alignment: .leading) {
                     ZStack {
