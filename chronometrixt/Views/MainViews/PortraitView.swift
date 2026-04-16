@@ -51,6 +51,7 @@ struct PortraitView: View {
                         EmptyView().onAppear { gov.sheet = nil }
                     }
                 case .settings: SettingsView(gov: gov)
+                case .timers: SmallTimesView(gov: gov)
                 default: EmptyView()
                 }
             }
@@ -64,7 +65,7 @@ struct PortraitView: View {
                             Image(systemName: "gear")
                             Text("settings")
                         }
-                        Button(action: {}) {
+                        Button(action: { gov.sheet = .timers }) {
                             Image(systemName: "bell")
                             Text("alarms")
                         }

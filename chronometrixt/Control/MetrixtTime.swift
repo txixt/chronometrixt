@@ -7,7 +7,11 @@
 
 import Foundation
 
-@Observable final class MetrixtEntropy {
+@Observable final class MetrixtEntropy: Equatable {
+    static func == (lhs: MetrixtEntropy, rhs: MetrixtEntropy) -> Bool {
+        return lhs === rhs
+    }
+    
     var time: MetrixtTime
     private var escapement: Timer?
     
