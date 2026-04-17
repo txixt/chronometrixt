@@ -8,9 +8,9 @@
 import Foundation
 
 @Observable final class AlarmGovernor {
-    var isStopwatching: Bool = false 
+    var alarmSeconds: Int = 0
+    var isStopwatching: Bool = false
     var stopwatch: Int = 0
     var mode: SmallTimeMode = .timer
     enum SmallTimeMode: Hashable { case timer, alarm, stopwatch }
-    
 }

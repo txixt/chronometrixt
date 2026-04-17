@@ -36,31 +36,19 @@ struct StopwatchView: View {
                 let seconds = gregSecs % 60
                 let timeString = String(format: "%d:%02d:%02d", hours, minutes, seconds)
                 
-                Text("greorian: " + timeString)
+                Text("gregorian: " + timeString)
                     .font(.title)
                     .foregroundStyle(.gray)
             }
             
             Spacer()
-            
+        
             HStack {
-                Button(action: reset) {
-                    Text("reset")
-                        .foregroundStyle(.background)
-                        .font(.title).bold()
-                        .frame(width: 120, height: 80)
-                        .background(RoundedRectangle(cornerRadius: 10).fill(.gray))
-                }
-                
+                SmallTimeButtonView(imageString: "restart", text: "reset", action: reset, color: .gray)
+            
                 Spacer()
                 
-                Button(action: { ag.isStopwatching.toggle() }) {
-                    Text(ag.isStopwatching ? "pause" : "start")
-                        .foregroundStyle(.background)
-                        .font(.title).bold()
-                        .frame(width: 120, height: 80)
-                        .background(RoundedRectangle(cornerRadius: 10).fill(.metricOrange))
-                }
+                SmallTimeButtonView(imageString: ag.isStopwatching ? "pause" : "play", text: ag.isStopwatching ? "pause" : "start", action: playPause, color: .metricOrange)
             }
             
             Spacer()
@@ -68,6 +56,8 @@ struct StopwatchView: View {
         .padding()
         .monospaced()
     }
+    
+    private func playPause() { ag.isStopwatching.toggle() }
     
     private func reset() {
         ag.isStopwatching = false

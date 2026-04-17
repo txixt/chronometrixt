@@ -24,7 +24,7 @@ struct SmallTimesView: View {
             TimerView()
                 .tag(AlarmGovernor.SmallTimeMode.timer)
             
-            AlarmView()
+            AlarmView(gov: gov, ag: ag)
                 .tag(AlarmGovernor.SmallTimeMode.alarm)
 
             StopwatchView(gov: gov, ag: ag)
