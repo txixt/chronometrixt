@@ -15,10 +15,10 @@ import SwiftData
     var metricSeconds: Int
     var gregDate: Date
     
-    init(metricTime: MetrixtTime?) {
+    init(metricTime: MetrixtTime?, dataType: String) {
         let metric = metricTime ?? MetrixtTime(date: nil)
         id = UUID().uuidString
-        type = "alarm" //alarm or timer
+        type = dataType //alarm or timer
         metricYears = metric.years
         metricSeconds = metric.seconds
         gregDate = metric.toGreg()
