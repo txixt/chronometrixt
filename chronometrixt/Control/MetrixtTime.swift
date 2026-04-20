@@ -8,10 +8,6 @@
 import Foundation
 
 @Observable final class MetrixtEntropy: Equatable {
-    static func == (lhs: MetrixtEntropy, rhs: MetrixtEntropy) -> Bool {
-        return lhs === rhs
-    }
-    
     var time: MetrixtTime
     private var escapement: Timer?
     
@@ -38,7 +34,72 @@ import Foundation
         }
     }
     
-    deinit {  }
+    deinit {
+        escapement?.invalidate()
+        escapement = nil
+    }
+    
+    static func == (lhs: MetrixtEntropy, rhs: MetrixtEntropy) -> Bool {
+        return lhs === rhs
+    }
+}
+
+@Observable final class MetrixtStopwatch {
+    var timer: MetrixtEntropy
+    var pauseValue: MetrixtTime?
+    
+    init() {
+        timer = MetrixtEntropy()
+        timer.time = metric.cal.replaceComponents(time: timer.time, components: [.hour, .minute, .second], with: [0, 0, 0]) ?? timer.time
+    }
+    
+    func pause() {
+        pauseValue = timer.time
+        timer.killTimer()
+    }
+    
+    func resume() {
+        let timerTime = timer.time
+        timer.restartTimer()
+        timer.time = pauseValue ?? timer.time
+        pauseValue = nil
+    }
+}
+
+@Observable final class MetrixtTimer {
+    var deadline: MetrixtTime
+    var countdown: MetrixtTime
+    var pause: Bool = false
+    private var escapement: Timer?
+    
+    init(time: MetrixtTime) {
+        let now = MetrixtTime(date: nil)
+        deadline = metric.cal.replaceComponents(
+            time: now,
+            components: [.year, .month, .week, .day],
+            with: [now.year, now.month, now.week, (time.hms > now.hms ? now.day + 1 : now.day)]
+        ) ?? time
+        countdown = metric.cal.update(time: time, component: .second, byAdding: time.seconds - now.seconds)
+        escapement = Timer.scheduledTimer(withTimeInterval: 0.864, repeats: true) { [weak self] _ in
+            guard let self else { return }
+            self.update()
+        }
+    }
+    
+    private func update() {
+        if !pause {
+            countdown = metric.cal.update(time: countdown, component: .second, byAdding: -1)
+        }
+        if countdown.seconds > deadline.seconds {
+            escapement?.invalidate()
+            escapement = nil
+        }
+    }
+    
+    deinit {
+        escapement?.invalidate()
+        escapement = nil
+    }
 }
 
 struct MetrixtTime: Hashable, Codable, Identifiable {
@@ -130,6 +191,15 @@ typealias metric = MetrixtCalendar
         return MetrixtTime(years: year, seconds: m + w + d + h + mi + se)
     }
     enum Component { case year, month, week, day, hour, minute, second }
+    
+    func replaceComponents(time: MetrixtTime, components: [Component], with values: [Int]) -> MetrixtTime? {
+        guard components.count == values.count else { return nil }
+        var newTime = time
+        for i in 0...components.count {
+            newTime = replace(time: newTime, component: components[i], with: values[i])
+        }
+        return newTime
+    }
     
     ///Because of the rotational/orbital discrepancy (that a year does not divide evenly into days) we have leap years
     ///And because sidereal orbit is an annoying ~365.265363 or so days long, we have a gap in the metric calendar
