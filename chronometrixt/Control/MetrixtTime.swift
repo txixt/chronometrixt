@@ -44,29 +44,38 @@ import Foundation
     }
 }
 
-@Observable final class MetrixtStopwatch {
-    var timer: MetrixtEntropy
-    var pauseValue: MetrixtTime?
+@Observable final class MetrixtAlarm: Identifiable {
+    var alarm: String = UUID().uuidString
+    var deadline: MetrixtTime
+    var currentTime: MetrixtTime
+    var escapement: Timer?
     
-    init() {
-        timer = MetrixtEntropy()
-        timer.time = metric.cal.replaceComponents(time: timer.time, components: [.hour, .minute, .second], with: [0, 0, 0]) ?? timer.time
+    init(deadline: MetrixtTime) {
+        self.deadline = deadline
+        self.currentTime = MetrixtTime(date: nil)
+        escapement = Timer.scheduledTimer(withTimeInterval: 0.864, repeats: true) { [weak self] _ in
+            guard let self else { return }
+            startAlarm()
+        }
     }
     
-    func pause() {
-        pauseValue = timer.time
-        timer.killTimer()
+    func startAlarm() {
+        currentTime = currentTime.seconds % 1000 == 0 ? MetrixtTime(date: nil) : metric.cal.update(time: currentTime, component: .second, byAdding: 1)
+        if currentTime.seconds >= deadline.seconds { endAlarm() }
     }
     
-    func resume() {
-        let timerTime = timer.time
-        timer.restartTimer()
-        timer.time = pauseValue ?? timer.time
-        pauseValue = nil
+    func endAlarm() {
+        //Play Musixt
+        
+    }
+    
+    func snooze() {
+        deadline = metric.cal.update(time: deadline, component: .minute, byAdding: 10)
     }
 }
 
-@Observable final class MetrixtTimer {
+@Observable final class MetrixtTimer: Identifiable {
+    var id: String = UUID().uuidString
     var deadline: MetrixtTime
     var countdown: MetrixtTime
     var pause: Bool = false
@@ -78,7 +87,7 @@ import Foundation
             time: now,
             components: [.year, .month, .week, .day],
             with: [now.year, now.month, now.week, (time.hms > now.hms ? now.day + 1 : now.day)]
-        ) ?? time
+        ) 
         countdown = metric.cal.update(time: time, component: .second, byAdding: time.seconds - now.seconds)
         escapement = Timer.scheduledTimer(withTimeInterval: 0.864, repeats: true) { [weak self] _ in
             guard let self else { return }
@@ -94,6 +103,42 @@ import Foundation
             escapement?.invalidate()
             escapement = nil
         }
+    }
+    
+    deinit {
+        escapement?.invalidate()
+        escapement = nil
+    }
+}
+
+@Observable final class MetrixtStopwatch {
+    var metricMicroseconds: Int = 0
+    var isStopwatching: Bool = false
+    private var escapement: Timer? = nil
+    
+    init() {
+        escapement = Timer.scheduledTimer(withTimeInterval: 0.00864, repeats: true) { [weak self] _ in
+            guard let self, self.isStopwatching else { return }
+            self.metricMicroseconds += 1
+        }
+    }
+    
+    func pause() {
+        isStopwatching = false
+    }
+    
+    func resume() {
+        isStopwatching = true
+    }
+    
+    func reset() {
+        isStopwatching = false
+        metricMicroseconds = 0
+    }
+    
+    func killTimer() {
+        escapement?.invalidate()
+        escapement = nil
     }
     
     deinit {
@@ -192,8 +237,8 @@ typealias metric = MetrixtCalendar
     }
     enum Component { case year, month, week, day, hour, minute, second }
     
-    func replaceComponents(time: MetrixtTime, components: [Component], with values: [Int]) -> MetrixtTime? {
-        guard components.count == values.count else { return nil }
+    func replaceComponents(time: MetrixtTime, components: [Component], with values: [Int]) -> MetrixtTime {
+        guard components.count == values.count else { return MetrixtTime(date: nil) }
         var newTime = time
         for i in 0...components.count {
             newTime = replace(time: newTime, component: components[i], with: values[i])

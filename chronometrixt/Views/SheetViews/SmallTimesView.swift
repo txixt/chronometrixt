@@ -6,13 +6,16 @@
 //
 
 import SwiftUI
+import SwiftData
 
 struct SmallTimesView: View {
+    @Query var alarms: [MetricAlarm]
     @Bindable var gov: Governor
     @State var ag: AlarmGovernor = AlarmGovernor()
     
     var body: some View {
         VStack {
+            
             SheetHeaderView(
                 gov: gov,
                 title: ag.mode == .alarm ? "alarm" : ag.mode == .timer ? "timer" : "stopwatch",
@@ -45,6 +48,7 @@ struct SmallTimesView: View {
             
             Spacer()
         }
+        .onAppear() { ag.populate(data: alarms, eternalNow: gov.eternalNow.time) }
     }
 }
 

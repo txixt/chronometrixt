@@ -6,6 +6,7 @@
 //
 
 import SwiftUI
+import SwiftData
 
 struct AlarmView: View {
     @Bindable var gov: Governor
@@ -16,55 +17,95 @@ struct AlarmView: View {
         VStack {
             Spacer()
             
-            HStack {
-                VStack {
-                    Text("hour").font(.caption)
-                    Picker("hour", selection: $ag.alarmSeconds) {
+            if !ag.activeAlarms.isEmpty {
+                ForEach(ag.activeAlarms, id: \.deadline.id) { alarm in
+                    ZStack {
+                        Divider()
+                        
+                        HStack {
+                            Text(alarm.deadline.hourMinuteSecondTxt)
+                            
+                            Spacer()
+                            
+                            Text("\(alarm.currentTime.seconds - alarm.deadline.seconds)")
+                                .foregroundStyle(.background)
+                                .background(RoundedRectangle(cornerRadius: 10).fill(.gray))
+                                .frame(width: 110, height: 55)
+                        }
+                    }
+                }
+            }
+            
+            if !ag.alarms.isEmpty {
+                ForEach(ag.alarms) { alarm in
+                    ZStack {
+                        Divider()
+                        
+                        HStack {
+                            Text(alarm.hourMinuteSecondTxt)
+                            
+                            Spacer()
+                            
+                            Button(action: {}) {
+                                Image(systemName: "arrow.3.trianglepath")
+                                    .foregroundStyle(.background)
+                                    .background(RoundedRectangle(cornerRadius: 10).fill(.metricOrange))
+                                    .frame(width: 110, height: 55)
+                            }
+                        }
+                    }
+                }
+            }
+            
+            if let na = ag.newAlarm {
+                HStack {
+                    Text("new alarm:")
+                    Spacer()
+                }
+                
+                HStack(spacing: 0) {
+                    Text(na.yearTxt + "." + na.mwdTxt + ".")
+                        .padding(.trailing)
+                    
+                    Picker("hour", selection: $ag.newAlarm) {
                         ForEach(0...9, id: \.self) { i in
-                            Text(String(i)).tag(i)
-                                .font(.largeTitle).bold()
+                            Text(String(na.hour)).tag(na.hour)
+                                .font(.title).bold()
+                        }
+                    }
+                    .frame(width: 60)
+
+                    Text(":").padding(.top)
+                    
+                    Picker("minute", selection: $ag.alarmSeconds) {
+                        ForEach(0...99, id: \.self) { i in
+                            Text(String(format: "%02d", i)).tag(i)
+                                .font(.title).bold()
                         }
                     }
                     .frame(width: 80)
-                }
 
-                Text(":").padding(.top)
-                
-                VStack {
-                    Text("minute").font(.caption)
+                    Text(":")
+                    
                     Picker("minute", selection: $ag.alarmSeconds) {
                         ForEach(0...99, id: \.self) { i in
                             Text(String(format: "%02d", i)).tag(i)
-                                .font(.largeTitle).bold()
+                                .font(.title).bold()
                         }
                     }
-                    .frame(width: 100)
-                }
+                    .frame(width: 80)
 
-                Text(":").padding(.top)
-                
-                VStack {
-                    Text("second").font(.caption)
-                    Picker("minute", selection: $ag.alarmSeconds) {
-                        ForEach(0...99, id: \.self) { i in
-                            Text(String(format: "%02d", i)).tag(i)
-                                .font(.largeTitle).bold()
-                        }
-                    }
-                    .frame(width: 100)
                 }
+                .monospacedDigit()
+                .pickerStyle(.wheel)
+                .frame(height: 100)
+                .padding(.bottom)
 
+                Text(na.toGreg().formatted())
+                    .font(.title)
+                    .foregroundStyle(.gray)
             }
-            .monospacedDigit()
-            .pickerStyle(.wheel)
-            .frame(height: 100)
-            .padding(.bottom)
             
-            HStack {
-                Text("gregorian: 9:45 am")
-                    .font(.title2)
-                Spacer()
-            }
             
             Spacer()
             
@@ -77,6 +118,7 @@ struct AlarmView: View {
             Spacer()
             
         }
+        .onAppear { ag.newAlarm = MetrixtTime(date: nil) }
         .padding()
         .monospaced()
     }

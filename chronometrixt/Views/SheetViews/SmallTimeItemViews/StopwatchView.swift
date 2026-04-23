@@ -16,29 +16,26 @@ struct StopwatchView: View {
             Spacer()
             
             HStack {
-                let hour: Int = ag.stopwatch / 10_000
-                let min: Int = (ag.stopwatch / 100) % 100
-                let sec: Int = ag.stopwatch % 100
-                let timeString: String = String(format: "%d:%02d:%02d", hour, min, sec)
+                let hour: Int = ag.stopwatch.metricMicroseconds / 1_000_000
+                let min: Int = (ag.stopwatch.metricMicroseconds / 10_000) % 100
+                let sec: Int = (ag.stopwatch.metricMicroseconds / 100) % 100
+                let msec: Int = ag.stopwatch.metricMicroseconds % 100
+                let timeString: String = String(format: "%d:%02d:%02d.%02d", hour, min, sec, msec)
                 
                 Text(timeString)
-                    .font(.system(size: 80))
-            }
-            .onChange(of: gov.eternalNow.time) {
-                if ag.isStopwatching { ag.stopwatch += 1 }
+                    .font(.system(size: 55))
             }
             .padding(.bottom)
             
             HStack {
-                let gregSecs = Int(Double(ag.stopwatch) * 0.864)
-                let hours = gregSecs / 3600
-                let minutes = (gregSecs / 60) % 60
-                let seconds = gregSecs % 60
-                let timeString = String(format: "%d:%02d:%02d", hours, minutes, seconds)
+                let gregSecs = Int(Double(ag.stopwatch.metricMicroseconds) * 0.864)
+                let hours = gregSecs / 360000
+                let minutes = (gregSecs / 6000) % 60
+                let seconds = (gregSecs / 100) % 60
+                let msecs = gregSecs % 100
+                let timeString = String(format: "%d:%02d:%02d.%02d", hours, minutes, seconds, msecs)
                 
                 Text("gregorian: " + timeString)
-                    .font(.title)
-                    .foregroundStyle(.gray)
             }
             
             Spacer()
@@ -48,7 +45,7 @@ struct StopwatchView: View {
             
                 Spacer()
                 
-                SmallTimeButtonView(imageString: ag.isStopwatching ? "pause" : "play", text: ag.isStopwatching ? "pause" : "start", action: playPause, color: .metricOrange)
+                SmallTimeButtonView(imageString: ag.stopwatch.isStopwatching ? "pause" : "play", text: ag.stopwatch.isStopwatching ? "pause" : "start", action: playPause, color: .metricOrange)
             }
             
             Spacer()
@@ -57,11 +54,16 @@ struct StopwatchView: View {
         .monospaced()
     }
     
-    private func playPause() { ag.isStopwatching.toggle() }
+    private func playPause() {
+        if ag.stopwatch.isStopwatching {
+            ag.stopwatch.pause()
+        } else {
+            ag.stopwatch.resume()
+        }
+    }
     
     private func reset() {
-        ag.isStopwatching = false
-        ag.stopwatch = 0
+        ag.stopwatch.reset()
     }
 }
 

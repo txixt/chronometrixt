@@ -11,27 +11,20 @@ import SwiftData
 @Observable final class AlarmGovernor {
     var newAlarm: MetrixtTime? = nil
     var alarms: [MetrixtTime] = []
-    var activeAlarms: [MetrixtEntropy] = []
+    var activeAlarms: [MetrixtAlarm] = []
     var newTimer: MetrixtTime? = nil
     var timers: [MetrixtTime] = []
-    var activeTimers: [MetrixtEntropy] = []
-    var newStopwatch: MetrixtTime? = nil
-    
+    var activeTimers: [MetrixtTimer] = []
+    var stopwatch: MetrixtStopwatch = MetrixtStopwatch()
     var alarmSeconds: Int = 0
-    var isStopwatching: Bool = false
-    var stopwatch: Int = 0
     
     var mode: SmallTimeMode = .timer
     enum SmallTimeMode: Hashable { case timer, alarm, stopwatch }
     
     func populate(data: [MetricAlarm], eternalNow: MetrixtTime) {
-        newAlarm = metric.cal.replace(time: eternalNow, component: .hour, with: 5)
-        newAlarm = metric.cal.replace(time: newAlarm!, component: .minute, with: 50)
-        newAlarm = metric.cal.replace(time: newAlarm!, component: .second, with: 50)
-        newTimer = metric.cal.replace(time: eternalNow, component: .hour, with: 0)
-        newTimer = metric.cal.replace(time: newTimer!, component: .minute, with: 0)
-        newTimer = metric.cal.replace(time: newTimer!, component: .second, with: 0)
-        newStopwatch = newTimer
+        newAlarm = metric.cal.replaceComponents(time: eternalNow, components: [.hour, .minute, .second], with: [5, 50, 50])
+        newTimer = metric.cal.replaceComponents(time: eternalNow, components: [.hour, .minute, .second], with: [0, 0, 0])
+        stopwatch = MetrixtStopwatch()
         for datum in data {
             let metrixt = MetrixtTime(years: datum.metricYears, seconds: datum.metricSeconds)
             if datum.type == "alarm" { alarms.append(metrixt) }
@@ -39,11 +32,17 @@ import SwiftData
         }
     }
     
-    func setAlarm(data: [MetricAlarm], context: ModelContext, eternalNow: MetrixtTime) {
+    func setAlarm(data: [MetricAlarm], context: ModelContext, eternalNow: MetrixtTime, alarmIndex: Int?) {
         guard (newAlarm != nil) else { return }
-        if newAlarm!.seconds > eternalNow.seconds { newAlarm = metric.cal.update(time: newAlarm!, component: .day, byAdding: 1) }
+        var ta: MetrixtTime = alarmIndex == nil ? newAlarm! : alarms[alarmIndex!]
+        if ta.seconds > eternalNow.seconds {
+            ta = metric.cal.replaceComponents(time: eternalNow, components: [.hour, .minute, .second], with: [ta.hour, ta.minute, ta.second])
+        }
         //set system Alarm
-        saveAlarm(data: data, context: context)
+        
+        activeAlarms.insert(MetrixtAlarm(deadline: ta), at: 0)
+        alarms.removeAll(where: { $0.id == ta.id })
+        if alarmIndex == nil { saveAlarm(data: data, context: context) }
     }
     func saveAlarm(data: [MetricAlarm], context: ModelContext) {
         let allAlarms = data.filter { $0.type == "alarm" }
@@ -51,9 +50,21 @@ import SwiftData
         let metrixt = MetricAlarm(metricTime: newAlarm, dataType: "alarm")
         context.insert(metrixt)
     }
-    
-    func setTimer(data: [MetricAlarm], context: ModelContext) {
+    func handleAlarmCompletion(deadline: MetrixtTime) {
+        alarms.insert(deadline, at: 0)
+        activeAlarms.removeAll(where: { $0.deadline == deadline })
         
+        //play music, display options etcetery
+        
+    }
+    
+    func setTimer(data: [MetricAlarm], context: ModelContext, eternalNow: MetrixtTime, timerIndex: Int?) {
+        guard newTimer != nil else { return }
+        let tt = timerIndex == nil ? newTimer! : timers[timerIndex!]
+        activeTimers.insert(MetrixtTimer(time: tt), at: 0)
+        //set system Alarm
+        
+        if timerIndex != nil { saveTimer(data: data, context: context) }
     }
     func saveTimer(data: [MetricAlarm], context: ModelContext) {
         let allTimers = data.filter { $0.type == "alarm" }
@@ -61,4 +72,11 @@ import SwiftData
         let metrixt = MetricAlarm(metricTime: newTimer, dataType: "timer")
         context.insert(metrixt)
     }
+    func handleTimerCompletion(deadline: MetrixtTime) {
+        alarms.insert(deadline, at: 0)
+        activeAlarms.removeAll(where: { $0.deadline.id == deadline.id })
+        
+        //play music, display options, etcetery et etcetery ad nauseum
+    }
+    
 }
