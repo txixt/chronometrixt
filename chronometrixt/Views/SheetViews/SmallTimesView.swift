@@ -25,7 +25,7 @@ struct SmallTimesView: View {
             Spacer()
             
             TabView(selection: $ag.mode) {
-                TimerView()
+                TimerView(gov: gov, ag: ag)
                     .tag(AlarmGovernor.SmallTimeMode.timer)
                 
                 AlarmView(gov: gov, ag: ag)
@@ -48,6 +48,7 @@ struct SmallTimesView: View {
             
             Spacer()
         }
+        .padding()
         .onAppear() { ag.populate(data: alarms, eternalNow: gov.eternalNow.time) }
     }
 }

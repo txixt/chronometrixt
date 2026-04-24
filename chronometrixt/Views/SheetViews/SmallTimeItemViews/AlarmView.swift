@@ -9,6 +9,8 @@ import SwiftUI
 import SwiftData
 
 struct AlarmView: View {
+    @Query var alarmData: [MetricAlarm]
+    @Environment(\.modelContext) private var context
     @Bindable var gov: Governor
     @Bindable var ag: AlarmGovernor
     private enum Component { case hour, minute, second }
@@ -18,58 +20,73 @@ struct AlarmView: View {
             Spacer()
             
             if !ag.activeAlarms.isEmpty {
-                ForEach(ag.activeAlarms, id: \.deadline.id) { alarm in
+                ForEach(ag.activeAlarms, id: \.alarm) { alarm in
                     ZStack {
                         Divider()
                         
                         HStack {
-                            Text(alarm.deadline.hourMinuteSecondTxt)
+                            VStack(alignment: .leading) {
+                                Text(alarm.deadline.hourMinuteSecondTxt)
+                                    .font(.title2).bold()
+                                Text(alarm.deadline.toGreg().formatted(date: .omitted, time: .standard))
+                                    .foregroundStyle(.secondary)
+                            }
                             
                             Spacer()
                             
-                            Text("\(alarm.currentTime.seconds - alarm.deadline.seconds)")
-                                .foregroundStyle(.background)
-                                .background(RoundedRectangle(cornerRadius: 10).fill(.gray))
-                                .frame(width: 110, height: 55)
+                            Button(action: { ag.dismissAlarm(alarm: alarm) }) {
+                                Image(systemName: "xmark")
+                                    .foregroundColor(.primary).bold()
+                            }
+                            
+                            Text(String(alarm.deadline.seconds - alarm.currentTime.seconds))
+                                .font(.title2).bold()
+                                .frame(width: 100, height: 33)
+                                .foregroundStyle(.primary)
+                                .background(RoundedRectangle(cornerRadius: 10).fill(.gray).opacity(0.2))
+                                .shadow(radius: 5)
                         }
                     }
                 }
             }
             
             if !ag.alarms.isEmpty {
-                ForEach(ag.alarms) { alarm in
+                ForEach(ag.alarms, id: \.id) { alarm in
                     ZStack {
                         Divider()
                         
                         HStack {
-                            Text(alarm.hourMinuteSecondTxt)
+                            VStack(alignment: .leading) {
+                                Text(alarm.hourMinuteSecondTxt)
+                                    .font(.title2).bold()
+                                Text(alarm.toGreg().formatted(date: .omitted, time: .standard))
+                                    .foregroundStyle(.secondary)
+                            }
                             
                             Spacer()
                             
-                            Button(action: {}) {
-                                Image(systemName: "arrow.3.trianglepath")
+                            Button(action: { setAlarm(oldAlarm: alarm) }) {
+                                Image(systemName: "arrow.3.trianglepath").bold()
                                     .foregroundStyle(.background)
+                                    .frame(width: 100, height: 33)
                                     .background(RoundedRectangle(cornerRadius: 10).fill(.metricOrange))
-                                    .frame(width: 110, height: 55)
                             }
                         }
                     }
                 }
             }
             
+            MetrixtSubdivider()
+            
             if let na = ag.newAlarm {
-                HStack {
-                    Text("new alarm:")
-                    Spacer()
-                }
                 
                 HStack(spacing: 0) {
-                    Text(na.yearTxt + "." + na.mwdTxt + ".")
+                    Text("new alarm: ").bold()
                         .padding(.trailing)
                     
-                    Picker("hour", selection: $ag.newAlarm) {
+                    Picker("hour", selection: $ag.alarmHour) {
                         ForEach(0...9, id: \.self) { i in
-                            Text(String(na.hour)).tag(na.hour)
+                            Text(String(i)).tag(i)
                                 .font(.title).bold()
                         }
                     }
@@ -77,7 +94,7 @@ struct AlarmView: View {
 
                     Text(":").padding(.top)
                     
-                    Picker("minute", selection: $ag.alarmSeconds) {
+                    Picker("minute", selection: $ag.alarmMinute) {
                         ForEach(0...99, id: \.self) { i in
                             Text(String(format: "%02d", i)).tag(i)
                                 .font(.title).bold()
@@ -87,7 +104,7 @@ struct AlarmView: View {
 
                     Text(":")
                     
-                    Picker("minute", selection: $ag.alarmSeconds) {
+                    Picker("second", selection: $ag.alarmSecond) {
                         ForEach(0...99, id: \.self) { i in
                             Text(String(format: "%02d", i)).tag(i)
                                 .font(.title).bold()
@@ -99,32 +116,32 @@ struct AlarmView: View {
                 .monospacedDigit()
                 .pickerStyle(.wheel)
                 .frame(height: 100)
+                
+                HStack {
+                    Spacer()
+        
+                    Text("gregorian: ")
+                    
+                    Text(na.toGreg().formatted(date: .omitted, time: .standard))
+                        .font(.title)
+                }
+                .foregroundStyle(.gray).bold()
                 .padding(.bottom)
-
-                Text(na.toGreg().formatted())
-                    .font(.title)
-                    .foregroundStyle(.gray)
             }
-            
-            
-            Spacer()
-            
+
             HStack {
                 Spacer()
                 
-                SmallTimeButtonView(imageString: "bell", text: "set", action: setAlarm, color: .metricOrange)
+                SmallTimeButtonView(imageString: "bell", text: "set", action: { setAlarm(oldAlarm: nil) }, color: .metricOrange)
             }
             
             Spacer()
             
         }
-        .onAppear { ag.newAlarm = MetrixtTime(date: nil) }
-        .padding()
-        .monospaced()
     }
     
-    private func setAlarm() {
-        
+    private func setAlarm(oldAlarm: MetrixtTime?) {
+        ag.setAlarm(data: alarmData, context: context, eternalNow: gov.eternalNow.time, oldAlarm: oldAlarm)
     }
 }
 

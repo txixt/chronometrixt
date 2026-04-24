@@ -49,10 +49,12 @@ import Foundation
     var deadline: MetrixtTime
     var currentTime: MetrixtTime
     var escapement: Timer?
+    private var onComplete: ((MetrixtTime) -> Void)?
     
-    init(deadline: MetrixtTime) {
+    init(deadline: MetrixtTime, onComplete: ((MetrixtTime) -> Void)? = nil) {
         self.deadline = deadline
         self.currentTime = MetrixtTime(date: nil)
+        self.onComplete = onComplete
         escapement = Timer.scheduledTimer(withTimeInterval: 0.864, repeats: true) { [weak self] _ in
             guard let self else { return }
             startAlarm()
@@ -61,16 +63,25 @@ import Foundation
     
     func startAlarm() {
         currentTime = currentTime.seconds % 1000 == 0 ? MetrixtTime(date: nil) : metric.cal.update(time: currentTime, component: .second, byAdding: 1)
-        if currentTime.seconds >= deadline.seconds { endAlarm() }
+        if currentTime.seconds >= deadline.seconds { 
+            endAlarm() 
+        }
     }
     
     func endAlarm() {
+        escapement?.invalidate()
+        escapement = nil
+        onComplete?(deadline)
         //Play Musixt
-        
     }
     
     func snooze() {
         deadline = metric.cal.update(time: deadline, component: .minute, byAdding: 10)
+    }
+    
+    deinit {
+        escapement?.invalidate()
+        escapement = nil
     }
 }
 
@@ -240,7 +251,7 @@ typealias metric = MetrixtCalendar
     func replaceComponents(time: MetrixtTime, components: [Component], with values: [Int]) -> MetrixtTime {
         guard components.count == values.count else { return MetrixtTime(date: nil) }
         var newTime = time
-        for i in 0...components.count {
+        for i in 0..<components.count {
             newTime = replace(time: newTime, component: components[i], with: values[i])
         }
         return newTime
