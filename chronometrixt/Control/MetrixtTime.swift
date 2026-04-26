@@ -87,40 +87,100 @@ import Foundation
 
 @Observable final class MetrixtTimer: Identifiable {
     var id: String = UUID().uuidString
-    var deadline: MetrixtTime
-    var countdown: MetrixtTime
-    var pause: Bool = false
+    var duration: Int
+    var deadline: Int
+    var countdown: Int
     private var escapement: Timer?
+    private var onComplete: ((Int) -> Void)?
     
-    init(time: MetrixtTime) {
-        let now = MetrixtTime(date: nil)
-        deadline = metric.cal.replaceComponents(
-            time: now,
-            components: [.year, .month, .week, .day],
-            with: [now.year, now.month, now.week, (time.hms > now.hms ? now.day + 1 : now.day)]
-        ) 
-        countdown = metric.cal.update(time: time, component: .second, byAdding: time.seconds - now.seconds)
+    init(duration: Int) {
+        self.duration = duration
+        deadline = MetrixtTime(date: nil).hms + duration
+        countdown = duration
         escapement = Timer.scheduledTimer(withTimeInterval: 0.864, repeats: true) { [weak self] _ in
             guard let self else { return }
-            self.update()
+            self.updateTimer()
         }
     }
     
-    private func update() {
-        if !pause {
-            countdown = metric.cal.update(time: countdown, component: .second, byAdding: -1)
-        }
-        if countdown.seconds > deadline.seconds {
+    private func updateTimer() {
+        countdown -= 1
+        if countdown <= 0 {
             escapement?.invalidate()
             escapement = nil
+            //completion handler
         }
     }
     
+    func cancelTimer() {
+        escapement?.invalidate()
+        escapement = nil
+        onComplete?(deadline)
+    }
+    
+    func toGregDeadline() -> Date {
+        return Date.now.addingTimeInterval(TimeInterval(duration))
+    }
+
     deinit {
         escapement?.invalidate()
         escapement = nil
     }
 }
+extension MetrixtTimer {
+    var totalSeconds: Double { TimeInterval(Double(duration % 100_000) * 0.864) }
+    var hours: Int { (duration / 10_000) % 10 }
+    var minutes: Int { (duration / 1_000) % 100 }
+    var seconds: Int { duration % 100 }
+    var countdownHr: Int { (countdown / 10_000) % 10 }
+    var countdownMin: Int { (countdown / 1_000) % 100 }
+    var countdownSec: Int { countdown % 100 }
+    var gregHr: Int { Int(totalSeconds) / 3600 }
+    var gregMin: Int { (Int(totalSeconds) % 3600) / 60 }
+    var gregSec: Int { Int(totalSeconds) % 60 }
+}
+extension MetrixtTimer: CustomStringConvertible {
+    var description: String { String(duration) }
+    var durationTxt: String { return String(format: "%01d:%02d:%02d", hours, minutes, seconds) }
+    var countdownTxt: String { return String(format: "%01d:%02d:%02d", countdownHr, countdownMin, countdownSec)  }
+    var gregDurationTxt: String { return String(format: "%02d:%02d:%02d", gregHr, gregMin, gregSec) }
+}
+//@Observable final class MetrixtTimer: Identifiable {
+//    var id: String = UUID().uuidString
+//    var deadline: MetrixtTime
+//    var countdown: MetrixtTime
+//    var pause: Bool = false
+//    private var escapement: Timer?
+//    
+//    init(time: MetrixtTime) {
+//        let now = MetrixtTime(date: nil)
+//        deadline = metric.cal.replaceComponents(
+//            time: now,
+//            components: [.year, .month, .week, .day],
+//            with: [now.year, now.month, now.week, (time.hms > now.hms ? now.day + 1 : now.day)]
+//        )
+//        countdown = metric.cal.update(time: time, component: .second, byAdding: time.seconds - now.seconds)
+//        escapement = Timer.scheduledTimer(withTimeInterval: 0.864, repeats: true) { [weak self] _ in
+//            guard let self else { return }
+//            self.update()
+//        }
+//    }
+//    
+//    private func update() {
+//        if !pause {
+//            countdown = metric.cal.update(time: countdown, component: .second, byAdding: -1)
+//        }
+//        if countdown.seconds > deadline.seconds {
+//            escapement?.invalidate()
+//            escapement = nil
+//        }
+//    }
+//    
+//    deinit {
+//        escapement?.invalidate()
+//        escapement = nil
+//    }
+//}
 
 @Observable final class MetrixtStopwatch {
     var metricMicroseconds: Int = 0
@@ -178,17 +238,19 @@ struct MetrixtTime: Hashable, Codable, Identifiable {
             return Date(timeIntervalSince1970: 0)
         }
         let result = initialYear.addingTimeInterval((TimeInterval(seconds) * 0.864))
-        let someOffset = MetrixtTime.cachedOffset ?? MetrixtTime.getOffset()
-        return someOffset == 0 ? result : result.addingTimeInterval(someOffset)
+        return result.addingTimeInterval(-Calendar.current.timeZone.daylightSavingTimeOffset())
+//        let someOffset = MetrixtTime.cachedOffset ?? MetrixtTime.getOffset()
+//        return someOffset == 0 ? result : result.addingTimeInterval(someOffset)
+
     }
-    private static func getOffset() -> TimeInterval {
-        cachedOffset = Date.now.timeIntervalSince(MetrixtTime(date: nil).basicGreg())
-        return cachedOffset!
-    }
-    private func basicGreg() -> Date {
-        guard let initialYear = Calendar.current.date(from: DateComponents(year: years - 3030, month: 1, day: 1)) else { return Date(timeIntervalSince1970: 0) }
-        return initialYear.addingTimeInterval(TimeInterval(seconds) * 0.864)
-    }
+//    private static func getOffset() -> TimeInterval {
+//        cachedOffset = Date.now.timeIntervalSince(MetrixtTime(date: nil).basicGreg())
+//        return cachedOffset!
+//    }
+//    private func basicGreg() -> Date {
+//        guard let initialYear = Calendar.current.date(from: DateComponents(year: years - 3030, month: 1, day: 1)) else { return Date(timeIntervalSince1970: 0) }
+//        return initialYear.addingTimeInterval(TimeInterval(seconds) * 0.864)
+//    }
 }
 ///Computed properties are simple divisions of the seconds per year, plus rotational values for clock hands
 extension MetrixtTime {
@@ -229,7 +291,13 @@ extension MetrixtTime: CustomStringConvertible {
     var hmstxt: String { String(format: "%05d", hms) }
     var hourMinuteSecondTxt: String { "\(hourTxt):\(minuteTxt):\(secondTxt)" }
     var fullDateTxt: String { "\(yearTxt).\(monthWeekDayTxt).\(hourMinuteSecondTxt)" }
+    var gregorianTimeOfDay: String {
+        let formatter = DateFormatter()
+        formatter.dateFormat = "HH:mm:ss"  // 24-hour format
+        return formatter.string(from: self.toGreg())
+    }
 }
+
 
 typealias metric = MetrixtCalendar
 @MainActor final class MetrixtCalendar {

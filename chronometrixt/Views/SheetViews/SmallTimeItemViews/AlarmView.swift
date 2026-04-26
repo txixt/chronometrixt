@@ -132,7 +132,12 @@ struct AlarmView: View {
             HStack {
                 Spacer()
                 
-                SmallTimeButtonView(imageString: "bell", text: "set", action: { setAlarm(oldAlarm: nil) }, color: .metricOrange)
+                if ag.activeAlarms.count < 3 {
+                    SmallTimeButtonView(imageString: "bell", text: "set", action: { setAlarm(oldAlarm: nil) }, color: .metricOrange)
+                } else {
+                    SmallTimeButtonView(imageString: "bell.slash", text: "alarms full", action: { return }, color: .gray)
+                        .disabled(true)
+                }
             }
             
             Spacer()

@@ -12,8 +12,8 @@ import SwiftData
     var newAlarm: MetrixtTime? = nil
     var alarms: [MetrixtTime] = []
     var activeAlarms: [MetrixtAlarm] = []
-    var newTimer: MetrixtTime? = nil
-    var timers: [MetrixtTime] = []
+    var newTimer: MetrixtTimer? = nil
+    var timers: [MetrixtTimer] = []
     var activeTimers: [MetrixtTimer] = []
     var stopwatch: MetrixtStopwatch = MetrixtStopwatch()
     
@@ -37,12 +37,7 @@ import SwiftData
     }
     
     private func updateNewTimer() {
-        guard let current = newAlarm else { return }
-        newTimer = metric.cal.replaceComponents(
-            time: current,
-            components: [.hour, .minute, .second],
-            with: [timerHour, timerMinute, timerSecond]
-        )
+        newTimer = MetrixtTimer(duration: (timerHour * 10_000) + (timerMinute * 100) + timerSecond)
     }
     
     func populate(data: [MetricAlarm], eternalNow: MetrixtTime) {
@@ -50,17 +45,17 @@ import SwiftData
         alarmHour = 5
         alarmMinute = 50
         alarmSecond = 50
-        newTimer = metric.cal.replaceComponents(time: eternalNow, components: [.hour, .minute, .second], with: [0, 0, 0])
+        newTimer = MetrixtTimer(duration: 0)
         stopwatch = MetrixtStopwatch()
         for datum in data {
-            let metrixt = MetrixtTime(years: datum.metricYears, seconds: datum.metricSeconds)
-            if datum.type == "alarm" { alarms.append(metrixt) }
-            if datum.type == "timer" { timers.append(metrixt) }
+            if datum.type == "alarm" { alarms.append(MetrixtTime(years: datum.metricYears, seconds: datum.metricSeconds)) }
+            if datum.type == "timer" { timers.append(MetrixtTimer(duration: datum.metricSeconds)) }
         }
     }
     
     func setAlarm(data: [MetricAlarm], context: ModelContext, eternalNow: MetrixtTime, oldAlarm: MetrixtTime?) {
         guard newAlarm != nil else { return }
+        while activeAlarms.count >= 3 { alarms.removeLast() }
         var ta: MetrixtTime = oldAlarm ?? newAlarm!
 
         if ta.seconds < eternalNow.seconds {
@@ -83,7 +78,7 @@ import SwiftData
         while alarms.count >= 3 { alarms.removeLast() }
         let allAlarms = data.filter { $0.type == "alarm" }
         while allAlarms.count >= 3 { context.delete(allAlarms.last!) }
-        let metrixt = MetricAlarm(metricTime: newAlarm, dataType: "alarm")
+        let metrixt = MetricAlarm(metricTime: newAlarm, dataType: "alarm", isActive: true)
         context.insert(metrixt)
     }
     func dismissAlarm(alarm: MetrixtAlarm) {
@@ -98,25 +93,28 @@ import SwiftData
         //play music, display options etcetery
     }
     
-    
-    func setTimer(data: [MetricAlarm], context: ModelContext, eternalNow: MetrixtTime, oldTimer: MetrixtTime?) {
+    func setTimer(data: [MetricAlarm], context: ModelContext, eternalNow: MetrixtTime, oldTimer: MetrixtTimer?) {
         guard newTimer != nil else { return }
         let tt = oldTimer == nil ? newTimer! : oldTimer!
-        activeTimers.insert(MetrixtTimer(time: tt), at: 0)
+        activeTimers.insert(MetrixtTimer(duration: tt.duration), at: 0)
         //set system Alarm
         
-        if oldTimer != nil { saveTimer(data: data, context: context) }
+        if oldTimer == nil { saveTimer(data: data, context: context) }
     }
     func saveTimer(data: [MetricAlarm], context: ModelContext) {
-        let allTimers = data.filter { $0.type == "alarm" }
+        while alarms.count > 3 { alarms.removeLast() }
+        let allTimers = data.filter { $0.type == "timer" }
         while allTimers.count >= 3 { context.delete(allTimers.last!) }
-        let metrixt = MetricAlarm(metricTime: newTimer, dataType: "timer")
-        context.insert(metrixt)
+        let timer = MetricAlarm(metricTime: MetrixtTime(years: 0, seconds: newTimer?.duration ?? 0), dataType: "timer", isActive: true)
+        context.insert(timer)
     }
-    func handleTimerCompletion(deadline: MetrixtTime) {
-        alarms.insert(deadline, at: 0)
-        activeAlarms.removeAll(where: { $0.deadline.id == deadline.id })
-        
+    func cancelTimer(timer: MetrixtTimer) {
+        timer.cancelTimer()
+        timers.insert(timer, at: 0)
+        activeTimers.removeAll(where: { $0.id == timer.id})
+    }
+    func handleTimerCompletion(timer: MetrixtTimer) {
+        cancelTimer(timer: timer)
         //play music, display options, etcetery et etcetery ad nauseum
     }
     

@@ -17,28 +17,28 @@ struct TimerView: View {
     var body: some View {
         VStack {
             Spacer()
-            
             if !ag.activeTimers.isEmpty {
-                ForEach(ag.activeTimers, id: \.deadline.id) { timer in
+                ForEach(ag.activeTimers, id: \.id) { timer in
                     ZStack {
                         Divider()
                         
                         HStack {
                             VStack(alignment: .leading) {
-                                Text(timer.deadline.hourMinuteSecondTxt)
+                                Text(timer.durationTxt)
                                     .font(.title2).bold()
-                                Text(timer.deadline.toGreg().formatted(date: .omitted, time: .shortened))
+                                Text(timer.gregDurationTxt)
                                     .foregroundStyle(.secondary)
                             }
                             
                             Spacer()
                             
-                            Button(action: {}) {
+                            Button(action: { ag.cancelTimer(timer: timer )}) {
                                 Image(systemName: "xmark")
                                     .foregroundColor(.primary).bold()
+                                    .shadow(radius: 3)
                             }
                             
-                            Text(timer.countdown.hourMinuteSecondTxt)
+                            Text(timer.countdownTxt)
                                 .font(.title2).bold()
                                 .frame(width: 100, height: 33)
                                 .foregroundStyle(.primary)
@@ -55,9 +55,9 @@ struct TimerView: View {
                         
                         HStack {
                             VStack(alignment: .leading) {
-                                Text(timer.hourMinuteSecondTxt)
+                                Text(timer.durationTxt)
                                     .font(.title2).bold()
-                                Text(timer.toGreg().formatted(date: .omitted, time: .shortened))
+                                Text(timer.gregDurationTxt)
                             }
                             
                             Spacer()
@@ -113,7 +113,7 @@ struct TimerView: View {
                 HStack {
                     Spacer()
                     Text("gregorian: ")
-                    Text(nt.toGreg().formatted(date: .omitted, time: .shortened))
+                    Text(nt.gregDurationTxt)
                         .font(.title)
                 }
                 .foregroundStyle(.gray).bold()
@@ -123,19 +123,30 @@ struct TimerView: View {
             HStack {
                 Spacer()
                 
-                SmallTimeButtonView(
-                    imageString: "timer",
-                    text: "start",
-                    action: { startTimer(oldTimer: nil) },
-                    color: .metricOrange
-                )
+                if ag.activeTimers.count < 3 {
+                    SmallTimeButtonView(
+                        imageString: "timer",
+                        text: "start",
+                        action: { startTimer(oldTimer: nil) },
+                        color: .metricOrange
+                    )
+                } else {
+                    SmallTimeButtonView(
+                        imageString: "timer.slash",
+                        text: "timers full",
+                        action: { return },
+                        color: .gray
+                    )
+                    .disabled(true)
+                }
+
             }
             
             Spacer()
         }
     }
     
-    private func startTimer(oldTimer: MetrixtTime?) {
+    private func startTimer(oldTimer: MetrixtTimer?) {
         ag.setTimer(data: timerData, context: context, eternalNow: gov.eternalNow.time, oldTimer: oldTimer)
     }
 }
