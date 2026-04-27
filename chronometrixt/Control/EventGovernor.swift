@@ -32,6 +32,7 @@ import SwiftData
     var originalStart: MetrixtTime? = nil
     var modelContext: ModelContext
     var gov: Governor
+    var ng: NotificationGovernor?
     
     var editField: EditingFields = .none
     enum EditingFields { case none, title, startDateMetric, startDateGreg, endDateMetric, endDateGreg, alarms, recurrence, location, notes, calendar, participants }
@@ -214,6 +215,14 @@ import SwiftData
             
             gov.event = event
             gov.sheet = .showEvent
+            
+            if !alarms.isEmpty {
+                for alarm in alarms {
+                    Task {
+                        try? await ng?.scheduleEvent(id: alarm.id, eventTime: metricStart, eventTitle: title)
+                    }
+                }
+            }
         } catch let error as EventHandler.EventError {
             handleEventError(error)
         } catch {
@@ -232,6 +241,14 @@ import SwiftData
         
         do {
             try EventHandler.applyUpdates(to: event, from: self)
+            if !alarms.isEmpty {
+                for alarm in alarms {
+                    ng?.cancelNotification(id: id)
+                    Task {
+                        try? await ng?.scheduleEvent(id: alarm.id, eventTime: metricStart, eventTitle: title)
+                    }
+                }
+            }
             gov.sheet = .showEvent
         } catch let error as EventHandler.EventError {
             handleEventError(error)

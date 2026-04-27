@@ -11,7 +11,7 @@ import SwiftData
 struct SmallTimesView: View {
     @Query var alarms: [MetricAlarm]
     @Bindable var gov: Governor
-    @State var ag: AlarmGovernor = AlarmGovernor()
+    @Bindable var ag: AlarmGovernor
     
     var body: some View {
         VStack {
@@ -65,5 +65,5 @@ struct SmallTimesView: View {
 }
 
 #Preview {
-    SmallTimesView(gov: Governor())
+    SmallTimesView(gov: Governor(), ag: AlarmGovernor())
 }

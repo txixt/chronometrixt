@@ -78,7 +78,9 @@ struct TimerView: View {
             if let nt = ag.newTimer {
                 
                 HStack(spacing: 0) {
-                    Text("new timer: ").bold()
+                    Spacer()
+                    
+                    Text("new timer:").bold()
                         .padding(.trailing)
                     
                     Picker("hour", selection: $ag.timerHour) {
@@ -87,6 +89,7 @@ struct TimerView: View {
                                 .font(.title).bold()
                         }
                     }
+                    .frame(width: 60)
                     
                     Text(":")
                     
@@ -96,6 +99,7 @@ struct TimerView: View {
                                 .font(.title).bold()
                         }
                     }
+                    .frame(width: 80)
                     
                     Text(":")
                     
@@ -105,6 +109,8 @@ struct TimerView: View {
                                 .font(.title).bold()
                         }
                     }
+                    .frame(width: 80)
+                    
                 }
                 .monospacedDigit()
                 .pickerStyle(.wheel)
@@ -112,7 +118,7 @@ struct TimerView: View {
                 
                 HStack {
                     Spacer()
-                    Text("gregorian: ")
+                    Text("gregorian duration:")
                     Text(nt.gregDurationTxt)
                         .font(.title)
                 }

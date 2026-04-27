@@ -24,6 +24,9 @@ import SwiftData
     var timerMinute: Int = 0 { didSet { updateNewTimer() } }
     var timerSecond: Int = 0 { didSet { updateNewTimer() } }
     
+    var ng: NotificationGovernor?
+    var lam: LiveActivityManager = LiveActivityManager()
+    
     var mode: SmallTimeMode = .timer
     enum SmallTimeMode: Hashable { case timer, alarm, stopwatch }
     
@@ -54,7 +57,7 @@ import SwiftData
     }
     
     func setAlarm(data: [MetricAlarm], context: ModelContext, eternalNow: MetrixtTime, oldAlarm: MetrixtTime?) {
-        guard newAlarm != nil else { return }
+        guard newAlarm != nil && ng != nil else { return }
         while activeAlarms.count >= 3 { alarms.removeLast() }
         var ta: MetrixtTime = oldAlarm ?? newAlarm!
 
@@ -73,6 +76,10 @@ import SwiftData
         if oldAlarm == nil {
             saveAlarm(data: data, context: context)
         }
+        
+        Task {
+            try? await ng?.scheduleAlarm(id: alarm.alarm, triggerTime: ta)
+        }
     }
     func saveAlarm(data: [MetricAlarm], context: ModelContext) {
         while alarms.count >= 3 { alarms.removeLast() }
@@ -85,21 +92,30 @@ import SwiftData
         alarm.escapement?.invalidate()
         activeAlarms.removeAll(where: { $0.alarm == alarm.alarm })
         alarms.insert(alarm.deadline, at: 0)
+        Task {
+            ng?.cancelNotification(id: alarm.alarm)
+        }
     }
     func handleAlarmCompletion(deadline: MetrixtTime) {
         alarms.insert(deadline, at: 0)
         activeAlarms.removeAll(where: { $0.deadline == deadline })
-        
-        //play music, display options etcetery
     }
     
     func setTimer(data: [MetricAlarm], context: ModelContext, eternalNow: MetrixtTime, oldTimer: MetrixtTimer?) {
         guard newTimer != nil else { return }
         let tt = oldTimer == nil ? newTimer! : oldTimer!
         activeTimers.insert(MetrixtTimer(duration: tt.duration), at: 0)
-        //set system Alarm
         
         if oldTimer == nil { saveTimer(data: data, context: context) }
+        
+        Task {
+            await lam.startTimerActivity(
+                timerID: newTimer!.id,
+                duration: tt.duration,
+                endTime: tt.toGregDeadline()
+            )
+            try? await ng?.scheduleTimer(id: tt.id, duration: tt.duration)
+        }
     }
     func saveTimer(data: [MetricAlarm], context: ModelContext) {
         while alarms.count > 3 { alarms.removeLast() }
@@ -112,10 +128,6 @@ import SwiftData
         timer.cancelTimer()
         timers.insert(timer, at: 0)
         activeTimers.removeAll(where: { $0.id == timer.id})
+        ng?.cancelNotification(id: timer.id)
     }
-    func handleTimerCompletion(timer: MetrixtTimer) {
-        cancelTimer(timer: timer)
-        //play music, display options, etcetery et etcetery ad nauseum
-    }
-    
 }

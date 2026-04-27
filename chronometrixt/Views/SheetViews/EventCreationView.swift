@@ -12,6 +12,7 @@ struct EventCreationView: View {
     @Environment(\.modelContext) private var context
     @Bindable var gov: Governor
     @Binding var eventGov: EventGovernor?
+    @Bindable var ng: NotificationGovernor
     @State var eventTitle: String = ""
     
     var body: some View {
@@ -60,6 +61,7 @@ struct EventCreationView: View {
             context: context,
             gov: gov
         )
+        eventGov!.ng = ng
     }
 }
 
@@ -67,14 +69,16 @@ struct EventCreationView: View {
 #Preview {
     let context = PreviewEG.previewContainer.mainContext
     let gov = Governor()
-    EventCreationView(gov: gov, eventGov: .constant(EventGovernor(
+    EventCreationView(
+        gov: gov,
+        eventGov: .constant(EventGovernor(
             title: "sample",
             starting: MetrixtTime(years: 5056, seconds: 123456),
             ending: MetrixtTime(years: 5056, seconds: 123459),
             context: context,
-            gov: gov
-            )
-        )
+            gov: gov)
+        ),
+        ng: NotificationGovernor()
     )
 }
 

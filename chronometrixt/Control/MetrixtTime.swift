@@ -130,10 +130,10 @@ import Foundation
 extension MetrixtTimer {
     var totalSeconds: Double { TimeInterval(Double(duration % 100_000) * 0.864) }
     var hours: Int { (duration / 10_000) % 10 }
-    var minutes: Int { (duration / 1_000) % 100 }
+    var minutes: Int { (duration / 100) % 100 }
     var seconds: Int { duration % 100 }
     var countdownHr: Int { (countdown / 10_000) % 10 }
-    var countdownMin: Int { (countdown / 1_000) % 100 }
+    var countdownMin: Int { (countdown / 100) % 100 }
     var countdownSec: Int { countdown % 100 }
     var gregHr: Int { Int(totalSeconds) / 3600 }
     var gregMin: Int { (Int(totalSeconds) % 3600) / 60 }

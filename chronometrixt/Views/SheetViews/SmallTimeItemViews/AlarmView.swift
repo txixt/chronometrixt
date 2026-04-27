@@ -37,6 +37,7 @@ struct AlarmView: View {
                             Button(action: { ag.dismissAlarm(alarm: alarm) }) {
                                 Image(systemName: "xmark")
                                     .foregroundColor(.primary).bold()
+                                    .shadow(radius: 3)
                             }
                             
                             Text(String(alarm.deadline.seconds - alarm.currentTime.seconds))
@@ -81,7 +82,9 @@ struct AlarmView: View {
             if let na = ag.newAlarm {
                 
                 HStack(spacing: 0) {
-                    Text("new alarm: ").bold()
+                    Spacer()
+                    
+                    Text("new alarm:").bold()
                         .padding(.trailing)
                     
                     Picker("hour", selection: $ag.alarmHour) {
@@ -120,7 +123,7 @@ struct AlarmView: View {
                 HStack {
                     Spacer()
         
-                    Text("gregorian: ")
+                    Text("gregorian time:")
                     
                     Text(na.toGreg().formatted(date: .omitted, time: .standard))
                         .font(.title)
