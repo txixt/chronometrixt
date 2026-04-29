@@ -9,29 +9,31 @@ import SwiftUI
 import SwiftData
 
 struct YearFocusView: View {
-    @Query private var allEvents: [MetricEvent]
+//    @Query private var allEvents: [MetricEvent]
     @Bindable var gov: Governor
     var year: MetrixtTime
-    
-    private var yearEvents: [Int] {
-        var days: [Int] = Array(repeating: 0, count: metric.cal.isLeapYear(year.year) ? 366 : 365)
-        guard !allEvents.isEmpty else { return days }
-        guard let span = gov.span else { return days }
-        
-        let events = allEvents.filter { event in
-            guard event.startYears == year.year else { return false }
-            return span.contains(event.startYears)
-        }
-        for event in events {
-            let eventDay = event.startSeconds / 100_000
-            if days[eventDay] < 3 { days[eventDay] += 1}
-        }
-        
-        return days
-    }
+
+///TOO EXPENSIVE?
+//    private var yearEvents: [Int] {
+//        var days: [Int] = Array(repeating: 0, count: metric.cal.isLeapYear(year.year) ? 366 : 365)
+//        guard !allEvents.isEmpty else { return days }
+//        guard let span = gov.span else { return days }
+//        
+//        let events = allEvents.filter { event in
+//            guard event.startYears == year.year else { return false }
+//            return span.contains(event.startYears)
+//        }
+//        for event in events {
+//            let eventDay = event.startSeconds / 100_000
+//            if days[eventDay] < 3 { days[eventDay] += 1}
+//        }
+//        
+//        return days
+//    }
     
     var body: some View {
-        GeometryReader { geo in
+        GeometryReader { geometryReader in
+            let geo = gov.geoSize ?? geometryReader.size
             VStack {
                 
                 HStack {
@@ -63,21 +65,21 @@ struct YearFocusView: View {
                                                 
                                                 ZStack {
                                                     RoundedRectangle(cornerRadius: 2)
-                                                        .frame(width: geo.size.width * 0.068, height: 4)
+                                                        .frame(width: geo.width * 0.068, height: 4)
                                                         .foregroundColor(isToday ? .metricOrange : .primary)
                                                         .shadow(color: isToday ? .metricOrange : .clear, radius: 5)
                                                         .shadow(color: isToday ? .metricOrange : .clear, radius: 5)
                                                         .shadow(color: isToday ? .metricOrange : .clear, radius: 5)
                                                         .opacity(pastEndOfYear ? 0 : 1)
                                                     
-                                                    HStack(spacing: 0) {
-                                                        let pips = thisMwd < yearEvents.count ? yearEvents[thisMwd] : 0
-                                                        ForEach(0..<pips, id: \.self) { _ in
-                                                            Circle().fill(.background)
-                                                                .frame(width: 3, height: 3)
-                                                                .padding(.horizontal, 1)
-                                                        }
-                                                    }
+//                                                    HStack(spacing: 0) {
+//                                                        let pips = thisMwd < yearEvents.count ? yearEvents[thisMwd] : 0
+//                                                        ForEach(0..<pips, id: \.self) { _ in
+//                                                            Circle().fill(.background)
+//                                                                .frame(width: 3, height: 3)
+//                                                                .padding(.horizontal, 1)
+//                                                        }
+//                                                    }
                                                 }
                                                 
                                             }
@@ -91,7 +93,7 @@ struct YearFocusView: View {
                 }
             }
             .padding(.horizontal)
-            .frame(width: geo.size.width, height: geo.size.width)
+            .frame(width: geo.width, height: geo.width)
         }
     }
     

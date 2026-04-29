@@ -12,7 +12,8 @@ struct CalendarScrollView: View {
     @State private var scrollControl: CGFloat = 0
     
     var body: some View {
-        GeometryReader { geo in
+        GeometryReader { geometryReader in
+            let geo = gov.geoSize ?? geometryReader.size
             LazyVStack {
                 Spacer()
                 HStack(alignment: .center) {
@@ -48,7 +49,7 @@ struct CalendarScrollView: View {
                                     }
                                 }
                             }
-                            .frame(height: geo.size.width)
+                            .frame(height: geo.width)
                             .clipped()
                         }
                     }
@@ -58,7 +59,7 @@ struct CalendarScrollView: View {
                 Spacer()
             }
             .frame(maxWidth: .infinity, maxHeight: .infinity)
-            .offset(y: -(geo.size.height * 0.5) + scrollControl)
+            .offset(y: -(geo.height * 0.5) + scrollControl)
             .gesture(
                 DragGesture()
                     .onChanged { value in

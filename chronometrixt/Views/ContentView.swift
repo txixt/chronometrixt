@@ -56,6 +56,9 @@ struct ContentView: View {
                     if new == .background || new == .inactive { gov.eternalNow.killTimer() }
                     else { gov.eternalNow.restartTimer() }
                 }
+                .onChange(of: geo.size) { _, new in
+                    gov.geoSize = new
+                }
                 .onAppear {
                     ng.gov = gov
                     ag.ng = ng

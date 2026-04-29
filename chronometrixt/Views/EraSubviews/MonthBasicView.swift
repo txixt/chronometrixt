@@ -12,7 +12,8 @@ struct MonthBasicView: View {
     var month: MetrixtTime
     
     var body: some View {
-        GeometryReader { geo in
+        GeometryReader { geometryReader in
+            let geo = gov.geoSize ?? geometryReader.size
             let isThisMonth = month.years == gov.eternalNow.time.years && month.month == gov.eternalNow.time.month
             VStack {
                 
@@ -48,7 +49,7 @@ struct MonthBasicView: View {
                                         Text("\(day)")
                                             .font(.caption).bold()
                                     }
-                                    .frame(width: geo.size.width * 0.068, height: 22)
+                                    .frame(width: geo.width * 0.068, height: 22)
                                     .opacity(yearEnded ? 0 : 1)
                                 }
                             }
@@ -58,7 +59,7 @@ struct MonthBasicView: View {
                 
             }
             .padding(.horizontal)
-            .frame(width: geo.size.width, height: geo.size.width)
+            .frame(width: geo.width, height: geo.width)
         }
     }
 }

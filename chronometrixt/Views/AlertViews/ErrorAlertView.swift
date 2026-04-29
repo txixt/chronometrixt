@@ -11,7 +11,8 @@ struct ErrorAlertView: View {
     @Bindable var gov: Governor
     
     var body: some View {
-        GeometryReader { geo in
+        GeometryReader { geometryReader in
+            let geo = gov.geoSize ?? geometryReader.size
             ZStack {
                 HStack{
                     Spacer()
@@ -48,7 +49,7 @@ struct ErrorAlertView: View {
                         .padding()
                         .monospaced()
                         .background(RoundedRectangle(cornerRadius: 30).fill(.background.opacity(0.9)))
-                        .frame(width: geo.size.width * 0.5, height: geo.size.height * 0.5)
+                        .frame(width: geo.width * 0.5, height: geo.height * 0.5)
                         .task { await lifeIsShort() }
         
                         

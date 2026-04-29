@@ -68,7 +68,8 @@ struct DayFocusView: View {
     }
     
     var body: some View {
-        GeometryReader { geo in
+        GeometryReader { geometryReader in
+            let geo = gov.geoSize ?? geometryReader.size
             VStack {
                 
                 HStack(spacing: 0) {
@@ -86,15 +87,15 @@ struct DayFocusView: View {
                         ZStack {
                             
                             RoundedRectangle(cornerRadius: 11)
-                                .frame(width: geo.size.width * 0.9, height: 22)
+                                .frame(width: geo.width * 0.9, height: 22)
                                 .foregroundColor(.gray).opacity(0.2)
                             
                             if !eventsByHour[hour].isEmpty {
                                 ForEach(eventsByHour[hour]) { segment in
                                     RoundedRectangle(cornerRadius: 11)
                                         .fill(segment.color.opacity(0.5))
-                                        .frame(width: max(geo.size.width * 0.9 * (segment.endPercent - segment.startPercent), 22), height: 22)
-                                        .offset(x: (geo.size.width * 0.9 * (segment.startPercent + segment.endPercent - 1.0) / 2.0))
+                                        .frame(width: max(geo.width * 0.9 * (segment.endPercent - segment.startPercent), 22), height: 22)
+                                        .offset(x: (geo.width * 0.9 * (segment.startPercent + segment.endPercent - 1.0) / 2.0))
                                 }
                             }
                             
@@ -131,7 +132,7 @@ struct DayFocusView: View {
                 }
             }
             .padding(.horizontal)
-            .frame(width: geo.size.width, height: geo.size.width)
+            .frame(width: geo.width, height: geo.width)
         }
     }
     

@@ -15,7 +15,8 @@ struct EventEditMainView: View {
     let update: Bool
     
     var body: some View {
-        GeometryReader { geo in
+        GeometryReader { geometryReader in
+            let geo = gov.geoSize ?? geometryReader.size
             VStack {
                 ScrollView {
                         VStack {
@@ -197,7 +198,7 @@ struct EventEditMainView: View {
                 .padding(.bottom)
                 
             }
-            .frame(height: geo.size.height)
+            .frame(height: geo.height)
         }
     }
     

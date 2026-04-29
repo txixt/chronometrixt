@@ -32,7 +32,8 @@ struct MonthFocusView: View {
     }
     
     var body: some View {
-        GeometryReader { geo in
+        GeometryReader { geometryReader in
+            let geo = gov.geoSize ?? geometryReader.size
             let isThisMonth = month.years == gov.eternalNow.time.years && month.month == gov.eternalNow.time.month
             VStack {
                 
@@ -84,7 +85,7 @@ struct MonthFocusView: View {
                                             }
                                         }
                                     }
-                                    .frame(width: geo.size.width * 0.068, height: 22)
+                                    .frame(width: geo.width * 0.068, height: 22)
                                     .opacity(yearEnded ? 0 : 1)
                                     .onTapGesture(count: 1) { goToDayWeekView(week: week, day: day) }
                                 }
@@ -95,7 +96,7 @@ struct MonthFocusView: View {
                 
             }
             .padding(.horizontal)
-            .frame(width: geo.size.width, height: geo.size.width)
+            .frame(width: geo.width, height: geo.width)
         }
     }
     

@@ -12,7 +12,8 @@ struct WeekBasicView: View {
     var week: MetrixtTime
     
     var body: some View {
-        GeometryReader { geo in
+        GeometryReader { geometryReader in
+            let geo = gov.geoSize ?? geometryReader.size
             let isThisWeek = week.year == gov.eternalNow.time.year &&
                              week.month == gov.eternalNow.time.month &&
                              week.week == gov.eternalNow.time.week
@@ -41,7 +42,7 @@ struct WeekBasicView: View {
                                 RoundedRectangle(cornerRadius: 15)
                                     .fill(isThisDay ? .metricOrange : .primary)
                                     .opacity(isThisDay ? 1.0 : 0.2)
-                                    .frame(width: geo.size.width * 0.07)
+                                    .frame(width: geo.width * 0.07)
                                 VStack {
                                     ForEach(0...9, id: \.self) { hour in
                                         Text("\(hour)")
@@ -51,7 +52,7 @@ struct WeekBasicView: View {
                                 }
                                 .opacity(yearEnded ? 0:1)
                             }
-                            .frame(height: geo.size.width * 0.7)
+                            .frame(height: geo.width * 0.7)
                         }
                         
                         if day != 9 { Spacer() }
@@ -62,7 +63,7 @@ struct WeekBasicView: View {
                 
             }
             .padding(.horizontal)
-            .frame(width: geo.size.width, height: geo.size.width)
+            .frame(width: geo.width, height: geo.width)
         }
     }
 }
