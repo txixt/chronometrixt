@@ -20,7 +20,7 @@ struct AlarmView: View {
             Spacer()
             
             if !ag.activeAlarms.isEmpty {
-                ForEach(ag.activeAlarms, id: \.alarm) { alarm in
+                ForEach(ag.activeAlarms, id: \.id) { alarm in
                     ZStack {
                         Divider()
                         
@@ -40,7 +40,7 @@ struct AlarmView: View {
                                     .shadow(radius: 3)
                             }
                             
-                            Text(String(alarm.deadline.seconds - alarm.currentTime.seconds))
+                            Text(alarm.countdownTxt)
                                 .font(.title2).bold()
                                 .frame(width: 100, height: 33)
                                 .foregroundStyle(.primary)
