@@ -61,6 +61,7 @@ struct SmallTimesView: View {
         .monospaced()
         .padding()
         .onAppear() { ag.populate(data: alarms, eternalNow: gov.eternalNow.time) }
+        .onDisappear() { ag.stopwatch = nil }
     }
 }
 

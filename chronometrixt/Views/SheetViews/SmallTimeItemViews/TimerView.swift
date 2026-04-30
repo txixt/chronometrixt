@@ -47,7 +47,10 @@ struct TimerView: View {
                         }
                     }
                 }
+                
+                MetrixtSubdivider()
             }
+            
             if !ag.timers.isEmpty {
                 ForEach(ag.timers, id: \.id) { timer in
                     ZStack {
@@ -71,60 +74,57 @@ struct TimerView: View {
                         }
                     }
                 }
+                
+                MetrixtSubdivider()
             }
             
-            MetrixtSubdivider()
-            
-            if let nt = ag.newTimer {
+            HStack(spacing: 0) {
+                Spacer()
                 
-                HStack(spacing: 0) {
-                    Spacer()
-                    
-                    Text("new timer:").bold()
-                        .padding(.trailing)
-                    
-                    Picker("hour", selection: $ag.timerHour) {
-                        ForEach(0...9, id: \.self) { i in
-                            Text(String(i)).tag(i)
-                                .font(.title).bold()
-                        }
-                    }
-                    .frame(width: 60)
-                    
-                    Text(":")
-                    
-                    Picker("minute", selection: $ag.timerMinute) {
-                        ForEach(0...99, id: \.self) { i in
-                            Text(String(format: "%02d", i)).tag(i)
-                                .font(.title).bold()
-                        }
-                    }
-                    .frame(width: 80)
-                    
-                    Text(":")
-                    
-                    Picker("second", selection: $ag.timerSecond) {
-                        ForEach(0...99, id: \.self) { i in
-                            Text(String(format: "%02d", i)).tag(i)
-                                .font(.title).bold()
-                        }
-                    }
-                    .frame(width: 80)
-                    
-                }
-                .monospacedDigit()
-                .pickerStyle(.wheel)
-                .frame(height: 100)
+                Text("new timer:").bold()
+                    .padding(.trailing)
                 
-                HStack {
-                    Spacer()
-                    Text("gregorian duration:")
-                    Text(nt.gregDurationTxt)
-                        .font(.title)
+                Picker("hour", selection: $ag.timerHour) {
+                    ForEach(0...9, id: \.self) { i in
+                        Text(String(i)).tag(i)
+                            .font(.title).bold()
+                    }
                 }
-                .foregroundStyle(.gray).bold()
-                .padding(.bottom)
+                .frame(width: 60)
+                
+                Text(":")
+                
+                Picker("minute", selection: $ag.timerMinute) {
+                    ForEach(0...99, id: \.self) { i in
+                        Text(String(format: "%02d", i)).tag(i)
+                            .font(.title).bold()
+                    }
+                }
+                .frame(width: 80)
+                
+                Text(":")
+                
+                Picker("second", selection: $ag.timerSecond) {
+                    ForEach(0...99, id: \.self) { i in
+                        Text(String(format: "%02d", i)).tag(i)
+                            .font(.title).bold()
+                    }
+                }
+                .frame(width: 80)
+                
             }
+            .monospacedDigit()
+            .pickerStyle(.wheel)
+            .frame(height: 100)
+            
+            HStack {
+                Spacer()
+                Text("gregorian duration:")
+                Text(ag.newTimer.gregDurationTxt)
+                    .font(.title)
+            }
+            .foregroundStyle(.gray).bold()
+            .padding(.bottom)
             
             HStack {
                 Spacer()

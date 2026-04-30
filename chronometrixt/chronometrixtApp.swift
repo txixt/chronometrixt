@@ -13,7 +13,8 @@ struct chronometrixtApp: App {
     var sharedModelContainer: ModelContainer = {
         let schema = Schema([
             MetricEvent.self,
-            MetricCalendar.self
+            MetricCalendar.self,
+            MetricAlarm.self
         ])
         let modelConfiguration = ModelConfiguration(schema: schema, isStoredInMemoryOnly: false)
 

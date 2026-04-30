@@ -9,57 +9,52 @@ import Foundation
 import SwiftData
 
 @Observable final class AlarmGovernor {
-    var newAlarm: MetrixtTime? = nil
+    var newAlarm: MetrixtTime = metric.cal.replaceComponents(time: MetrixtTime(date: nil), components: [.hour, .minute, .second], with: [5, 50, 50])
     var alarms: [MetrixtTime] = []
     var activeAlarms: [MetrixtAlarm] = []
-    var newTimer: MetrixtTimer? = nil
-    var timers: [MetrixtTimer] = []
-    var activeTimers: [MetrixtTimer] = []
-    var stopwatch: MetrixtStopwatch = MetrixtStopwatch()
-    
     var alarmHour: Int = 5 { didSet { updateNewAlarm() } }
     var alarmMinute: Int = 50 { didSet { updateNewAlarm() } }
     var alarmSecond: Int = 50 { didSet { updateNewAlarm() } }
-    var timerHour: Int = 0 { didSet { updateNewTimer() }}
-    var timerMinute: Int = 0 { didSet { updateNewTimer() } }
-    var timerSecond: Int = 0 { didSet { updateNewTimer() } }
-    
-    var ng: NotificationGovernor?
-    var lam: LiveActivityManager = LiveActivityManager()
-    
-    var mode: SmallTimeMode = .timer
-    enum SmallTimeMode: Hashable { case timer, alarm, stopwatch }
-    
     private func updateNewAlarm() {
-        guard let current = newAlarm else { return }
         newAlarm = metric.cal.replaceComponents(
-            time: current,
+            time: newAlarm,
             components: [.hour, .minute, .second],
             with: [alarmHour, alarmMinute, alarmSecond]
         )
     }
     
+    
+    var newTimer: MetrixtTimer = MetrixtTimer(duration: 0)
+    var timers: [MetrixtTimer] = []
+    var activeTimers: [MetrixtTimer] = []
+    var timerHour: Int = 0 { didSet { updateNewTimer() }}
+    var timerMinute: Int = 0 { didSet { updateNewTimer() } }
+    var timerSecond: Int = 0 { didSet { updateNewTimer() } }
     private func updateNewTimer() {
         newTimer = MetrixtTimer(duration: (timerHour * 10_000) + (timerMinute * 100) + timerSecond)
     }
     
+    var stopwatch: MetrixtStopwatch? = nil
+    
+    var mode: SmallTimeMode = .timer
+    enum SmallTimeMode: Hashable { case timer, alarm, stopwatch }
+        
+    var ng: NotificationGovernor?
+    var lam: LiveActivityManager = LiveActivityManager()
+    
+    
     func populate(data: [MetricAlarm], eternalNow: MetrixtTime) {
-        newAlarm = metric.cal.replaceComponents(time: eternalNow, components: [.hour, .minute, .second], with: [5, 50, 50])
-        alarmHour = 5
-        alarmMinute = 50
-        alarmSecond = 50
-        newTimer = MetrixtTimer(duration: 0)
-        stopwatch = MetrixtStopwatch()
+        stopwatch = MetrixtStopwatch(time: nil)
         for datum in data {
-            if datum.type == "alarm" { alarms.append(MetrixtTime(years: datum.metricYears, seconds: datum.metricSeconds)) }
-            if datum.type == "timer" { timers.append(MetrixtTimer(duration: datum.metricSeconds)) }
+            if datum.type == .alarm { alarms.append(MetrixtTime(years: datum.metricYears, seconds: datum.metricSeconds)) }
+            if datum.type == .timer { timers.append(MetrixtTimer(duration: datum.metricSeconds)) }
+            if datum.type == .stopwatch { stopwatch = MetrixtStopwatch(time: MetrixtTime(years: datum.metricYears, seconds: datum.metricSeconds) ) }
         }
     }
     
     func setAlarm(data: [MetricAlarm], context: ModelContext, eternalNow: MetrixtTime, oldAlarm: MetrixtTime?) {
-        guard newAlarm != nil && ng != nil else { return }
         while activeAlarms.count >= 3 { alarms.removeLast() }
-        var ta: MetrixtTime = oldAlarm ?? newAlarm!
+        var ta: MetrixtTime = oldAlarm ?? newAlarm
 
         if ta.seconds < eternalNow.seconds {
             let tomorrow = metric.cal.update(time: eternalNow, component: .day, byAdding: 1)
@@ -83,10 +78,10 @@ import SwiftData
     }
     func saveAlarm(data: [MetricAlarm], context: ModelContext) {
         while alarms.count >= 3 { alarms.removeLast() }
-        let allAlarms = data.filter { $0.type == "alarm" }
+        let allAlarms = data.filter { $0.type == .alarm }
         while allAlarms.count >= 3 { context.delete(allAlarms.last!) }
-        let metrixt = MetricAlarm(metricTime: newAlarm, dataType: "alarm", isActive: true)
-        context.insert(metrixt)
+        let metric = MetricAlarm(time: newAlarm, type: .alarm)
+        context.insert(metric)
     }
     func dismissAlarm(alarm: MetrixtAlarm) {
         alarm.escapement?.invalidate()
@@ -102,15 +97,14 @@ import SwiftData
     }
     
     func setTimer(data: [MetricAlarm], context: ModelContext, eternalNow: MetrixtTime, oldTimer: MetrixtTimer?) {
-        guard newTimer != nil else { return }
-        let tt = oldTimer == nil ? newTimer! : oldTimer!
+        let tt = oldTimer ?? newTimer
         activeTimers.insert(MetrixtTimer(duration: tt.duration), at: 0)
         
         if oldTimer == nil { saveTimer(data: data, context: context) }
         
         Task {
             await lam.startTimerActivity(
-                timerID: newTimer!.id,
+                timerID: newTimer.id,
                 duration: tt.duration,
                 endTime: tt.toGregDeadline()
             )
@@ -119,9 +113,9 @@ import SwiftData
     }
     func saveTimer(data: [MetricAlarm], context: ModelContext) {
         while alarms.count > 3 { alarms.removeLast() }
-        let allTimers = data.filter { $0.type == "timer" }
+        let allTimers = data.filter { $0.type == .timer }
         while allTimers.count >= 3 { context.delete(allTimers.last!) }
-        let timer = MetricAlarm(metricTime: MetrixtTime(years: 0, seconds: newTimer?.duration ?? 0), dataType: "timer", isActive: true)
+        let timer = MetricAlarm(time: MetrixtTime(years: 0, seconds: newTimer.duration), type: .timer)
         context.insert(timer)
     }
     func cancelTimer(timer: MetrixtTimer) {
@@ -130,4 +124,28 @@ import SwiftData
         activeTimers.removeAll(where: { $0.id == timer.id})
         ng?.cancelNotification(id: timer.id)
     }
+    
+    func toggleStopwatch(data: [MetricAlarm], context: ModelContext) {
+        guard let stopwatch else { return }
+        if stopwatch.isStopwatching {
+            stopwatch.pause()
+        } else {
+            stopwatch.resume()
+        }
+        if stopwatch.metricSeconds == 0 { saveStopwatch(data: data, context: context) }
+    }
+    func resetStopwatch(data: [MetricAlarm], context: ModelContext) {
+        guard let stopwatch else { return }
+        stopwatch.reset()
+        deleteStopwatch(data: data, context: context)
+    }
+    private func saveStopwatch(data: [MetricAlarm], context: ModelContext) {
+        deleteStopwatch(data: data, context: context)
+        context.insert(MetricAlarm(time: MetrixtTime(date: nil), type: .stopwatch))
+    }
+    private func deleteStopwatch(data: [MetricAlarm], context: ModelContext) {
+        let existingStopwatches = data.filter { $0.type == .stopwatch }
+        for stopwatch in existingStopwatches { context.delete(stopwatch) }
+    }
+    
 }

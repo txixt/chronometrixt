@@ -49,6 +49,8 @@ struct AlarmView: View {
                         }
                     }
                 }
+                
+                MetrixtSubdivider()
             }
             
             if !ag.alarms.isEmpty {
@@ -75,62 +77,65 @@ struct AlarmView: View {
                         }
                     }
                 }
+                
+                MetrixtSubdivider()
             }
             
-            MetrixtSubdivider()
+
             
-            if let na = ag.newAlarm {
+            HStack(spacing: 0) {
                 
-                HStack(spacing: 0) {
-                    Spacer()
-                    
-                    Text("new alarm:").bold()
-                        .padding(.trailing)
-                    
-                    Picker("hour", selection: $ag.alarmHour) {
-                        ForEach(0...9, id: \.self) { i in
-                            Text(String(i)).tag(i)
-                                .font(.title).bold()
-                        }
-                    }
-                    .frame(width: 60)
-
-                    Text(":").padding(.top)
-                    
-                    Picker("minute", selection: $ag.alarmMinute) {
-                        ForEach(0...99, id: \.self) { i in
-                            Text(String(format: "%02d", i)).tag(i)
-                                .font(.title).bold()
-                        }
-                    }
-                    .frame(width: 80)
-
-                    Text(":")
-                    
-                    Picker("second", selection: $ag.alarmSecond) {
-                        ForEach(0...99, id: \.self) { i in
-                            Text(String(format: "%02d", i)).tag(i)
-                                .font(.title).bold()
-                        }
-                    }
-                    .frame(width: 80)
-
-                }
-                .monospacedDigit()
-                .pickerStyle(.wheel)
-                .frame(height: 100)
+                Spacer()
                 
-                HStack {
-                    Spacer()
-        
-                    Text("gregorian time:")
-                    
-                    Text(na.toGreg().formatted(date: .omitted, time: .standard))
-                        .font(.title)
+                Text("new alarm:").bold()
+                    .padding(.trailing)
+                
+                Picker("hour", selection: $ag.alarmHour) {
+                    ForEach(0...9, id: \.self) { i in
+                        Text(String(i)).tag(i)
+                            .font(.title).bold()
+                    }
                 }
-                .foregroundStyle(.gray).bold()
-                .padding(.bottom)
+                .frame(width: 60)
+
+                Text(":").padding(.top)
+                
+                Picker("minute", selection: $ag.alarmMinute) {
+                    ForEach(0...99, id: \.self) { i in
+                        Text(String(format: "%02d", i)).tag(i)
+                            .font(.title).bold()
+                    }
+                }
+                .frame(width: 80)
+
+                Text(":")
+                
+                Picker("second", selection: $ag.alarmSecond) {
+                    ForEach(0...99, id: \.self) { i in
+                        Text(String(format: "%02d", i)).tag(i)
+                            .font(.title).bold()
+                    }
+                }
+                .frame(width: 80)
+
             }
+            .monospacedDigit()
+            .pickerStyle(.wheel)
+            .frame(height: 100)
+            
+            HStack {
+                Spacer()
+    
+                Text("gregorian time:")
+                
+                Text(ag.newAlarm.toGreg().formatted(date: .omitted, time: .standard))
+                    .font(.title)
+            }
+            .foregroundStyle(.gray).bold()
+            .padding(.bottom)
+                
+                
+            
 
             HStack {
                 Spacer()
