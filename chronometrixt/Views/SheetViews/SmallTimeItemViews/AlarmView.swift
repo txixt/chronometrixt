@@ -49,8 +49,6 @@ struct AlarmView: View {
                         }
                     }
                 }
-                
-                MetrixtSubdivider()
             }
             
             if !ag.alarms.isEmpty {
@@ -77,10 +75,11 @@ struct AlarmView: View {
                         }
                     }
                 }
-                
-                MetrixtSubdivider()
             }
             
+            if !ag.alarms.isEmpty || !ag.activeAlarms.isEmpty {
+                MetrixtSubdivider()
+            }
 
             
             HStack(spacing: 0) {
@@ -88,7 +87,6 @@ struct AlarmView: View {
                 Spacer()
                 
                 Text("new alarm:").bold()
-                    .padding(.trailing)
                 
                 Picker("hour", selection: $ag.alarmHour) {
                     ForEach(0...9, id: \.self) { i in
@@ -126,7 +124,7 @@ struct AlarmView: View {
             HStack {
                 Spacer()
     
-                Text("gregorian time:")
+                Text("gregorian:")
                 
                 Text(ag.newAlarm.toGreg().formatted(date: .omitted, time: .standard))
                     .font(.title)

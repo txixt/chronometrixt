@@ -53,7 +53,6 @@ import SwiftData
     }
     
     func setAlarm(data: [MetricAlarm], context: ModelContext, eternalNow: MetrixtTime, oldAlarm: MetrixtTime?) {
-        while activeAlarms.count >= 3 { alarms.removeLast() }
         var ta: MetrixtTime = oldAlarm ?? newAlarm
 
         if ta.seconds < eternalNow.seconds {
@@ -67,21 +66,19 @@ import SwiftData
         
         activeAlarms.insert(alarm, at: 0)
         alarms.removeAll(where: { $0.id == ta.id })
+        if alarms.count + activeAlarms.count > 3 { alarms.removeLast() }
         
-        if oldAlarm == nil {
-            saveAlarm(data: data, context: context)
-        }
+        if oldAlarm == nil { saveAlarm(data: data, context: context) }
         
         Task {
             try? await ng?.scheduleAlarm(id: alarm.alarm, triggerTime: ta)
         }
     }
     func saveAlarm(data: [MetricAlarm], context: ModelContext) {
-        while alarms.count >= 3 { alarms.removeLast() }
         let allAlarms = data.filter { $0.type == .alarm }
-        while allAlarms.count >= 3 { context.delete(allAlarms.last!) }
         let metric = MetricAlarm(time: newAlarm, type: .alarm)
         context.insert(metric)
+        while allAlarms.count > 3 { context.delete(allAlarms.last!) }
     }
     func dismissAlarm(alarm: MetrixtAlarm) {
         alarm.escapement?.invalidate()
@@ -98,7 +95,10 @@ import SwiftData
     
     func setTimer(data: [MetricAlarm], context: ModelContext, eternalNow: MetrixtTime, oldTimer: MetrixtTimer?) {
         let tt = oldTimer ?? newTimer
+        
         activeTimers.insert(MetrixtTimer(duration: tt.duration), at: 0)
+        timers.removeAll(where: { $0.id == tt.id })
+        if timers.count + activeTimers.count > 3 { timers.removeLast() }
         
         if oldTimer == nil { saveTimer(data: data, context: context) }
         
@@ -112,11 +112,10 @@ import SwiftData
         }
     }
     func saveTimer(data: [MetricAlarm], context: ModelContext) {
-        while alarms.count > 3 { alarms.removeLast() }
         let allTimers = data.filter { $0.type == .timer }
-        while allTimers.count >= 3 { context.delete(allTimers.last!) }
         let timer = MetricAlarm(time: MetrixtTime(years: 0, seconds: newTimer.duration), type: .timer)
         context.insert(timer)
+        while allTimers.count > 3 { context.delete(allTimers.last!) }
     }
     func cancelTimer(timer: MetrixtTimer) {
         timer.cancelTimer()

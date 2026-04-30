@@ -47,8 +47,6 @@ struct TimerView: View {
                         }
                     }
                 }
-                
-                MetrixtSubdivider()
             }
             
             if !ag.timers.isEmpty {
@@ -74,7 +72,9 @@ struct TimerView: View {
                         }
                     }
                 }
-                
+            }
+            
+            if !ag.activeTimers.isEmpty || !ag.timers.isEmpty {
                 MetrixtSubdivider()
             }
             
@@ -82,7 +82,6 @@ struct TimerView: View {
                 Spacer()
                 
                 Text("new timer:").bold()
-                    .padding(.trailing)
                 
                 Picker("hour", selection: $ag.timerHour) {
                     ForEach(0...9, id: \.self) { i in
@@ -119,7 +118,7 @@ struct TimerView: View {
             
             HStack {
                 Spacer()
-                Text("gregorian duration:")
+                Text("gregorian:")
                 Text(ag.newTimer.gregDurationTxt)
                     .font(.title)
             }
@@ -132,13 +131,14 @@ struct TimerView: View {
                 if ag.activeTimers.count < 3 {
                     SmallTimeButtonView(
                         imageString: "timer",
-                        text: "start",
+                        text: ag.newTimer.duration == 0 ? "set" : "start",
                         action: { startTimer(oldTimer: nil) },
-                        color: .metricOrange
+                        color: ag.newTimer.duration > 0 ? .metricOrange : .gray
                     )
+                    .disabled(ag.newTimer.duration == 0)
                 } else {
                     SmallTimeButtonView(
-                        imageString: "timer.slash",
+                        imageString: "timer.circle.fill",
                         text: "timers full",
                         action: { return },
                         color: .gray

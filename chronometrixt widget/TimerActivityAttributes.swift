@@ -9,6 +9,7 @@ import Foundation
 import ActivityKit
 
 /// Attributes for timer Live Activity
+#if os(iOS)
 struct TimerActivityAttributes: ActivityAttributes {
     /// Static data that doesn't change
     let timerID: String
@@ -34,3 +35,4 @@ struct TimerActivityAttributes: ActivityAttributes {
         }
     }
 }
+#endif

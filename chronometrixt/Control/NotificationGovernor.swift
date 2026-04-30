@@ -205,10 +205,26 @@ import UIKit
         print("❌ Cancelled all \(type.rawValue) notifications")
     }
     
+    func clearBadgeAndDelivered() {
+        let center = UNUserNotificationCenter.current()
+        center.removeAllDeliveredNotifications()
+        
+        Task { @MainActor in
+            UNUserNotificationCenter.current().setBadgeCount(0)
+//            UIApplication.shared.applicationIconBadgeNumber = 0
+            print("cleared")
+        }
+    }
+    
     func cancelAllNotifications() {
         UNUserNotificationCenter.current().removeAllPendingNotificationRequests()
         scheduledIdentifiers.removeAll()
         pendingQueue.removeAll()
+        
+        Task { @MainActor in
+            UNUserNotificationCenter.current().removeAllPendingNotificationRequests()
+            UNUserNotificationCenter.current().setBadgeCount(0)
+        }
         print("❌ Cancelled all notifications")
     }
     
