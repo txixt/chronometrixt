@@ -14,11 +14,11 @@ struct EventAlarmEditorView: View {
     private let offsets: [(String, TimeInterval)] = [
         ("none", 0),
         ("at time of event", 1),
-        ("5 min before", 5 * 60),
-        ("10 min before", 10 * 60),
-        ("30 min before", 30 * 60),
-        ("1 hour before", 60 * 60),
-        ("1 day before", 86400),
+        ("5 min before", 500 * 0.864),
+        ("10 min before", 1_000 * 0.864),
+        ("50 min before", 5_000 * 0.864),
+        ("1 hour before", 10_000 * 0.864),
+        ("1 day before", 100_000 * 0.864),
     ]
     
     var body: some View {

@@ -9,6 +9,7 @@ import Foundation
 import UserNotifications
 import AVFoundation
 import UIKit
+import SwiftData
 
 @Observable final class NotificationGovernor {
     private let systemLimit = 64
@@ -17,6 +18,7 @@ import UIKit
     private var audioPlayer: AVAudioPlayer?
     
     var gov: Governor?
+    var context: ModelContext?  // Need access to SwiftData for event lookups
 
     enum NotificationType: String {
         case event = "EVENT_ALARM"
@@ -31,6 +33,7 @@ import UIKit
         let title: String
         let body: String
         let soundName: String
+        let eventID: String?  // Track event ID for lookups
     }
     
     init() {
@@ -47,21 +50,18 @@ import UIKit
             title: "Dismiss",
             options: [.destructive]
         )
-        
         let alarmCategory = UNNotificationCategory(
             identifier: NotificationType.alarm.rawValue,
             actions: [snoozeAction, dismissAction],
             intentIdentifiers: [],
             options: [.customDismissAction]
         )
-        
         let timerCategory = UNNotificationCategory(
             identifier: NotificationType.timer.rawValue,
             actions: [dismissAction],
             intentIdentifiers: [],
             options: [.customDismissAction]
         )
-        
         let eventCategory = UNNotificationCategory(
             identifier: NotificationType.event.rawValue,
             actions: [dismissAction],
@@ -92,61 +92,62 @@ import UIKit
     
     func scheduleEvent(
         id: String,
+        eventID: String,  // Full event ID for lookup later
         eventTime: MetrixtTime,
         eventTitle: String,
         soundFileName: String = "satGnos5"
     ) async throws {
-        let gregorianDate = eventTime.toGreg()
-        
         try await scheduleNotification(
             id: id,
             type: .event,
-            triggerDate: gregorianDate,
-            title: "Event: \(eventTitle)",
-            body: "Metric time: \(eventTime.hourMinuteSecondTxt)",
-            soundFileName: soundFileName
+            triggerDate: eventTime.toGreg(),
+            title: "\(eventTitle)",
+            body: "metric time: \(eventTime.hourMinuteSecondTxt)",
+            soundFileName: soundFileName,
+            eventID: eventID
         )
     }
+    
     func scheduleAlarm(
         id: String,
         triggerTime: MetrixtTime,
         soundFileName: String = "alarm_sound"
     ) async throws {
-        let gregorianDate = triggerTime.toGreg()
-        
         try await scheduleNotification(
             id: id,
             type: .alarm,
-            triggerDate: gregorianDate,
+            triggerDate: triggerTime.toGreg(),
             title: "Alarm",
             body: "Metric time: \(triggerTime.hourMinuteSecondTxt)",
-            soundFileName: soundFileName
+            soundFileName: soundFileName,
+            eventID: nil
         )
     }
+    
     func scheduleTimer(
         id: String,
         duration: Int, // in metric seconds
         soundFileName: String = "satGnos5"
     ) async throws {
-        let gregorianDuration = TimeInterval(duration) * 0.864
-        let triggerDate = Date.now.addingTimeInterval(gregorianDuration)
-        
         try await scheduleNotification(
             id: id,
             type: .timer,
-            triggerDate: triggerDate,
+            triggerDate: Date.now.addingTimeInterval(TimeInterval(duration) * 0.864),
             title: "Timer Complete",
             body: "Timer finished",
-            soundFileName: soundFileName
+            soundFileName: soundFileName,
+            eventID: nil
         )
     }
+    
     private func scheduleNotification(
         id: String,
         type: NotificationType,
         triggerDate: Date,
         title: String,
         body: String,
-        soundFileName: String = "satGnos5"
+        soundFileName: String = "satGnos5",
+        eventID: String? = nil  // Optional event ID for lookups
     ) async throws {
         let pendingNotifications = await UNUserNotificationCenter.current()
             .pendingNotificationRequests()
@@ -158,7 +159,8 @@ import UIKit
                 triggerDate: triggerDate,
                 title: title,
                 body: body,
-                soundName: soundFileName
+                soundName: soundFileName,
+                eventID: eventID
             )
             pendingQueue.append(pending)
             return
@@ -169,6 +171,14 @@ import UIKit
         content.body = body
         content.categoryIdentifier = type.rawValue
         content.sound = UNNotificationSound(named: UNNotificationSoundName("\(soundFileName).mp3"))
+        
+        // Store metadata in userInfo for later retrieval
+        content.userInfo = [
+            "notificationType": type.rawValue,
+            "notificationID": id,
+            "eventID": eventID ?? "",
+            "triggerTime": body  // Store the metric time string
+        ]
         
         let components = Calendar.current.dateComponents(
             [.year, .month, .day, .hour, .minute, .second],
@@ -211,7 +221,6 @@ import UIKit
         
         Task { @MainActor in
             UNUserNotificationCenter.current().setBadgeCount(0)
-//            UIApplication.shared.applicationIconBadgeNumber = 0
             print("cleared")
         }
     }
@@ -247,7 +256,8 @@ import UIKit
                 triggerDate: next.triggerDate,
                 title: next.title,
                 body: next.body,
-                soundFileName: next.soundName
+                soundFileName: next.soundName,
+                eventID: next.eventID
             )
         }
     }
@@ -260,13 +270,23 @@ import UIKit
         let identifier = response.notification.request.identifier
         let actionIdentifier = response.actionIdentifier
         let category = response.notification.request.content.categoryIdentifier
+        let userInfo = response.notification.request.content.userInfo
+        let eventID = userInfo["eventID"] as? String ?? ""
+        let triggerTime = userInfo["triggerTime"] as? String ?? ""
         
         switch actionIdentifier {
-        case "SNOOZE_ACTION":
-            handleSnooze(identifier: identifier, category: category)
+        case "SNOOZE_ACTION": 
+            handleSnooze(identifier: identifier, category: category) 
             
         case "DISMISS_ACTION", UNNotificationDefaultActionIdentifier:
-            handleDismiss(identifier: identifier, category: category, governor: governor)
+            handleDismiss(
+                identifier: identifier,
+                category: category,
+                governor: governor,
+                alarmGovernor: alarmGovernor,
+                eventID: eventID,
+                triggerTime: triggerTime
+            )
             
         default:
             break
@@ -277,22 +297,88 @@ import UIKit
         }
     }
     
-    private func handleSnooze(identifier: String, category: String) {
-        // TODO: Reschedule notification for 10 metric minutes later
-        print("🔔 Snooze requested for: \(identifier)")
+    func handleSnooze(identifier: String, category: String) {
+        Task {
+            try? await scheduleAlarm(
+                id: identifier, 
+                triggerTime: metric.cal.update(
+                    time: MetrixtTime(date: nil), 
+                    component: .minute, 
+                    byAdding: 5
+                )
+            )
+        }
     }
     
-    private func handleDismiss(identifier: String, category: String, governor: Governor) {
-        // TODO: Show alert in app, play sound if app is open
-        print("🔕 Dismiss requested for: \(identifier)")
+    private func handleDismiss(
+        identifier: String,
+        category: String,
+        governor: Governor,
+        alarmGovernor: AlarmGovernor,
+        eventID: String,
+        triggerTime: String
+    ) {
+        guard let notificationType = NotificationType(rawValue: category) else { return }
         
-        // You can set governor.alert here to show an alert view
-        // governor.alert = .error // or create a new alert type for alarms
+        Task { @MainActor in
+            switch notificationType {
+            case .event: handleEventNotification(eventID: eventID, governor: governor)
+            case .alarm: handleAlarmNotification(triggerTime: triggerTime, governor: governor, alarmGovernor: alarmGovernor)
+            case .timer: handleTimerNotification(governor: governor)
+            }
+            
+            playSound()
+            triggerHaptic()
+        }
     }
     
-    // MARK: - Sound Playback (for in-app triggers)
+    // MARK: - Alert Handlers
     
-    /// Play sound when app is in foreground
+    private func handleEventNotification(eventID: String, governor: Governor) {
+        guard let context = context, !eventID.isEmpty else {
+            governor.alertTxt = ""
+            governor.alert = .event
+            return
+        }
+        
+        let descriptor = FetchDescriptor<MetricEvent>(
+            predicate: #Predicate { event in
+                event.id == eventID
+            }
+        )
+        
+        do {
+            let events = try context.fetch(descriptor)
+            if let event = events.first {
+                governor.event = event
+                governor.alertTxt = event.title
+                governor.alert = .event
+            } else {
+                // Event not found (might have been deleted)
+                governor.alertTxt = "Event Debug: Event Missing"
+                governor.alert = .event
+            }
+        } catch {
+            print("❌ Error fetching event: \(error)")
+            governor.alertTxt = "Event notification"
+            governor.alert = .event
+        }
+    }
+    
+    private func handleAlarmNotification(
+        triggerTime: String,
+        governor: Governor,
+        alarmGovernor: AlarmGovernor
+    ) {
+        governor.alertTxt = triggerTime
+        governor.alert = .alarm
+    }
+    
+    private func handleTimerNotification(governor: Governor) {
+        governor.alertTxt = "Timer complete"
+        governor.alert = .timer
+    }
+    
     func playSound(fileName: String = "satGnos5") {
         guard let soundURL = Bundle.main.url(forResource: fileName, withExtension: "caf") else {
             print("❌ Sound file not found: \(fileName).mp3")
@@ -303,7 +389,6 @@ import UIKit
             audioPlayer = try AVAudioPlayer(contentsOf: soundURL)
             audioPlayer?.numberOfLoops = 3 // Loop 3 times
             audioPlayer?.play()
-            print("🔊 Playing sound: \(fileName)")
         } catch {
             print("❌ Error playing sound: \(error)")
         }

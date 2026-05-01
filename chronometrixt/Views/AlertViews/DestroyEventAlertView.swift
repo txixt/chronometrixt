@@ -15,6 +15,7 @@ struct DestroyEventAlertView: View {
         GeometryReader { geometryReader in
             let geo = gov.geoSize ?? geometryReader.size
             ZStack {
+                Color(.gray).opacity(0.2).ignoresSafeArea()
                 HStack{
                     Spacer()
                     VStack {
@@ -22,11 +23,9 @@ struct DestroyEventAlertView: View {
                         
                         
                         VStack {
-                            Spacer()
                             ZStack {
                                 Divider()
                                 Text("💣")
-                                    .font(.largeTitle)
                             }
                             
                             Spacer()
@@ -35,10 +34,11 @@ struct DestroyEventAlertView: View {
                                 Button(action: { eg.destroySingle() }) {
                                     VStack {
                                         Image(systemName: "trash")
-                                        Text("destroy this event?")
+                                        Text("destroy this event")
                                     }
-                                    .tint(.red)
-                                    .shadow(color: .red, radius: 3)
+                                    .tint(.primary)
+                                    .frame(width: geo.width * 0.4)
+                                    .background(RoundedRectangle(cornerRadius: 10).fill(.red))
                                 }
                             }
                             
@@ -52,11 +52,31 @@ struct DestroyEventAlertView: View {
                                             Image(systemName: "trash")
                                             Image(systemName: "trash")
                                         }
-                                        Text("destroy this and future events?")
+                                        Text("erase this and future events")
                                     }
-                                    .tint(.red)
-                                    .shadow(color: .red, radius: 3)
+                                    .tint(.primary)
+                                    .frame(width: geo.width * 0.4)
+                                    .background(RoundedRectangle(cornerRadius: 10).fill(.red))
                                 }
+                                
+                                Spacer()
+                                
+                                Button(action: { eg.destroySeries()} ) {
+                                    VStack {
+                                        HStack {
+                                            Image(systemName: "trash")
+                                            Image(systemName: "trash")
+                                            Image(systemName: "trash")
+                                            Image(systemName: "trash")
+                                            Image(systemName: "trash")
+                                        }
+                                        Text("obliterate this from the timeline")
+                                    }
+                                    .tint(.primary)
+                                    .frame(width: geo.width * 0.4)
+                                    .background(RoundedRectangle(cornerRadius: 10).fill(.red))
+                                }
+
                             }
                             
                             Spacer()
@@ -68,10 +88,6 @@ struct DestroyEventAlertView: View {
                                     .shadow(color: .gray, radius: 3)
                                     .bold()
                             }
-                            
-                            
-                            
-                            Spacer()
                         }
                         .padding()
                         .monospaced()

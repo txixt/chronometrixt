@@ -17,11 +17,11 @@ import SwiftUI
     var scale: CalendarScale = .year
     var sheet: SheetView? = nil
     var alert: AlertView? = nil
-    var errorMessage: String = ""
+    var alertTxt: String = ""
     var geoSize: CGSize? = nil
     enum CalendarScale { case eon, year, month, week, day }
     enum SheetView: Identifiable { var id: Self { self }; case makeEvent, editEvent, showEvent, findEvent, timers, settings }
-    enum AlertView: Identifiable { var id: Self { self }; case error, destroyEvent, destroyAllEvents }
+    enum AlertView: Identifiable { var id: Self { self }; case error, event, timer, alarm, destroyEvent, destroyAllEvents }
 
     init() {
         eternalNow = MetrixtEntropy()

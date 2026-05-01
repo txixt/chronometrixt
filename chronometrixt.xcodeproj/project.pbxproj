@@ -127,6 +127,7 @@
 		C1E64CD42F6621AB00059B84 /* Exceptions for "depricated" folder in "chronometrixt" target */ = {
 			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
 			membershipExceptions = (
+				AlarmAlertViewnot.swift,
 				CalendarSubviews/DayMetricViewArchaic.swift,
 				CalendarSubviews/HourMetricView.swift,
 				CalendarSubviews/MetricDayView.swift,
@@ -150,6 +151,7 @@
 				MonthScrollView.swift,
 				MonthSubScrollView.swift,
 				tempCreationView.swift,
+				TimerAlertViewnope.swift,
 				WeekMetricView.swift,
 				WeekScrollView.swift,
 				YearMetricView.swift,
@@ -160,6 +162,7 @@
 		C1E64CD52F6621AB00059B84 /* Exceptions for "depricated" folder in "MetricWatchWidgitExtension" target */ = {
 			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
 			membershipExceptions = (
+				AlarmAlertViewnot.swift,
 				CalendarSubviews/DayMetricViewArchaic.swift,
 				CalendarSubviews/HourMetricView.swift,
 				CalendarSubviews/MetricDayView.swift,
@@ -183,6 +186,7 @@
 				MonthScrollView.swift,
 				MonthSubScrollView.swift,
 				tempCreationView.swift,
+				TimerAlertViewnope.swift,
 				WeekMetricView.swift,
 				WeekScrollView.swift,
 				YearMetricView.swift,

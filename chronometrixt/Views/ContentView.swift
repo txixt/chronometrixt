@@ -32,7 +32,7 @@ struct ContentView: View {
                     ZStack {
                         PortraitView(gov: gov, eg: $eg, ag: ag, ng: ng)
                         
-                        AlertView(gov: gov, eg: $eg)
+                        AlertView(gov: gov, eg: $eg, ag: ag, ng: ng)
                     }
                 }
 #endif
@@ -48,7 +48,7 @@ struct ContentView: View {
                 .task {
                     let granted = await ng.requestAuthorization()
                     if !granted {
-                        gov.errorMessage = "alarms and notifications will not work"
+                        gov.alertTxt = "alarms and notifications will not work - please allow notifications in settings for full functionality"
                         gov.alert = .error
                     }
                 }
@@ -61,6 +61,7 @@ struct ContentView: View {
                 }
                 .onAppear {
                     ng.gov = gov
+                    ng.context = context
                     ag.ng = ng
                     appDel.governor = gov
                     appDel.alarmGovernor = ag
