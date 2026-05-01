@@ -12,35 +12,38 @@ struct EventCreationView: View {
     @Environment(\.modelContext) private var context
     @Bindable var gov: Governor
     @Binding var eventGov: EventGovernor?
+    @Bindable var ag: AlarmGovernor
     @Bindable var ng: NotificationGovernor
     @State var eventTitle: String = ""
     
     var body: some View {
-        
-        VStack {
-            SheetHeaderView(gov: gov, title: "new event", titleImage: "plus")
-            
+        ZStack {
             VStack {
+                SheetHeaderView(gov: gov, title: "new event", titleImage: "plus")
                 
-                if eventGov == nil {
-                    EventCreationLandingView(
-                        gov: gov,
-                        eventTitle: $eventTitle,
-                        onSubmit: finishEditingTitle)
+                VStack {
+                    
+                    if eventGov == nil {
+                        EventCreationLandingView(
+                            gov: gov,
+                            eventTitle: $eventTitle,
+                            onSubmit: finishEditingTitle)
+                    }
+                    
+                    if eventGov != nil {
+                        EventEditMainView(gov: gov, eventGov: eventGov!, update: false)
+                    } else {
+                        Spacer()
+                    }
+                    
                 }
-                
-                if eventGov != nil {
-                    EventEditMainView(gov: gov, eventGov: eventGov!, update: false)
-                } else {
-                    Spacer()
-                }
-                
-            }
 
+            }
+            .padding()
+            .monospaced()
         }
-        .padding()
-        .monospaced()
-        
+
+        AlertView(gov: gov, eg: $eventGov, ag: ag, ng: ng)
     }
     
     private func finishEditingTitle() {
@@ -78,6 +81,7 @@ struct EventCreationView: View {
             context: context,
             gov: gov)
         ),
+        ag: AlarmGovernor(),
         ng: NotificationGovernor()
     )
 }

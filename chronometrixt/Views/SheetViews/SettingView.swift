@@ -9,8 +9,13 @@ import SwiftUI
 
 struct SettingsView: View {
     @Bindable var gov: Governor
+    @Binding var eg: EventGovernor?
+    @Bindable var ag: AlarmGovernor
+    @Bindable var ng: NotificationGovernor
     
     var body: some View {
+        ZStack {
+            
         VStack {
             SheetHeaderView(gov: gov, title: "settings", titleImage: "gear")
             
@@ -143,8 +148,8 @@ struct SettingsView: View {
                         .bold(false)
                 }
                 .foregroundStyle(.gray)
-
-
+                
+                
             }
             .bold()
             .foregroundColor(.primary)
@@ -161,9 +166,13 @@ struct SettingsView: View {
         .font(.subheadline)
         .padding()
         .monospaced()
+            
+            AlertView(gov: gov, eg: $eg, ag: ag, ng: ng)
+        
+    }
     }
 }
 
 #Preview {
-    SettingsView(gov: Governor())
+    SettingsView(gov: Governor(), eg: .constant(PreviewEG().eg()), ag: AlarmGovernor(), ng: NotificationGovernor())
 }

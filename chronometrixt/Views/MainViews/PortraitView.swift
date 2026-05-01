@@ -29,20 +29,21 @@ struct PortraitView: View {
             .onChange(of: gov.event) { eg = gov.event != nil ? EventGovernor(event: gov.event!, context: context, gov: gov) : nil }
             .sheet(item: $gov.sheet) { sheet in
                 switch sheet {
-                case .makeEvent: EventCreationView(gov: gov, eventGov: $eg, ng: ng)
+                case .makeEvent: EventCreationView(gov: gov, eventGov: $eg, ag: ag, ng: ng)
                 case .editEvent:
-                    if let eg {
-                        EventEditView(gov: gov, eg: eg)
+                    if eg != nil {
+                        EventEditView(gov: gov, eg: $eg, ag: ag, ng: ng)
                     } else {
                         EmptyView().onAppear { gov.sheet = nil }
                     }
                 case .showEvent:
-                    if let eg {
-                        EventDisplayView(gov: gov, eg: eg)
+                    if eg != nil  {
+                        EventDisplayView(gov: gov, eg: $eg, ag: ag, ng: ng)
+                    } else {
                         EmptyView().onAppear { gov.sheet = nil }
                     }
-                case .settings: SettingsView(gov: gov)
-                case .timers: SmallTimesView(gov: gov, ag: ag)
+                case .settings: SettingsView(gov: gov, eg: $eg, ag: ag, ng: ng)
+                case .timers: SmallTimesView(gov: gov, eg: $eg, ag: ag, ng: ng)
                 default: EmptyView()
 //                case .makeEvent: EventCreationView(gov: gov, eventGov: $eg).alertHost(gov: gov, eg: eg)
 //                case .editEvent:

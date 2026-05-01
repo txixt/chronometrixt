@@ -11,7 +11,9 @@ import SwiftData
 struct SmallTimesView: View {
     @Query var alarms: [MetricAlarm]
     @Bindable var gov: Governor
+    @Binding var eg: EventGovernor?
     @Bindable var ag: AlarmGovernor
+    @Bindable var ng: NotificationGovernor
     
     var body: some View {
         VStack {
@@ -57,6 +59,8 @@ struct SmallTimesView: View {
             .tint(.primary)
             
             Spacer()
+            
+            AlertView(gov: gov, eg: $eg, ag: ag, ng: ng)
         }
         .monospaced()
         .padding()
@@ -66,5 +70,5 @@ struct SmallTimesView: View {
 }
 
 #Preview {
-    SmallTimesView(gov: Governor(), ag: AlarmGovernor())
+    SmallTimesView(gov: Governor(), eg: .constant(PreviewEG().eg()), ag: AlarmGovernor(), ng: NotificationGovernor())
 }
