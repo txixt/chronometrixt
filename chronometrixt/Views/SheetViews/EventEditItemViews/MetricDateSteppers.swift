@@ -9,8 +9,8 @@ import SwiftUI
 
 struct MetricDateSteppers: View {
     @Bindable var gov: Governor
-    @Bindable var eg: EventGovernor
-    var target: EventGovernor.EditingFields
+    @Bindable var eg: EventComptroller
+    var target: EventComptroller.EditingFields
     
     var body: some View {
         let isStart = target == .startDateMetric

@@ -9,12 +9,9 @@ import SwiftUI
 
 struct EventDisplayView: View {
     @Bindable var gov: Governor
-    @Binding var eg: EventGovernor?
-    @Bindable var ag: AlarmGovernor
-    @Bindable var ng: NotificationGovernor
     
     var body: some View {
-        let truncatedTitl: String = eg!.title.split(separator: " ", maxSplits: 2).prefix(2).joined(separator: " ")
+        let truncatedTitl: String = gov.ec!.title.split(separator: " ", maxSplits: 2).prefix(2).joined(separator: " ")
         
         ZStack {
             VStack {
@@ -23,32 +20,32 @@ struct EventDisplayView: View {
                 
                 HStack {
                     VStack(alignment: .leading) {
-                        Text(eg!.title)
-                            .foregroundStyle(Color(hex: eg!.calendarColor))
+                        Text(gov.ec!.title)
+                            .foregroundStyle(Color(hex: gov.ec!.calendarColor))
                             .font(.title)
                             .padding(.bottom)
                         
                         Text("starts: ")
                             .font(.caption)
-                        Text(eg!.metricStart.fullDateTxt)
+                        Text(gov.ec!.metricStart.fullDateTxt)
                             .font(.title2)
-                        Text(eg!.gregStart.formatted())
+                        Text(gov.ec!.gregStart.formatted())
                             .padding(.bottom)
                         
                         VStack(alignment: .leading) {
                             Text("ends: ")
                                 .font(.caption)
-                            Text(eg!.isAllDay ? "all day" : eg!.metricEnd.fullDateTxt)
+                            Text(gov.ec!.isAllDay ? "all day" : gov.ec!.metricEnd.fullDateTxt)
                                 .font(.title2)
-                            if !eg!.isAllDay {
-                                Text(eg!.gregEnd.formatted())
+                            if !gov.ec!.isAllDay {
+                                Text(gov.ec!.gregEnd.formatted())
                             }
                         }
                         .padding(.bottom)
                         
                         VStack(alignment: .leading) {
-                            if !eg!.location.isEmpty {
-                                MapInsetView(location: eg!.location)
+                            if !gov.ec!.location.isEmpty {
+                                MapInsetView(location: gov.ec!.location)
                                     .tint(.primary)
                             } else {
                                 Text("none")
@@ -64,11 +61,11 @@ struct EventDisplayView: View {
                             }
                             .frame(width: 100)
                             VStack(alignment: .leading) {
-                                if eg!.recurrence != .none {
+                                if gov.ec!.recurrence != .none {
                                     Text(String(
-                                        "\(eg!.recurrence.frequency)" +
-                                        (eg!.recurrence.frequency == .none && eg!.recurrence.count == nil ? "" :
-                                        (eg!.recurrence.count == nil ? " x ∞" : " x \(eg!.recurrence.count!)"))
+                                        "\(gov.ec!.recurrence.frequency)" +
+                                        (gov.ec!.recurrence.frequency == .none && gov.ec!.recurrence.count == nil ? "" :
+                                        (gov.ec!.recurrence.count == nil ? " x ∞" : " x \(gov.ec!.recurrence.count!)"))
                                                     ))
                                 } else {
                                     Text("one-time event")
@@ -84,7 +81,7 @@ struct EventDisplayView: View {
                             }
                             .frame(width: 100)
                             VStack(alignment: .leading) {
-                                Text("\(eg!.alarms.count.description)")
+                                Text("\(gov.ec!.alarms.count.description)")
                             }
                         }
                         .font(.caption)
@@ -99,7 +96,7 @@ struct EventDisplayView: View {
                             .frame(width: 100)
                             VStack(alignment: .leading) {
                                 ScrollView {
-                                    Text(eg!.notes.isEmpty ? "none" : eg!.notes)
+                                    Text(gov.ec!.notes.isEmpty ? "none" : gov.ec!.notes)
                                 }
                                 .frame(maxHeight: 150)
                             }
@@ -149,12 +146,12 @@ struct EventDisplayView: View {
             .monospaced()
             .padding()
             
-            AlertView(gov: gov, eg: $eg, ag: ag, ng: ng)
+            AlertView(gov: gov)
         }
 
     }
 }
 
 #Preview {
-    EventDisplayView(gov: Governor(), eg: .constant(PreviewEG().eg()), ag: AlarmGovernor(), ng: NotificationGovernor())
+    EventDisplayView(gov: Governor())
 }

@@ -18,9 +18,9 @@ let dummyMetricEvents: [MetricEvent] = {
             notes: "Discuss project updates",
             location: "Conference Room A",
             startYears: now.year,
-            startSeconds: (now.mwd * 100_000) + 20000,  // 2:00:00
+            startSeconds: (now.mwd * 100_000) + 20000,
             endYears: now.year,
-            endSeconds: (now.mwd * 100_000) + 35000,    // 3:50:00
+            endSeconds: (now.mwd * 100_000) + 35000,
             utcStart: Date(),
             utcEnd: Date().addingTimeInterval(3600),
             timeZoneIdentifier: TimeZone.current.identifier,
@@ -41,9 +41,9 @@ let dummyMetricEvents: [MetricEvent] = {
             notes: "",
             location: "Cafeteria",
             startYears: now.year,
-            startSeconds: (now.mwd * 100_000) + 50000,  // 5:00:00
+            startSeconds: (now.mwd * 100_000) + 50000,
             endYears: now.year,
-            endSeconds: (now.mwd * 100_000) + 59999,    // 6:00:00
+            endSeconds: (now.mwd * 100_000) + 59999,   
             utcStart: Date().addingTimeInterval(7200),
             utcEnd: Date().addingTimeInterval(10800),
             timeZoneIdentifier: TimeZone.current.identifier,

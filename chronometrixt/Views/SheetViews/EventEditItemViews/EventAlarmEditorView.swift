@@ -8,7 +8,7 @@
 import SwiftUI
 
 struct EventAlarmEditorView: View {
-    @Bindable var eg: EventGovernor
+    @Bindable var eg: EventComptroller
     @State var alarm: EventAlarm = EventAlarm(id: UUID().uuidString, offset: 0, type: .notification)
     
     private let offsets: [(String, TimeInterval)] = [

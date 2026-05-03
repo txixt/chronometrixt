@@ -13,7 +13,7 @@ struct EventHandler {
     // MARK: - Build Event (pure data translation, no insertion)
     
     /// Build a MetricEvent from EventGovernor state. Does NOT insert into context.
-    static func buildEvent(from eg: EventGovernor) throws -> MetricEvent {
+    static func buildEvent(from eg: EventComptroller) throws -> MetricEvent {
         guard !eg.title.isEmpty else {
             throw EventError.invalidTitle
         }
@@ -57,7 +57,7 @@ struct EventHandler {
     // MARK: - Apply Updates
     
     /// Write all EventGovernor fields onto an existing MetricEvent.
-    static func applyUpdates(to event: MetricEvent, from eg: EventGovernor) throws {
+    static func applyUpdates(to event: MetricEvent, from eg: EventComptroller) throws {
         guard !eg.title.isEmpty else { throw EventError.invalidTitle }
         
         let utcStart = UTCConverter.toUTC(from: eg.metricStart)
@@ -310,7 +310,7 @@ struct EventHandler {
     // MARK: - Edit Propagation
     
     /// Update all events in a series from EventGovernor data.
-    static func updateEventSeries(_ event: MetricEvent, from eg: EventGovernor, context: ModelContext) throws {
+    static func updateEventSeries(_ event: MetricEvent, from eg: EventComptroller, context: ModelContext) throws {
         let parentId = event.recurringParentId != "NONE" ? event.recurringParentId : event.id
         let parentPredicate = #Predicate<MetricEvent> { e in e.id == parentId }
         guard let parents = try? context.fetch(FetchDescriptor<MetricEvent>(predicate: parentPredicate)),
@@ -327,7 +327,7 @@ struct EventHandler {
     }
     
     /// Update this event and all future siblings: splits the series.
-    static func updateThisAndFuture(_ event: MetricEvent, from eg: EventGovernor, context: ModelContext) throws {
+    static func updateThisAndFuture(_ event: MetricEvent, from eg: EventComptroller, context: ModelContext) throws {
         guard event.recurringParentId != "NONE" else {
             try updateEventSeries(event, from: eg, context: context)
             return

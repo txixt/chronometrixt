@@ -8,7 +8,7 @@
 import SwiftUI
 
 struct EventParticipantView: View {
-    @Bindable var eg: EventGovernor
+    @Bindable var eg: EventComptroller
     
     var body: some View {
         VStack {

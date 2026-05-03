@@ -9,8 +9,9 @@ import Foundation
 import SwiftUI
 
 @Observable final class Governor {
-    var eternalNow: MetrixtEntropy
+    var eternalNow: MetrixtEntropy = MetrixtEntropy()
     var finiteNotNow: MetrixtTime? = nil
+    
     var someTimes: [MetrixtTime] = []
     var event: MetricEvent?
     var span: ClosedRange<Int>? = nil
@@ -23,8 +24,12 @@ import SwiftUI
     enum SheetView: Identifiable { var id: Self { self }; case makeEvent, editEvent, showEvent, findEvent, timers, settings }
     enum AlertView: Identifiable { var id: Self { self }; case error, event, timer, alarm, destroyEvent, destroyAllEvents }
 
+    var ac: AlarmComptroller = AlarmComptroller()
+    var ec: EventComptroller? = nil
+    var nc: NotificationComptroller = NotificationComptroller()
+    
     init() {
-        eternalNow = MetrixtEntropy()
+        ac.ng = nc
     }
     
     func populateTimes() {

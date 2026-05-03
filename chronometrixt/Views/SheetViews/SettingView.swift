@@ -9,9 +9,6 @@ import SwiftUI
 
 struct SettingsView: View {
     @Bindable var gov: Governor
-    @Binding var eg: EventGovernor?
-    @Bindable var ag: AlarmGovernor
-    @Bindable var ng: NotificationGovernor
     
     var body: some View {
         ZStack {
@@ -167,12 +164,12 @@ struct SettingsView: View {
         .padding()
         .monospaced()
             
-            AlertView(gov: gov, eg: $eg, ag: ag, ng: ng)
+            AlertView(gov: gov)
         
     }
     }
 }
 
 #Preview {
-    SettingsView(gov: Governor(), eg: .constant(PreviewEG().eg()), ag: AlarmGovernor(), ng: NotificationGovernor())
+    SettingsView(gov: Governor())
 }

@@ -11,9 +11,6 @@ import SwiftData
 struct PortraitView: View {
     @Environment(\.modelContext) private var context
     @Bindable var gov: Governor
-    @Binding var eg: EventGovernor?
-    @Bindable var ag: AlarmGovernor
-    @Bindable var ng: NotificationGovernor
     
     var body: some View {
         NavigationStack {
@@ -26,24 +23,24 @@ struct PortraitView: View {
                 TimeControlView(gov: gov)
                 
             }
-            .onChange(of: gov.event) { eg = gov.event != nil ? EventGovernor(event: gov.event!, context: context, gov: gov) : nil }
+            .onChange(of: gov.event) { gov.ec = gov.event != nil ? EventComptroller(event: gov.event!, context: context, gov: gov) : nil }
             .sheet(item: $gov.sheet) { sheet in
                 switch sheet {
-                case .makeEvent: EventCreationView(gov: gov, eventGov: $eg, ag: ag, ng: ng)
+                case .makeEvent: EventCreationView(gov: gov)
                 case .editEvent:
-                    if eg != nil {
-                        EventEditView(gov: gov, eg: $eg, ag: ag, ng: ng)
+                    if gov.ec != nil {
+                        EventEditView(gov: gov)
                     } else {
                         EmptyView().onAppear { gov.sheet = nil }
                     }
                 case .showEvent:
-                    if eg != nil  {
-                        EventDisplayView(gov: gov, eg: $eg, ag: ag, ng: ng)
+                    if gov.ec != nil  {
+                        EventDisplayView(gov: gov)
                     } else {
                         EmptyView().onAppear { gov.sheet = nil }
                     }
-                case .settings: SettingsView(gov: gov, eg: $eg, ag: ag, ng: ng)
-                case .timers: SmallTimesView(gov: gov, eg: $eg, ag: ag, ng: ng)
+                case .settings: SettingsView(gov: gov)
+                case .timers: SmallTimesView(gov: gov)
                 default: EmptyView()
 //                case .makeEvent: EventCreationView(gov: gov, eventGov: $eg).alertHost(gov: gov, eg: eg)
 //                case .editEvent:
@@ -102,5 +99,5 @@ struct PortraitView: View {
 //}
 
 #Preview {
-    PortraitView(gov: Governor(), eg: .constant(PreviewEG().eg()), ag: AlarmGovernor(), ng: NotificationGovernor())
+    PortraitView(gov: Governor())
 }

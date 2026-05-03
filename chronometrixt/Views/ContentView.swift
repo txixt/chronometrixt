@@ -11,13 +11,10 @@ import SwiftData
 struct ContentView: View {
     @UIApplicationDelegateAdaptor(AppDelegate.self) var appDel
     @Environment(\.scenePhase) private var scene
-    @Query var calendars: [MetricCalendar]
     @Environment(\.modelContext) private var context
     @Query private var items: [MetricEvent]
+    @Query var calendars: [MetricCalendar]
     @State var gov: Governor = Governor()
-    @State var eg: EventGovernor?
-    @State var ag: AlarmGovernor = AlarmGovernor()
-    @State var ng: NotificationGovernor = NotificationGovernor()
     
     var body: some View {
         GeometryReader { geo in
@@ -30,9 +27,9 @@ struct ContentView: View {
                     LandscapeView(gov: gov)
                 } else {
                     ZStack {
-                        PortraitView(gov: gov, eg: $eg, ag: ag, ng: ng)
+                        PortraitView(gov: gov)
                         
-                        AlertView(gov: gov, eg: $eg, ag: ag, ng: ng)
+                        AlertView(gov: gov)
                     }
                 }
 #endif
@@ -42,37 +39,17 @@ struct ContentView: View {
 #endif
                 }
                 .environment(gov)
-                .environment(eg)
-                .environment(ng)
-                .environment(ag)
-                .task {
-                    let granted = await ng.requestAuthorization()
-                    if !granted {
-                        gov.alertTxt = "alarms and notifications will not work - please allow notifications in settings for full functionality"
-                        gov.alert = .error
-                    }
-                }
+                .task { try? await authorize() }
                 .onChange(of: scene) { _, new in
-                    if new == .background || new == .inactive { gov.eternalNow.killTimer() }
-                    else { gov.eternalNow.restartTimer() }
+                    toggleEscapement(scene: new)
                 }
                 .onChange(of: geo.size) { _, new in
                     gov.geoSize = new
                 }
-                .onAppear {
-                    ng.gov = gov
-                    ng.context = context
-                    ag.ng = ng
-                    appDel.governor = gov
-                    appDel.alarmGovernor = ag
-                    appDel.notificationGovernor = ng
-                    if calendars.isEmpty { context.insert(CalInitializer.first())
-                }
-                    
-            }
+                .onAppear { initialize() }
                 
-        }
-        .toolbar {
+            }
+            .toolbar {
 #if os(iOS)
             if geo.size.width < geo.size.height {
                     ToolbarItem(placement: .bottomBar) {
@@ -95,7 +72,7 @@ struct ContentView: View {
                     }
                     ToolbarSpacer(placement: .bottomBar)
                     ToolbarItem(placement: .bottomBar) {
-                        Button(action: { eg = nil; gov.sheet = .makeEvent }) {
+                        Button(action: createEvent) {
                             Image(systemName: "plus")
                         }
                         .disabled(gov.finiteNotNow == nil)
@@ -126,6 +103,31 @@ struct ContentView: View {
             
         }
         
+    }
+    
+    private func initialize() {
+            gov.nc.gov = gov
+            gov.nc.context = context
+            appDel.governor = gov
+            if calendars.isEmpty { context.insert(CalInitializer.first()) }
+    }
+    
+    private func authorize() async throws {
+        let granted = await gov.nc.requestAuthorization()
+        if !granted {
+            gov.alertTxt = "alarms and notifications will not work - please allow notifications in settings for full functionality"
+            gov.alert = .error
+        }
+    }
+    
+    private func toggleEscapement(scene: ScenePhase) {
+        if scene == .background || scene == .inactive { gov.eternalNow.killTimer() }
+        else { gov.eternalNow.restartTimer() }
+    }
+    
+    private func createEvent() {
+        gov.ec = nil
+        gov.sheet = .makeEvent
     }
 }
 

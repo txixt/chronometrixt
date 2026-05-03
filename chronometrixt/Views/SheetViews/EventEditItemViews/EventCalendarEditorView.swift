@@ -10,7 +10,7 @@ import SwiftData
 
 struct EventCalendarEditorView: View {
     @Query var calendars: [MetricCalendar]
-    @Bindable var eg: EventGovernor
+    @Bindable var eg: EventComptroller
     
     var body: some View {
         VStack {

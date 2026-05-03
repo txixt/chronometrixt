@@ -9,7 +9,7 @@ import SwiftUI
 
 struct MetricDateEditView: View {
     @Binding var gov: Governor
-    @Binding var eventGov: EventGovernor
+    @Binding var eventGov: EventComptroller
     @Binding var metricDate: MetrixtTime
     
     var body: some View {

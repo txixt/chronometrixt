@@ -12,15 +12,14 @@ struct AlarmView: View {
     @Query var alarmData: [MetricAlarm]
     @Environment(\.modelContext) private var context
     @Bindable var gov: Governor
-    @Bindable var ag: AlarmGovernor
     private enum Component { case hour, minute, second }
     
     var body: some View {
         VStack {
             Spacer()
             
-            if !ag.activeAlarms.isEmpty {
-                ForEach(ag.activeAlarms, id: \.id) { alarm in
+            if !gov.ac.activeAlarms.isEmpty {
+                ForEach(gov.ac.activeAlarms, id: \.id) { alarm in
                     ZStack {
                         Divider()
                         
@@ -34,7 +33,7 @@ struct AlarmView: View {
                             
                             Spacer()
                             
-                            Button(action: { ag.dismissAlarm(alarm: alarm) }) {
+                            Button(action: { gov.ac.dismissAlarm(alarm: alarm) }) {
                                 Image(systemName: "xmark")
                                     .foregroundColor(.primary).bold()
                                     .shadow(radius: 3)
@@ -51,8 +50,8 @@ struct AlarmView: View {
                 }
             }
             
-            if !ag.alarms.isEmpty {
-                ForEach(ag.alarms, id: \.id) { alarm in
+            if !gov.ac.alarms.isEmpty {
+                ForEach(gov.ac.alarms, id: \.id) { alarm in
                     ZStack {
                         Divider()
                         
@@ -77,7 +76,7 @@ struct AlarmView: View {
                 }
             }
             
-            if !ag.alarms.isEmpty || !ag.activeAlarms.isEmpty {
+            if !gov.ac.alarms.isEmpty || !gov.ac.activeAlarms.isEmpty {
                 MetrixtSubdivider()
             }
 
@@ -88,7 +87,7 @@ struct AlarmView: View {
                 
                 Text("new alarm:").bold()
                 
-                Picker("hour", selection: $ag.alarmHour) {
+                Picker("hour", selection: $gov.ac.alarmHour) {
                     ForEach(0...9, id: \.self) { i in
                         Text(String(i)).tag(i)
                             .font(.title).bold()
@@ -98,7 +97,7 @@ struct AlarmView: View {
 
                 Text(":").padding(.top)
                 
-                Picker("minute", selection: $ag.alarmMinute) {
+                Picker("minute", selection: $gov.ac.alarmMinute) {
                     ForEach(0...99, id: \.self) { i in
                         Text(String(format: "%02d", i)).tag(i)
                             .font(.title).bold()
@@ -108,7 +107,7 @@ struct AlarmView: View {
 
                 Text(":")
                 
-                Picker("second", selection: $ag.alarmSecond) {
+                Picker("second", selection: $gov.ac.alarmSecond) {
                     ForEach(0...99, id: \.self) { i in
                         Text(String(format: "%02d", i)).tag(i)
                             .font(.title).bold()
@@ -126,7 +125,7 @@ struct AlarmView: View {
     
                 Text("gregorian:")
                 
-                Text(ag.newAlarm.toGreg().formatted(date: .omitted, time: .standard))
+                Text(gov.ac.newAlarm.toGreg().formatted(date: .omitted, time: .standard))
                     .font(.title)
             }
             .foregroundStyle(.gray).bold()
@@ -138,7 +137,7 @@ struct AlarmView: View {
             HStack {
                 Spacer()
                 
-                if ag.activeAlarms.count < 3 {
+                if gov.ac.activeAlarms.count < 3 {
                     SmallTimeButtonView(imageString: "bell", text: "set", action: { setAlarm(oldAlarm: nil) }, color: .metricOrange)
                 } else {
                     SmallTimeButtonView(imageString: "bell.slash", text: "alarms full", action: { return }, color: .gray)
@@ -152,10 +151,10 @@ struct AlarmView: View {
     }
     
     private func setAlarm(oldAlarm: MetrixtTime?) {
-        ag.setAlarm(data: alarmData, context: context, eternalNow: gov.eternalNow.time, oldAlarm: oldAlarm)
+        gov.ac.setAlarm(data: alarmData, context: context, eternalNow: gov.eternalNow.time, oldAlarm: oldAlarm)
     }
 }
 
 #Preview {
-    AlarmView(gov: Governor(), ag: AlarmGovernor())
+    AlarmView(gov: Governor())
 }

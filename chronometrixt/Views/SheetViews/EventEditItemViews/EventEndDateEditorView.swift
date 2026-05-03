@@ -9,7 +9,7 @@ import SwiftUI
 
 struct EventEndDateEditorView: View {
     @Bindable var gov: Governor
-    @Bindable var eg: EventGovernor
+    @Bindable var eg: EventComptroller
     
     var body: some View {
         VStack {
@@ -63,7 +63,7 @@ struct EventEndDateEditorView: View {
 }
 
 struct AddTimeButton: View {
-    @Bindable var eg: EventGovernor
+    @Bindable var eg: EventComptroller
     var text: String
     let setTheEnd: () -> Void
     

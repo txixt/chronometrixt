@@ -9,7 +9,7 @@ import Foundation
 import SwiftData
 
 @Observable final class BackgroundActivityManager {
-    var ng: NotificationGovernor?
+    var ng: NotificationComptroller?
     var context: ModelContext?
     private var materializationTimer: Timer?
     

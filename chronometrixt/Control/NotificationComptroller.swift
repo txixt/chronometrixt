@@ -11,14 +11,14 @@ import AVFoundation
 import UIKit
 import SwiftData
 
-@Observable final class NotificationGovernor {
+@Observable final class NotificationComptroller {
     private let systemLimit = 64
     private var pendingQueue: [PendingNotification] = []
     private var scheduledIdentifiers: Set<String> = []
     private var audioPlayer: AVAudioPlayer?
     
     var gov: Governor?
-    var context: ModelContext?  // Need access to SwiftData for event lookups
+    var context: ModelContext?
 
     enum NotificationType: String {
         case event = "EVENT_ALARM"
@@ -33,7 +33,7 @@ import SwiftData
         let title: String
         let body: String
         let soundName: String
-        let eventID: String?  // Track event ID for lookups
+        let eventID: String? 
     }
     
     init() {
@@ -264,8 +264,7 @@ import SwiftData
     
     func handleNotificationResponse(
         response: UNNotificationResponse,
-        governor: Governor,
-        alarmGovernor: AlarmGovernor
+        governor: Governor
     ) {
         let identifier = response.notification.request.identifier
         let actionIdentifier = response.actionIdentifier
@@ -283,7 +282,6 @@ import SwiftData
                 identifier: identifier,
                 category: category,
                 governor: governor,
-                alarmGovernor: alarmGovernor,
                 eventID: eventID,
                 triggerTime: triggerTime
             )
@@ -314,7 +312,6 @@ import SwiftData
         identifier: String,
         category: String,
         governor: Governor,
-        alarmGovernor: AlarmGovernor,
         eventID: String,
         triggerTime: String
     ) {
@@ -323,7 +320,7 @@ import SwiftData
         Task { @MainActor in
             switch notificationType {
             case .event: handleEventNotification(eventID: eventID, governor: governor)
-            case .alarm: handleAlarmNotification(triggerTime: triggerTime, governor: governor, alarmGovernor: alarmGovernor)
+            case .alarm: handleAlarmNotification(triggerTime: triggerTime, governor: governor)
             case .timer: handleTimerNotification(governor: governor)
             }
             
@@ -367,8 +364,7 @@ import SwiftData
     
     private func handleAlarmNotification(
         triggerTime: String,
-        governor: Governor,
-        alarmGovernor: AlarmGovernor
+        governor: Governor
     ) {
         governor.alertTxt = triggerTime
         governor.alert = .alarm

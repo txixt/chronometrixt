@@ -8,7 +8,7 @@
 import Foundation
 import SwiftData
 
-@Observable final class AlarmGovernor {
+@Observable final class AlarmComptroller {
     var newAlarm: MetrixtTime = metric.cal.replaceComponents(time: MetrixtTime(date: nil), components: [.hour, .minute, .second], with: [5, 50, 50])
     var alarms: [MetrixtTime] = []
     var activeAlarms: [MetrixtAlarm] = []
@@ -39,7 +39,7 @@ import SwiftData
     var mode: SmallTimeMode = .timer
     enum SmallTimeMode: Hashable { case timer, alarm, stopwatch }
         
-    var ng: NotificationGovernor?
+    var ng: NotificationComptroller?
     var lam: LiveActivityManager = LiveActivityManager()
     
     

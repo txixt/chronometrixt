@@ -9,7 +9,7 @@ import Foundation
 import SwiftUI
 import SwiftData
 
-@Observable final class EventGovernor {
+@Observable final class EventComptroller {
     var id: String
     var title: String
     var notes: String
@@ -32,7 +32,7 @@ import SwiftData
     var originalStart: MetrixtTime? = nil
     var modelContext: ModelContext
     var gov: Governor
-    var ng: NotificationGovernor?
+    var nc: NotificationComptroller?
     
     var editField: EditingFields = .none
     enum EditingFields { case none, title, startDateMetric, startDateGreg, endDateMetric, endDateGreg, alarms, recurrence, location, notes, calendar, participants }
@@ -202,7 +202,7 @@ import SwiftData
                 for alarm in alarms {
                     Task {
                         let metricAlarmTime = metric.cal.update(time: metricStart, component: .second, byAdding: Int(-alarm.offset / 0.864))
-                        try? await ng?.scheduleEvent(
+                        try? await gov.nc.scheduleEvent(
                             id: alarm.id,
                             eventID: event.id,
                             eventTime: metricAlarmTime,
@@ -232,7 +232,7 @@ import SwiftData
             
             if !alarms.isEmpty {
                 for alarm in alarms {
-                    ng?.cancelNotification(id: alarm.id)
+                    gov.nc.cancelNotification(id: alarm.id)
                 }
             }
             
@@ -240,7 +240,7 @@ import SwiftData
                 for alarm in alarms {
                     Task {
                         let metricAlarmTime = metric.cal.update(time: metricStart, component: .second, byAdding: Int(-alarm.offset / 0.864))
-                        try? await ng?.scheduleEvent(
+                        try? await gov.nc.scheduleEvent(
                             id: alarm.id,
                             eventID: event.id,
                             eventTime: metricAlarmTime,  // Offset applied!
@@ -263,7 +263,7 @@ import SwiftData
     func destroySingle() {
         guard let event = gov.event else { return }
         
-        for alarm in alarms { ng?.cancelNotification(id: alarm.id) }
+        for alarm in alarms { gov.nc.cancelNotification(id: alarm.id) }
         
         EventHandler.destroySingleEvent(event, context: modelContext)
         gov.event = nil
@@ -276,7 +276,7 @@ import SwiftData
         guard let event = gov.event else { return }
         
         let alarmIds = EventHandler.futureAlarmIds(for: event, context: modelContext)
-        for alarmId in alarmIds { ng?.cancelNotification(id: alarmId) }
+        for alarmId in alarmIds { gov.nc.cancelNotification(id: alarmId) }
         
         EventHandler.destroyThisAndFuture(event, context: modelContext)
         gov.event = nil
@@ -289,7 +289,7 @@ import SwiftData
         guard let event = gov.event else { return }
         
         let alarmIds = EventHandler.allAlarmIds(for: event, context: modelContext)
-        for alarmId in alarmIds { ng?.cancelNotification(id: alarmId) }
+        for alarmId in alarmIds { gov.nc.cancelNotification(id: alarmId) }
         
         EventHandler.destroyEventSeries(event, context: modelContext)
         gov.event = nil
@@ -322,10 +322,10 @@ struct PreviewEG {
     let metric = MetrixtTime(date: Date.now)
     let laterMetric = MetrixtCalendar().update(time: MetrixtTime(date: Date.now), component: .minute, byAdding: 1)
     
-    func eg() -> EventGovernor {
+    func eg() -> EventComptroller {
         let context = PreviewEG.previewContainer.mainContext
         let gov = Governor()
-        return EventGovernor(
+        return EventComptroller(
             id: UUID().uuidString,
             title: "some event thing",
             notes: "my aunt once took me to disney land and we had a threesome with goofy.",

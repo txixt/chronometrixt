@@ -12,10 +12,9 @@ struct StopwatchView: View {
     @Environment(\.modelContext) private var context
     @Query var data: [MetricAlarm]
     @Bindable var gov: Governor
-    @Bindable var ag: AlarmGovernor
     
     var body: some View {
-        if let stopwatch = ag.stopwatch {
+        if let stopwatch = gov.ac.stopwatch {
             VStack {
                 
                 Spacer()
@@ -69,14 +68,14 @@ struct StopwatchView: View {
     }
     
     private func playPause() {
-        ag.toggleStopwatch(data: data, context: context)
+        gov.ac.toggleStopwatch(data: data, context: context)
     }
     
     private func reset() {
-        ag.resetStopwatch(data: data, context: context)
+        gov.ac.resetStopwatch(data: data, context: context)
     }
 }
 
 #Preview {
-    StopwatchView(gov: Governor(), ag: AlarmGovernor())
+    StopwatchView(gov: Governor())
 }

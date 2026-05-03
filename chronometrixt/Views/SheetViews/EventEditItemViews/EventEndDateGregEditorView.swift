@@ -9,7 +9,7 @@ import SwiftUI
 
 struct EventEndDateGregEditorView: View {
     @Bindable var gov: Governor
-    @Bindable var eg: EventGovernor
+    @Bindable var eg: EventComptroller
     
     var body: some View {
         MetrixtSubdivider()

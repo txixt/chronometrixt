@@ -11,9 +11,6 @@ import SwiftData
 struct EventCreationView: View {
     @Environment(\.modelContext) private var context
     @Bindable var gov: Governor
-    @Binding var eventGov: EventGovernor?
-    @Bindable var ag: AlarmGovernor
-    @Bindable var ng: NotificationGovernor
     @State var eventTitle: String = ""
     
     var body: some View {
@@ -23,15 +20,15 @@ struct EventCreationView: View {
                 
                 VStack {
                     
-                    if eventGov == nil {
+                    if gov.ec == nil {
                         EventCreationLandingView(
                             gov: gov,
                             eventTitle: $eventTitle,
                             onSubmit: finishEditingTitle)
                     }
                     
-                    if eventGov != nil {
-                        EventEditMainView(gov: gov, eventGov: eventGov!, update: false)
+                    if gov.ec != nil {
+                        EventEditMainView(gov: gov, update: false)
                     } else {
                         Spacer()
                     }
@@ -43,47 +40,34 @@ struct EventCreationView: View {
             .monospaced()
         }
 
-        AlertView(gov: gov, eg: $eventGov, ag: ag, ng: ng)
+        AlertView(gov: gov)
     }
     
     private func finishEditingTitle() {
         guard !eventTitle.isEmpty else { return }
-        if eventGov == nil {
+        if gov.ec == nil {
             initializeEvent()
         } else {
-            eventGov!.title = eventTitle
+            gov.ec!.title = eventTitle
         }
     }
     
     private func initializeEvent() {
         if gov.finiteNotNow == nil { gov.finiteNotNow = gov.eternalNow.time }
-        eventGov = EventGovernor(
+        gov.ec = EventComptroller(
             title: eventTitle,
             starting: gov.finiteNotNow!,
             ending: metric.cal.update(time: gov.finiteNotNow!, component: .minute, byAdding: 1),
             context: context,
             gov: gov
         )
-        eventGov!.ng = ng
+        gov.ec!.nc = gov.nc
     }
 }
 
 
 #Preview {
-    let context = PreviewEG.previewContainer.mainContext
-    let gov = Governor()
-    EventCreationView(
-        gov: gov,
-        eventGov: .constant(EventGovernor(
-            title: "sample",
-            starting: MetrixtTime(years: 5056, seconds: 123456),
-            ending: MetrixtTime(years: 5056, seconds: 123459),
-            context: context,
-            gov: gov)
-        ),
-        ag: AlarmGovernor(),
-        ng: NotificationGovernor()
-    )
+    EventCreationView(gov: Governor())
 }
 
 //struct EventLabelView: View {

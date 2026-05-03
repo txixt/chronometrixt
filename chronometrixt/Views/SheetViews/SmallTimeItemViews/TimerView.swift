@@ -12,13 +12,12 @@ struct TimerView: View {
     @Query private var timerData: [MetricAlarm]
     @Environment(\.modelContext) private var context
     @Bindable var gov: Governor
-    @Bindable var ag: AlarmGovernor
     
     var body: some View {
         VStack {
             Spacer()
-            if !ag.activeTimers.isEmpty {
-                ForEach(ag.activeTimers, id: \.id) { timer in
+            if !gov.ac.activeTimers.isEmpty {
+                ForEach(gov.ac.activeTimers, id: \.id) { timer in
                     ZStack {
                         Divider()
                         
@@ -32,7 +31,7 @@ struct TimerView: View {
                             
                             Spacer()
                             
-                            Button(action: { ag.cancelTimer(timer: timer )}) {
+                            Button(action: { gov.ac.cancelTimer(timer: timer )}) {
                                 Image(systemName: "xmark")
                                     .foregroundColor(.primary).bold()
                                     .shadow(radius: 3)
@@ -49,8 +48,8 @@ struct TimerView: View {
                 }
             }
             
-            if !ag.timers.isEmpty {
-                ForEach(ag.timers, id: \.id) { timer in
+            if !gov.ac.timers.isEmpty {
+                ForEach(gov.ac.timers, id: \.id) { timer in
                     ZStack {
                         Divider()
                         
@@ -74,7 +73,7 @@ struct TimerView: View {
                 }
             }
             
-            if !ag.activeTimers.isEmpty || !ag.timers.isEmpty {
+            if !gov.ac.activeTimers.isEmpty || !gov.ac.timers.isEmpty {
                 MetrixtSubdivider()
             }
             
@@ -83,7 +82,7 @@ struct TimerView: View {
                 
                 Text("new timer:").bold()
                 
-                Picker("hour", selection: $ag.timerHour) {
+                Picker("hour", selection: $gov.ac.timerHour) {
                     ForEach(0...9, id: \.self) { i in
                         Text(String(i)).tag(i)
                             .font(.title).bold()
@@ -93,7 +92,7 @@ struct TimerView: View {
                 
                 Text(":")
                 
-                Picker("minute", selection: $ag.timerMinute) {
+                Picker("minute", selection: $gov.ac.timerMinute) {
                     ForEach(0...99, id: \.self) { i in
                         Text(String(format: "%02d", i)).tag(i)
                             .font(.title).bold()
@@ -103,7 +102,7 @@ struct TimerView: View {
                 
                 Text(":")
                 
-                Picker("second", selection: $ag.timerSecond) {
+                Picker("second", selection: $gov.ac.timerSecond) {
                     ForEach(0...99, id: \.self) { i in
                         Text(String(format: "%02d", i)).tag(i)
                             .font(.title).bold()
@@ -119,7 +118,7 @@ struct TimerView: View {
             HStack {
                 Spacer()
                 Text("gregorian:")
-                Text(ag.newTimer.gregDurationTxt)
+                Text(gov.ac.newTimer.gregDurationTxt)
                     .font(.title)
             }
             .foregroundStyle(.gray).bold()
@@ -128,14 +127,14 @@ struct TimerView: View {
             HStack {
                 Spacer()
                 
-                if ag.activeTimers.count < 3 {
+                if gov.ac.activeTimers.count < 3 {
                     SmallTimeButtonView(
                         imageString: "timer",
-                        text: ag.newTimer.duration == 0 ? "set" : "start",
+                        text: gov.ac.newTimer.duration == 0 ? "set" : "start",
                         action: { startTimer(oldTimer: nil) },
-                        color: ag.newTimer.duration > 0 ? .metricOrange : .gray
+                        color: gov.ac.newTimer.duration > 0 ? .metricOrange : .gray
                     )
-                    .disabled(ag.newTimer.duration == 0)
+                    .disabled(gov.ac.newTimer.duration == 0)
                 } else {
                     SmallTimeButtonView(
                         imageString: "timer.circle.fill",
@@ -153,10 +152,10 @@ struct TimerView: View {
     }
     
     private func startTimer(oldTimer: MetrixtTimer?) {
-        ag.setTimer(data: timerData, context: context, eternalNow: gov.eternalNow.time, oldTimer: oldTimer)
+        gov.ac.setTimer(data: timerData, context: context, eternalNow: gov.eternalNow.time, oldTimer: oldTimer)
     }
 }
 
 #Preview {
-    TimerView(gov: Governor(), ag: AlarmGovernor())
+    TimerView(gov: Governor())
 }

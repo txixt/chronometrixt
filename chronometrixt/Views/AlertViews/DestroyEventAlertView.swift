@@ -9,7 +9,6 @@ import SwiftUI
 
 struct DestroyEventAlertView: View {
     @Bindable var gov: Governor
-    @Bindable var eg: EventGovernor
     
     var body: some View {
         GeometryReader { geometryReader in
@@ -31,7 +30,7 @@ struct DestroyEventAlertView: View {
                             Spacer()
                             
                             if gov.event != nil {
-                                Button(action: { eg.destroySingle() }) {
+                                Button(action: { gov.ec!.destroySingle() }) {
                                     VStack {
                                         Image(systemName: "trash")
                                         Text("destroy this event")
@@ -45,7 +44,7 @@ struct DestroyEventAlertView: View {
                             if gov.event != nil && gov.event!.recurrenceRule != "NONE" {
                                 Spacer()
                                 
-                                Button(action: { eg.destroyThisAndFuture() }) {
+                                Button(action: { gov.ec!.destroyThisAndFuture() }) {
                                     VStack {
                                         HStack {
                                             Image(systemName: "trash")
@@ -61,7 +60,7 @@ struct DestroyEventAlertView: View {
                                 
                                 Spacer()
                                 
-                                Button(action: { eg.destroySeries()} ) {
+                                Button(action: { gov.ec!.destroySeries()} ) {
                                     VStack {
                                         HStack {
                                             Image(systemName: "trash")
@@ -104,5 +103,5 @@ struct DestroyEventAlertView: View {
 }
 
 #Preview {
-    DestroyEventAlertView(gov: Governor(), eg: PreviewEG().eg())
+    DestroyEventAlertView(gov: Governor())
 }

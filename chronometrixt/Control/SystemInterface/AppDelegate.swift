@@ -11,9 +11,7 @@ import UserNotifications
 
 class AppDelegate: NSObject, UIApplicationDelegate, UNUserNotificationCenterDelegate {
     var governor: Governor?
-    var eventGovernor: EventGovernor?
-    var alarmGovernor: AlarmGovernor?
-    var notificationGovernor: NotificationGovernor?
+    var notificationGovernor: NotificationComptroller?
     
     func application(
         _ application: UIApplication,
@@ -38,18 +36,11 @@ class AppDelegate: NSObject, UIApplicationDelegate, UNUserNotificationCenterDele
         didReceive response: UNNotificationResponse,
         withCompletionHandler completionHandler: @escaping () -> Void
     ) {
-        guard let gov = governor,
-              let ag = alarmGovernor,
-              let ng = notificationGovernor
-        else {
-            completionHandler()
-            return
-        }
+        guard let governor else { completionHandler(); return }
         
-        ng.handleNotificationResponse(
+        governor.nc.handleNotificationResponse(
             response: response,
-            governor: gov,
-            alarmGovernor: ag
+            governor: governor
         )
         
         completionHandler()

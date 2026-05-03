@@ -9,7 +9,6 @@ import SwiftUI
 
 struct TimerAlertView: View {
     @Bindable var gov: Governor
-    @Bindable var ag: AlarmGovernor
     
     var body: some View {
         GeometryReader { geometryReader in
@@ -73,7 +72,7 @@ struct TimerAlertView: View {
     
     private func goToTimer() {
         gov.sheet = .timers
-        ag.mode = .timer
+        gov.ac.mode = .timer
         tidyUp()
     }
 
@@ -84,5 +83,5 @@ struct TimerAlertView: View {
 }
 
 #Preview {
-    TimerAlertView(gov: Governor(), ag: AlarmGovernor())
+    TimerAlertView(gov: Governor())
 }
