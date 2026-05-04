@@ -320,16 +320,14 @@ import SwiftData
         Task { @MainActor in
             switch notificationType {
             case .event: handleEventNotification(eventID: eventID, governor: governor)
-            case .alarm: handleAlarmNotification(triggerTime: triggerTime, governor: governor)
-            case .timer: handleTimerNotification(governor: governor)
+            case .alarm: handleAlarmNotification(triggerTime: triggerTime, gov: governor, id: identifier)
+            case .timer: handleTimerNotification(gov: governor, id: identifier)
             }
-            
+
             playSound()
             triggerHaptic()
         }
     }
-    
-    // MARK: - Alert Handlers
     
     private func handleEventNotification(eventID: String, governor: Governor) {
         guard let context = context, !eventID.isEmpty else {
@@ -364,15 +362,20 @@ import SwiftData
     
     private func handleAlarmNotification(
         triggerTime: String,
-        governor: Governor
+        gov: Governor,
+        id: String
     ) {
-        governor.alertTxt = triggerTime
-        governor.alert = .alarm
+        gov.alertTxt = triggerTime
+        gov.alert = .alarm
+    
     }
     
-    private func handleTimerNotification(governor: Governor) {
-        governor.alertTxt = "Timer complete"
-        governor.alert = .timer
+    private func handleTimerNotification(gov: Governor, id: String) {
+        playSound()
+
+        gov.alertTxt = "Timer complete"
+        gov.alert = .timer
+        
     }
     
     func playSound(fileName: String = "satGnos5") {

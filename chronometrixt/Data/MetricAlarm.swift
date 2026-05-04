@@ -13,7 +13,7 @@ import SwiftData
     ///for Alarms, metric and greg time represent alarm date - alarms are one off and alarm handler creates a new alarm on snooze. UX  limits alarms to 3 total
     ///for Timers, metric years can be ignored, metric seconds represents timer duration, and gregDate is the alarm time set for the system. UX limits timers to 3 total
     ///for Stopwatch, metric and greg time both represent initiation time. UX limits stopwatch to one.
-    var id: String = UUID().uuidString
+    var id: String
     var metricYears: Int
     var metricSeconds: Int
     var gregDate: Date
@@ -24,7 +24,8 @@ import SwiftData
     }
     enum AlarmType: String, Codable, Sendable { case event, alarm, timer, stopwatch }
         
-    init(time: MetrixtTime, type: AlarmType) {
+    init(id: String, time: MetrixtTime, type: AlarmType) {
+        self.id = id
         metricYears = time.years
         metricSeconds = time.seconds
         gregDate = time.toGreg()
@@ -32,7 +33,8 @@ import SwiftData
         self.type = type
     }
     
-    init(time: MetrixtTime, typeString: String) {
+    init(id: String, time: MetrixtTime, typeString: String) {
+        self.id = id
         metricYears = time.years
         metricSeconds = time.seconds
         gregDate = time.toGreg()

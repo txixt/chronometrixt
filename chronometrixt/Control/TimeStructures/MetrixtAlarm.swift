@@ -8,7 +8,7 @@
 import Foundation
 
 @Observable final class MetrixtAlarm: Identifiable {
-    var alarm: String = UUID().uuidString
+    var id: String = UUID().uuidString
     var deadline: MetrixtTime
     var countdown: Int
     var escapement: Timer?

@@ -9,6 +9,7 @@ import SwiftUI
 import SwiftData
 
 struct SmallTimesView: View {
+    @Environment(\.modelContext) private var context
     @Query var alarms: [MetricAlarm]
     @Bindable var gov: Governor
     
@@ -61,8 +62,15 @@ struct SmallTimesView: View {
         }
         .monospaced()
         .padding()
-        .onAppear() { gov.ac.populate(data: alarms, eternalNow: gov.eternalNow.time) }
+        .onAppear() { prepAlarmComptroller() }
+        .onChange(of: alarms) { gov.ac.alarmData = alarms }
         .onDisappear() { gov.ac.stopwatch = nil }
+    }
+    
+    private func prepAlarmComptroller() {
+        gov.ac.context = context
+        gov.ac.alarmData = alarms
+        gov.ac.populate(data: alarms, context: context)
     }
 }
 

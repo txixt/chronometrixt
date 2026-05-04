@@ -7,6 +7,7 @@
 
 import Foundation
 import SwiftUI
+import SwiftData
 
 @Observable final class Governor {
     var eternalNow: MetrixtEntropy = MetrixtEntropy()
@@ -27,6 +28,11 @@ import SwiftUI
     var ac: AlarmComptroller = AlarmComptroller()
     var ec: EventComptroller? = nil
     var nc: NotificationComptroller = NotificationComptroller()
+    
+    var context: ModelContext? = nil
+    var eventData: [MetricEvent] = []
+    var alarmData: [MetricAlarm] = []
+    var calendarData: [MetricCalendar] = []
     
     init() {
         ac.ng = nc

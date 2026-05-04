@@ -8,6 +8,7 @@
 import Foundation
 
 @Observable final class MetrixtStopwatch {
+    var id: String = UUID().uuidString
     var metricSeconds: Int = 0
     var isStopwatching: Bool = false
     private var escapement: Timer? = nil

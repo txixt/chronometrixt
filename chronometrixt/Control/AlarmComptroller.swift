@@ -41,10 +41,15 @@ import SwiftData
         
     var ng: NotificationComptroller?
     var lam: LiveActivityManager = LiveActivityManager()
+    var context: ModelContext? = nil
+    var alarmData: [MetricAlarm] = []
     
-    
-    func populate(data: [MetricAlarm], eternalNow: MetrixtTime) {
+    func populate(data: [MetricAlarm], context: ModelContext) {
         stopwatch = MetrixtStopwatch(time: nil)
+        let allAlarms = data.filter({ $0.type == .alarm })
+        while allAlarms.count > 3 { context.delete(allAlarms.last!) }
+        let allTimers = data.filter({ $0.type == .timer })
+        while allTimers.count > 3 { context.delete(allTimers.last!) }
         for datum in data {
             if datum.type == .alarm { alarms.append(MetrixtTime(years: datum.metricYears, seconds: datum.metricSeconds)) }
             if datum.type == .timer { timers.append(MetrixtTimer(duration: datum.metricSeconds)) }
@@ -71,26 +76,30 @@ import SwiftData
         if oldAlarm == nil { saveAlarm(data: data, context: context) }
         
         Task {
-            try? await ng?.scheduleAlarm(id: alarm.alarm, triggerTime: ta)
+            try? await ng?.scheduleAlarm(id: alarm.id, triggerTime: ta)
         }
     }
     func saveAlarm(data: [MetricAlarm], context: ModelContext) {
         let allAlarms = data.filter { $0.type == .alarm }
-        let metric = MetricAlarm(time: newAlarm, type: .alarm)
+        let metric = MetricAlarm(id: newAlarm.id, time: newAlarm, type: .alarm)
         context.insert(metric)
         while allAlarms.count > 3 { context.delete(allAlarms.last!) }
     }
     func dismissAlarm(alarm: MetrixtAlarm) {
         alarm.escapement?.invalidate()
-        activeAlarms.removeAll(where: { $0.alarm == alarm.alarm })
+        activeAlarms.removeAll(where: { $0.id == alarm.id })
         alarms.insert(alarm.deadline, at: 0)
         Task {
-            ng?.cancelNotification(id: alarm.alarm)
+            ng?.cancelNotification(id: alarm.id)
         }
     }
     func handleAlarmCompletion(deadline: MetrixtTime) {
         alarms.insert(deadline, at: 0)
         activeAlarms.removeAll(where: { $0.deadline == deadline })
+    }
+    func triggerAlarm(id: String) {
+        let alarmDatum = alarmData.first(where: { $0.id == id })
+        let alarmInterface = activeAlarms.first(where: { $0.id == id })
     }
     
     func setTimer(data: [MetricAlarm], context: ModelContext, eternalNow: MetrixtTime, oldTimer: MetrixtTimer?) {
@@ -100,7 +109,7 @@ import SwiftData
         timers.removeAll(where: { $0.id == tt.id })
         if timers.count + activeTimers.count > 3 { timers.removeLast() }
         
-        if oldTimer == nil { saveTimer(data: data, context: context) }
+        if oldTimer == nil { saveTimer(id: newTimer.id, data: data, context: context) }
         
         Task {
             await lam.startTimerActivity(
@@ -111,9 +120,9 @@ import SwiftData
             try? await ng?.scheduleTimer(id: tt.id, duration: tt.duration)
         }
     }
-    func saveTimer(data: [MetricAlarm], context: ModelContext) {
+    func saveTimer(id: String, data: [MetricAlarm], context: ModelContext) {
         let allTimers = data.filter { $0.type == .timer }
-        let timer = MetricAlarm(time: MetrixtTime(years: 0, seconds: newTimer.duration), type: .timer)
+        let timer = MetricAlarm(id: id, time: MetrixtTime(years: 0, seconds: newTimer.duration), type: .timer)
         context.insert(timer)
         while allTimers.count > 3 { context.delete(allTimers.last!) }
     }
@@ -140,7 +149,7 @@ import SwiftData
     }
     private func saveStopwatch(data: [MetricAlarm], context: ModelContext) {
         deleteStopwatch(data: data, context: context)
-        context.insert(MetricAlarm(time: MetrixtTime(date: nil), type: .stopwatch))
+        context.insert(MetricAlarm(id: stopwatch?.id ?? UUID().uuidString ,time: MetrixtTime(date: nil), type: .stopwatch))
     }
     private func deleteStopwatch(data: [MetricAlarm], context: ModelContext) {
         let existingStopwatches = data.filter { $0.type == .stopwatch }

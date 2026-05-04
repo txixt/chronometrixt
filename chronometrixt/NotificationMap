@@ -1,0 +1,106 @@
+
+┌──────────────────────────────────────────────────────────────────┐
+│                  USER CREATES ALARM/TIMER/EVENT                  │
+└────────────────────────────┬─────────────────────────────────────┘
+                             ↓
+┌──────────────────────────────────────────────────────────────────┐
+│              AlarmGovernor / EventGovernor calls:                │
+│                                                                  │
+│  • ng.scheduleEvent(id, eventID, time, title, sound)             │
+│  • ng.scheduleAlarm(id, time, sound)                             │
+│  • ng.scheduleTimer(id, duration, sound)                         │
+└────────────────────────────┬─────────────────────────────────────┘
+                             ↓
+┌──────────────────────────────────────────────────────────────────┐
+│          NotificationGovernor.scheduleNotification()             │
+│                                                                  │
+│  • Creates UNMutableNotificationContent                          │
+│  • Stores metadata in content.userInfo:                          │
+│    - notificationType (event/alarm/timer)                        │
+│    - notificationID                                              │
+│    - eventID (for events only)                                   │
+│    - triggerTime (metric time string)                            │
+│                                                                  │
+│  • If < 64 notifications → schedules immediately                 │
+│  • If >= 64 → adds to pendingQueue                               │
+└────────────────────────────┬─────────────────────────────────────┘
+                             ↓
+┌──────────────────────────────────────────────────────────────────┐
+│              iOS SYSTEM STORES THE NOTIFICATION                  │
+│                  (max 64 pending at a time)                      │
+└────────────────────────────┬─────────────────────────────────────┘
+                             ↓
+                    [TIME PASSES...]
+                             ↓
+┌──────────────────────────────────────────────────────────────────┐
+│           SYSTEM TRIGGERS AT SCHEDULED TIME                      │
+└────────────────────────────┬─────────────────────────────────────┘
+                             ↓
+                   ┌─────────┴─────────┐
+                   │                   │
+         ┌─────────▼─────────┐ ┌──────▼────────┐
+         │  APP FOREGROUND   │ │ APP BACKGROUND│
+         │                   │ │  OR CLOSED    │
+         └─────────┬─────────┘ └──────┬────────┘
+                   │                   │
+                   │                   │
+  ┌────────────────▼────────┐  ┌───────▼──────────────┐
+  │ willPresent gets called │  │ System shows banner  │
+  │ • Shows banner + sound  │  │ User taps banner     │
+  │ • Plays in-app sound    │  │ App opens (if closed)│
+  │ • Triggers haptic       │  └───────┬──────────────┘
+  └────────────────┬────────┘          │
+                   │                   │
+                   └─────────┬─────────┘
+                             ↓
+┌──────────────────────────────────────────────────────────────────┐
+│   AppDelegate.userNotificationCenter(didReceive response:)       │
+│                                                                  │
+│   Called when user:                                              │
+│   • Taps notification banner                                     │
+│   • Taps "Dismiss" action button                                 │
+│   • Taps "Snooze" action button (alarms only)                    │
+└────────────────────────────┬─────────────────────────────────────┘
+                             ↓
+┌──────────────────────────────────────────────────────────────────┐
+│     NotificationGovernor.handleNotificationResponse()            │
+│                                                                  │
+│   1. Extracts metadata from userInfo:                            │
+│      • eventID, triggerTime, category                            │
+│                                                                  │
+│   2. Routes based on actionIdentifier:                           │
+│      • SNOOZE_ACTION → reschedule alarm +5 minutes               │
+│      • DISMISS_ACTION → show in-app alert                        │
+│                                                                  │
+│   3. Calls processQueue() to schedule pending notifications      │
+└────────────────────────────┬─────────────────────────────────────┘
+                             ↓
+┌──────────────────────────────────────────────────────────────────┐
+│            handleDismiss() routes by type:                       │
+│                                                                  │
+│  EVENT:                                                          │
+│    • Fetches MetricEvent from SwiftData using eventID            │
+│    • Sets gov.event = fetched event                              │
+│    • Sets gov.alertTxt = event.title                             │
+│    • Sets gov.alert = .event                                     │
+│                                                                  │
+│  ALARM:                                                          │
+│    • Sets gov.alertTxt = triggerTime (metric time)               │
+│    • Sets gov.alert = .alarm                                     │
+│                                                                  │
+│  TIMER:                                                          │
+│    • Sets gov.alertTxt = "Timer complete"                        │
+│    • Sets gov.alert = .timer                                     │
+│                                                                  │
+│  Then: playSound() + triggerHaptic()                             │
+└────────────────────────────┬─────────────────────────────────────┘
+                             ↓
+┌──────────────────────────────────────────────────────────────────┐
+│              AlertView detects gov.alert != nil                  │
+│                                                                  │
+│  Shows appropriate view:                                         │
+│    • .event  → EventAlertView                                    │
+│    • .alarm  → AlarmAlertView (with Snooze/Dismiss buttons)      │
+│    • .timer  → TimerAlertView (with Dismiss button)              │
+│    • .error  → ErrorAlertView                                    │
+└──────────────────────────────────────────────────────────────────┘
