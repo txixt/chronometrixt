@@ -63,14 +63,11 @@ struct SmallTimesView: View {
         .monospaced()
         .padding()
         .onAppear() { prepAlarmComptroller() }
-        .onChange(of: alarms) { gov.ac.alarmData = alarms }
         .onDisappear() { gov.ac.stopwatch = nil }
     }
     
     private func prepAlarmComptroller() {
-        gov.ac.context = context
-        gov.ac.alarmData = alarms
-        gov.ac.populate(data: alarms, context: context)
+        gov.ac.populate(data: alarms)
     }
 }
 

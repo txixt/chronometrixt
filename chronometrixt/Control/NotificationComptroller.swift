@@ -28,12 +28,12 @@ import SwiftData
     
     struct PendingNotification: Identifiable {
         let id: String
+        let dataId: String
+        let eventId: String?
         let type: NotificationType
         let triggerDate: Date
         let title: String
         let body: String
-        let soundName: String
-        let eventID: String? 
     }
     
     init() {
@@ -92,62 +92,63 @@ import SwiftData
     
     func scheduleEvent(
         id: String,
-        eventID: String,  // Full event ID for lookup later
+        dataId: String,
+        eventId: String,
         eventTime: MetrixtTime,
         eventTitle: String,
         soundFileName: String = "satGnos5"
     ) async throws {
         try await scheduleNotification(
             id: id,
+            dataId: dataId,
+            eventId: eventId,
             type: .event,
             triggerDate: eventTime.toGreg(),
             title: "\(eventTitle)",
-            body: "metric time: \(eventTime.hourMinuteSecondTxt)",
-            soundFileName: soundFileName,
-            eventID: eventID
+            body: "metric time: \(eventTime.hourMinuteSecondTxt)"
         )
     }
     
     func scheduleAlarm(
         id: String,
+        dataId: String,
         triggerTime: MetrixtTime,
-        soundFileName: String = "alarm_sound"
     ) async throws {
         try await scheduleNotification(
             id: id,
+            dataId: dataId,
+            eventId: nil,
             type: .alarm,
             triggerDate: triggerTime.toGreg(),
             title: "Alarm",
-            body: "Metric time: \(triggerTime.hourMinuteSecondTxt)",
-            soundFileName: soundFileName,
-            eventID: nil
+            body: "Metric time: \(triggerTime.hourMinuteSecondTxt)"
         )
     }
     
     func scheduleTimer(
         id: String,
-        duration: Int, // in metric seconds
-        soundFileName: String = "satGnos5"
+        dataId: String,
+        duration: Int,
     ) async throws {
         try await scheduleNotification(
             id: id,
+            dataId: dataId,
+            eventId: nil,
             type: .timer,
             triggerDate: Date.now.addingTimeInterval(TimeInterval(duration) * 0.864),
             title: "Timer Complete",
-            body: "Timer finished",
-            soundFileName: soundFileName,
-            eventID: nil
+            body: "Timer finished"
         )
     }
     
     private func scheduleNotification(
         id: String,
+        dataId: String,
+        eventId: String?,
         type: NotificationType,
         triggerDate: Date,
         title: String,
-        body: String,
-        soundFileName: String = "satGnos5",
-        eventID: String? = nil  // Optional event ID for lookups
+        body: String
     ) async throws {
         let pendingNotifications = await UNUserNotificationCenter.current()
             .pendingNotificationRequests()
@@ -155,12 +156,12 @@ import SwiftData
         if pendingNotifications.count >= systemLimit {
             let pending = PendingNotification(
                 id: id,
+                dataId: dataId,
+                eventId: eventId,
                 type: type,
                 triggerDate: triggerDate,
                 title: title,
-                body: body,
-                soundName: soundFileName,
-                eventID: eventID
+                body: body
             )
             pendingQueue.append(pending)
             return
@@ -170,13 +171,12 @@ import SwiftData
         content.title = title
         content.body = body
         content.categoryIdentifier = type.rawValue
-        content.sound = UNNotificationSound(named: UNNotificationSoundName("\(soundFileName).mp3"))
-        
-        // Store metadata in userInfo for later retrieval
+        content.sound = UNNotificationSound(named: UNNotificationSoundName("satGnos5.mp3"))
         content.userInfo = [
             "notificationType": type.rawValue,
             "notificationID": id,
-            "eventID": eventID ?? "",
+            "dataID": dataId,
+            "eventID": eventId ?? "NONE",
             "triggerTime": body  // Store the metric time string
         ]
         
@@ -239,50 +239,45 @@ import SwiftData
     
     func processQueue() async {
         guard !pendingQueue.isEmpty else { return }
-        
         let pending = await UNUserNotificationCenter.current().pendingNotificationRequests()
         guard pending.count < systemLimit else { return }
-        
-        // Sort queue by trigger date (earliest first)
         pendingQueue.sort { $0.triggerDate < $1.triggerDate }
         
-        // Schedule the next one
         if let next = pendingQueue.first {
             pendingQueue.removeFirst()
-            
             try? await scheduleNotification(
                 id: next.id,
+                dataId: next.dataId,
+                eventId: next.eventId,
                 type: next.type,
                 triggerDate: next.triggerDate,
                 title: next.title,
-                body: next.body,
-                soundFileName: next.soundName,
-                eventID: next.eventID
+                body: next.body
             )
         }
     }
     
-    func handleNotificationResponse(
-        response: UNNotificationResponse,
-        governor: Governor
-    ) {
-        let identifier = response.notification.request.identifier
+    func handleNotificationResponse(response: UNNotificationResponse) {
+        guard let gov else { print("handleNotificationResponse has no gov"); return }
+        let id = response.notification.request.identifier
+        let dataId = response.notification.request.identifier
+        let eventId = response.notification.request.identifier
         let actionIdentifier = response.actionIdentifier
         let category = response.notification.request.content.categoryIdentifier
         let userInfo = response.notification.request.content.userInfo
-        let eventID = userInfo["eventID"] as? String ?? ""
         let triggerTime = userInfo["triggerTime"] as? String ?? ""
         
         switch actionIdentifier {
         case "SNOOZE_ACTION": 
-            handleSnooze(identifier: identifier, category: category) 
+            handleSnooze(id: id, dataId: dataId, category: category)
             
         case "DISMISS_ACTION", UNNotificationDefaultActionIdentifier:
             handleDismiss(
-                identifier: identifier,
+                id: id,
+                dataId: dataId,
+                eventId: eventId == "NONE" ? nil : eventId,
                 category: category,
-                governor: governor,
-                eventID: eventID,
+                gov: gov,
                 triggerTime: triggerTime
             )
             
@@ -295,87 +290,85 @@ import SwiftData
         }
     }
     
-    func handleSnooze(identifier: String, category: String) {
+    func handleSnooze(id: String, dataId: String, category: String) {
         Task {
             try? await scheduleAlarm(
-                id: identifier, 
-                triggerTime: metric.cal.update(
-                    time: MetrixtTime(date: nil), 
-                    component: .minute, 
-                    byAdding: 5
-                )
+                id: id,
+                dataId: dataId,
+                triggerTime: metric.cal.update(time: MetrixtTime(date: nil), component: .minute, byAdding: 5)
             )
         }
     }
     
     private func handleDismiss(
-        identifier: String,
+        id: String,
+        dataId: String,
+        eventId: String?,
         category: String,
-        governor: Governor,
-        eventID: String,
+        gov: Governor,
         triggerTime: String
     ) {
         guard let notificationType = NotificationType(rawValue: category) else { return }
         
-        Task { @MainActor in
-            switch notificationType {
-            case .event: handleEventNotification(eventID: eventID, governor: governor)
-            case .alarm: handleAlarmNotification(triggerTime: triggerTime, gov: governor, id: identifier)
-            case .timer: handleTimerNotification(gov: governor, id: identifier)
-            }
-
-            playSound()
-            triggerHaptic()
+        switch notificationType {
+        case .event: handleEventNotification(alarmId: id, dataId: dataId, eventId: eventId!)
+        case .alarm: handleAlarmNotification(id: id)
+        case .timer: handleTimerNotification(id: id)
         }
+        playSound()
+        triggerHaptic()
     }
     
-    private func handleEventNotification(eventID: String, governor: Governor) {
-        guard let context = context, !eventID.isEmpty else {
-            governor.alertTxt = ""
-            governor.alert = .event
+    private func handleEventNotification(alarmId: String, dataId: String, eventId: String) {
+        guard let gov, let context = gov.context else {
+            print("gov context or event id not handled correctly at ~334 in NotificationComptroller")
             return
         }
         
-        let descriptor = FetchDescriptor<MetricEvent>(
-            predicate: #Predicate { event in
-                event.id == eventID
-            }
-        )
+        if let alarm = gov.alarmData.first(where: { $0.id == dataId }) {
+            context.delete(alarm)
+        } else {
+            print("handleEventNotification error deleting alarm")
+        }
         
-        do {
-            let events = try context.fetch(descriptor)
-            if let event = events.first {
-                governor.event = event
-                governor.alertTxt = event.title
-                governor.alert = .event
-            } else {
-                // Event not found (might have been deleted)
-                governor.alertTxt = "Event Debug: Event Missing"
-                governor.alert = .event
-            }
-        } catch {
-            print("❌ Error fetching event: \(error)")
-            governor.alertTxt = "Event notification"
-            governor.alert = .event
+        if let event = gov.eventData.first(where: { $0.id == eventId }) {
+            gov.event = event
+            gov.alertTxt = event.title
+            gov.alert = .event
+        } else {
+            print("handleEventNotification error calling event")
         }
     }
     
-    private func handleAlarmNotification(
-        triggerTime: String,
-        gov: Governor,
-        id: String
-    ) {
-        gov.alertTxt = triggerTime
-        gov.alert = .alarm
-    
+    private func handleAlarmNotification(id: String) {
+        guard let gov else { print("error at handleAlarmNotification in NotificationComptroller"); return }
+        if let thisAlarmData = gov.alarmData.first(where: { $0.id == id }) {
+            let seconds = thisAlarmData.metricSeconds % 100_000
+            let hour = (seconds / 10_000) % 10
+            let minute = (seconds / 100) % 100
+            let second = seconds % 100
+            gov.alertTxt = String(format: "%01d:%02d:%02d", hour, minute, second)
+            gov.alert = .alarm
+            gov.ac.dismissAlarm(id: id)
+        } else {
+            print("data retieval error in handleAlarmNotification in NotificationComptroller")
+        }
     }
     
-    private func handleTimerNotification(gov: Governor, id: String) {
-        playSound()
+    private func handleTimerNotification(id: String) {
+        guard let gov else { print("error at handleTimerNotification in NotificationComptroller"); return }
+        if let thisTimerData = gov.alarmData.first(where: { $0.id == id }) {
+            let seconds = thisTimerData.metricSeconds % 100_000
+            let hour = (seconds / 10_000) % 10
+            let minute = (seconds / 100) % 100
+            let second = seconds % 100
+            gov.alertTxt = String(format: "%01d:%02d:%02d", hour, minute, second)
+            gov.alert = .timer
+            gov.ac.retireTimer(id: id)
+        } else {
+            print("data retrieval error in handleTimerNotification in NotificationComptroller")
+        }
 
-        gov.alertTxt = "Timer complete"
-        gov.alert = .timer
-        
     }
     
     func playSound(fileName: String = "satGnos5") {

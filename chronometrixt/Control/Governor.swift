@@ -34,10 +34,6 @@ import SwiftData
     var alarmData: [MetricAlarm] = []
     var calendarData: [MetricCalendar] = []
     
-    init() {
-        ac.ng = nc
-    }
-    
     func populateTimes() {
         ///reset anchor to start of week to avoid truncated calendar weeks and days if the start day is > 4 or 5
 //        let thisTime = finiteNotNow ?? eternalNow.time

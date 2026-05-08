@@ -33,7 +33,7 @@ struct AlarmView: View {
                             
                             Spacer()
                             
-                            Button(action: { gov.ac.dismissAlarm(alarm: alarm) }) {
+                            Button(action: { gov.ac.dismissAlarm(id: alarm.id) }) {
                                 Image(systemName: "xmark")
                                     .foregroundColor(.primary).bold()
                                     .shadow(radius: 3)
@@ -64,6 +64,12 @@ struct AlarmView: View {
                             }
                             
                             Spacer()
+                            
+                            Button(action: { gov.ac.destroyAlarm(alarm: alarm) }) {
+                                Image(systemName: "trash")
+                                    .foregroundColor(.primary).bold()
+                                    .shadow(radius: 3)
+                            }
                             
                             Button(action: { setAlarm(oldAlarm: alarm) }) {
                                 Image(systemName: "arrow.3.trianglepath").bold()
@@ -151,7 +157,7 @@ struct AlarmView: View {
     }
     
     private func setAlarm(oldAlarm: MetrixtTime?) {
-        gov.ac.setAlarm(data: alarmData, context: context, eternalNow: gov.eternalNow.time, oldAlarm: oldAlarm)
+        gov.ac.setAlarm(oldAlarm: oldAlarm)
     }
 }
 

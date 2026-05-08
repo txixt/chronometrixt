@@ -31,7 +31,7 @@ struct TimerView: View {
                             
                             Spacer()
                             
-                            Button(action: { gov.ac.cancelTimer(timer: timer )}) {
+                            Button(action: { gov.ac.cancelTimer(timer: timer)}) {
                                 Image(systemName: "xmark")
                                     .foregroundColor(.primary).bold()
                                     .shadow(radius: 3)
@@ -61,6 +61,12 @@ struct TimerView: View {
                             }
                             
                             Spacer()
+                            
+                            Button(action: { gov.ac.destroyTimer(timer: timer) }) {
+                                Image(systemName: "trash")
+                                    .foregroundColor(.primary).bold()
+                                    .shadow(radius: 3)
+                            }
                             
                             Button(action: { startTimer(oldTimer: timer) }) {
                                 Image(systemName: "arrow.3.trianglepath").bold()
@@ -152,7 +158,7 @@ struct TimerView: View {
     }
     
     private func startTimer(oldTimer: MetrixtTimer?) {
-        gov.ac.setTimer(data: timerData, context: context, eternalNow: gov.eternalNow.time, oldTimer: oldTimer)
+        gov.ac.setTimer(oldTimer: oldTimer)
     }
 }
 

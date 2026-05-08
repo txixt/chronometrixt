@@ -8,12 +8,13 @@
 import Foundation
 
 @Observable final class MetrixtStopwatch {
-    var id: String = UUID().uuidString
+    var id: String
     var metricSeconds: Int = 0
     var isStopwatching: Bool = false
     private var escapement: Timer? = nil
     
     init(time: MetrixtTime?) {
+        self.id = UUID().uuidString
         metricSeconds = time == nil ? 0 : MetrixtTime(date: nil).seconds - time!.seconds
         escapement = Timer.scheduledTimer(withTimeInterval: 0.864, repeats: true) { [weak self] _ in
             guard let self, self.isStopwatching else { return }

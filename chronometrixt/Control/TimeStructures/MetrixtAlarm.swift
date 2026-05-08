@@ -8,13 +8,14 @@
 import Foundation
 
 @Observable final class MetrixtAlarm: Identifiable {
-    var id: String = UUID().uuidString
+    var id: String
     var deadline: MetrixtTime
     var countdown: Int
     var escapement: Timer?
     private var onComplete: ((MetrixtTime) -> Void)?
     
     init(deadline: MetrixtTime, onComplete: ((MetrixtTime) -> Void)? = nil) {
+        self.id = UUID().uuidString
         self.deadline = deadline
         self.countdown = deadline.seconds - MetrixtTime(date: nil).seconds
         self.onComplete = onComplete
@@ -35,7 +36,6 @@ import Foundation
         escapement?.invalidate()
         escapement = nil
         onComplete?(deadline)
-        //Play Musixt
     }
     
     deinit {

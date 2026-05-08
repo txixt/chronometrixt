@@ -23,7 +23,6 @@ import SwiftData
         )
     }
     
-    
     var newTimer: MetrixtTimer = MetrixtTimer(duration: 0)
     var timers: [MetrixtTimer] = []
     var activeTimers: [MetrixtTimer] = []
@@ -38,13 +37,12 @@ import SwiftData
     
     var mode: SmallTimeMode = .timer
     enum SmallTimeMode: Hashable { case timer, alarm, stopwatch }
-        
-    var ng: NotificationComptroller?
-    var lam: LiveActivityManager = LiveActivityManager()
-    var context: ModelContext? = nil
-    var alarmData: [MetricAlarm] = []
     
-    func populate(data: [MetricAlarm], context: ModelContext) {
+    var gov: Governor?
+    var lam: LiveActivityManager = LiveActivityManager()
+    
+    func populate(data: [MetricAlarm]) {
+        guard let gov, let context = gov.context else { print("no gov no joy"); return }
         stopwatch = MetrixtStopwatch(time: nil)
         let allAlarms = data.filter({ $0.type == .alarm })
         while allAlarms.count > 3 { context.delete(allAlarms.last!) }
@@ -57,59 +55,67 @@ import SwiftData
         }
     }
     
-    func setAlarm(data: [MetricAlarm], context: ModelContext, eternalNow: MetrixtTime, oldAlarm: MetrixtTime?) {
+    func setAlarm(oldAlarm: MetrixtTime?) {
+        guard let gov, let context = gov.context else { print("no mud in joyville"); return }
         var ta: MetrixtTime = oldAlarm ?? newAlarm
-
-        if ta.seconds < eternalNow.seconds {
-            let tomorrow = metric.cal.update(time: eternalNow, component: .day, byAdding: 1)
+        if ta.seconds < gov.eternalNow.time.seconds {
+            let tomorrow = metric.cal.update(time: gov.eternalNow.time, component: .day, byAdding: 1)
             ta = metric.cal.replaceComponents(time: tomorrow, components: [.hour, .minute, .second], with: [ta.hour, ta.minute, ta.second])
         }
         
-        let alarm = MetrixtAlarm(deadline: ta, onComplete: { [weak self] deadline in
-            self?.handleAlarmCompletion(deadline: deadline)
-        })
+        let alarm = MetrixtAlarm(deadline: ta)
         
         activeAlarms.insert(alarm, at: 0)
         alarms.removeAll(where: { $0.id == ta.id })
         if alarms.count + activeAlarms.count > 3 { alarms.removeLast() }
         
-        if oldAlarm == nil { saveAlarm(data: data, context: context) }
+        let dataId = oldAlarm == nil ?
+        saveAlarm(data: gov.alarmData, context: context)
+        :
+        gov.alarmData.first(where: { $0.type == .alarm && $0.id == oldAlarm!.id })!.id
         
         Task {
-            try? await ng?.scheduleAlarm(id: alarm.id, triggerTime: ta)
+            try? await gov.nc.scheduleAlarm(id: alarm.id, dataId: dataId, triggerTime: ta)
         }
     }
-    func saveAlarm(data: [MetricAlarm], context: ModelContext) {
+    func saveAlarm(data: [MetricAlarm], context: ModelContext) -> String {
         let allAlarms = data.filter { $0.type == .alarm }
         let metric = MetricAlarm(id: newAlarm.id, time: newAlarm, type: .alarm)
         context.insert(metric)
         while allAlarms.count > 3 { context.delete(allAlarms.last!) }
+        
+        return metric.id
     }
-    func dismissAlarm(alarm: MetrixtAlarm) {
-        alarm.escapement?.invalidate()
-        activeAlarms.removeAll(where: { $0.id == alarm.id })
-        alarms.insert(alarm.deadline, at: 0)
-        Task {
-            ng?.cancelNotification(id: alarm.id)
+    func dismissAlarm(id: String) {
+        guard let gov else { return }
+        if let alarm = activeAlarms.first(where: { $0.id == id }) {
+            alarm.escapement?.invalidate()
+            activeAlarms.removeAll(where: { $0.id == alarm.id })
+            alarms.insert(alarm.deadline, at: 0)
+            Task {
+                gov.nc.cancelNotification(id: alarm.id)
+            }
         }
     }
-    func handleAlarmCompletion(deadline: MetrixtTime) {
-        alarms.insert(deadline, at: 0)
-        activeAlarms.removeAll(where: { $0.deadline == deadline })
-    }
-    func triggerAlarm(id: String) {
-        let alarmDatum = alarmData.first(where: { $0.id == id })
-        let alarmInterface = activeAlarms.first(where: { $0.id == id })
+    func destroyAlarm(alarm: MetrixtTime) {
+        guard let gov, let context = gov.context else { print("didn't destroy, no gov"); return }
+        if let datum = gov.alarmData.first(where: { $0.type == .alarm && $0.metricSeconds == alarm.seconds }) {
+            context.delete(datum)
+            print("alarm deleted")
+            alarms.removeAll(where: { $0.id == alarm.id })
+        }
     }
     
-    func setTimer(data: [MetricAlarm], context: ModelContext, eternalNow: MetrixtTime, oldTimer: MetrixtTimer?) {
+    func setTimer(oldTimer: MetrixtTimer?) {
+        guard let gov, let context = gov.context else { print("no gov in alarmComptroller slkd"); return }
         let tt = oldTimer ?? newTimer
         
         activeTimers.insert(MetrixtTimer(duration: tt.duration), at: 0)
         timers.removeAll(where: { $0.id == tt.id })
         if timers.count + activeTimers.count > 3 { timers.removeLast() }
         
-        if oldTimer == nil { saveTimer(id: newTimer.id, data: data, context: context) }
+        let dataId = oldTimer == nil ? saveTimer(id: newTimer.id, data: gov.alarmData, context: context)
+        : gov.alarmData.first(where: { $0.type == .timer && $0.metricSeconds == oldTimer!.duration })!.id
         
         Task {
             await lam.startTimerActivity(
@@ -117,21 +123,37 @@ import SwiftData
                 duration: tt.duration,
                 endTime: tt.toGregDeadline()
             )
-            try? await ng?.scheduleTimer(id: tt.id, duration: tt.duration)
+            try? await gov.nc.scheduleTimer(id: tt.id, dataId: dataId, duration: tt.duration)
         }
     }
-    func saveTimer(id: String, data: [MetricAlarm], context: ModelContext) {
+    func saveTimer(id: String, data: [MetricAlarm], context: ModelContext) -> String {
         let allTimers = data.filter { $0.type == .timer }
         let timer = MetricAlarm(id: id, time: MetrixtTime(years: 0, seconds: newTimer.duration), type: .timer)
         context.insert(timer)
         while allTimers.count > 3 { context.delete(allTimers.last!) }
+        return timer.id
     }
     func cancelTimer(timer: MetrixtTimer) {
+        guard let gov else { return }
         timer.cancelTimer()
         timers.insert(timer, at: 0)
         activeTimers.removeAll(where: { $0.id == timer.id})
-        ng?.cancelNotification(id: timer.id)
+        gov.nc.cancelNotification(id: timer.id)
     }
+    func retireTimer(id: String) {
+        if let timer = activeTimers.first(where: { $0.id == id }) {
+            timers.insert(timer, at: 0)
+            activeTimers.removeAll(where: { $0.id == id })
+        }
+    }
+    func destroyTimer(timer: MetrixtTimer) {
+        guard let gov, let context = gov.context else { print("who bed the shat?"); return }
+        if let datum = gov.alarmData.first(where: { $0.type == .timer && $0.metricSeconds == timer.duration }) {
+            context.delete(datum)
+            timers.removeAll(where: { $0.id == timer.id})
+        }
+    }
+    
     
     func toggleStopwatch(data: [MetricAlarm], context: ModelContext) {
         guard let stopwatch else { return }

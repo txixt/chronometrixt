@@ -204,7 +204,8 @@ import SwiftData
                         let metricAlarmTime = metric.cal.update(time: metricStart, component: .second, byAdding: Int(-alarm.offset / 0.864))
                         try? await gov.nc.scheduleEvent(
                             id: alarm.id,
-                            eventID: event.id,
+                            dataId: alarm.id,
+                            eventId: event.id,
                             eventTime: metricAlarmTime,
                             eventTitle: title
                         )
@@ -242,7 +243,8 @@ import SwiftData
                         let metricAlarmTime = metric.cal.update(time: metricStart, component: .second, byAdding: Int(-alarm.offset / 0.864))
                         try? await gov.nc.scheduleEvent(
                             id: alarm.id,
-                            eventID: event.id,
+                            dataId: alarm.id,
+                            eventId: event.id,
                             eventTime: metricAlarmTime,  // Offset applied!
                             eventTitle: title
                         )

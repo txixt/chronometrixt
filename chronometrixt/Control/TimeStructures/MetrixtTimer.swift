@@ -8,14 +8,14 @@
 import Foundation
 
 @Observable final class MetrixtTimer: Identifiable {
-    var id: String = UUID().uuidString
+    var id: String
     var duration: Int
     var deadline: Int
     var countdown: Int
     private var escapement: Timer?
-    private var onComplete: ((Int) -> Void)?
     
     init(duration: Int) {
+        self.id = UUID().uuidString
         self.duration = duration
         deadline = MetrixtTime(date: nil).hms + duration
         countdown = duration
@@ -24,6 +24,18 @@ import Foundation
             self.updateTimer()
         }
     }
+    
+//    init(duration: Int, onComplete: ((MetrixtTimer) -> Void)? = nil) {
+//        self.id = UUID().uuidString
+//        self.duration = duration
+//        self.onComplete = onComplete
+//        deadline = MetrixtTime(date: nil).hms + duration
+//        countdown = duration
+//        escapement = Timer.scheduledTimer(withTimeInterval: 0.864, repeats: true) { [weak self] _ in
+//            guard let self else { return }
+//            self.updateTimer()
+//        }
+//    }
     
     private func updateTimer() {
         countdown -= 1
@@ -37,7 +49,6 @@ import Foundation
     func cancelTimer() {
         escapement?.invalidate()
         escapement = nil
-        onComplete?(deadline)
     }
     
     func toGregDeadline() -> Date {

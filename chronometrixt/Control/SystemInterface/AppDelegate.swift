@@ -38,11 +38,9 @@ class AppDelegate: NSObject, UIApplicationDelegate, UNUserNotificationCenterDele
     ) {
         guard let governor else { completionHandler(); return }
         
-        governor.nc.handleNotificationResponse(
-            response: response,
-            governor: governor
-        )
-        
-        completionHandler()
+        DispatchQueue.main.async {
+            governor.nc.handleNotificationResponse(response: response)
+            completionHandler()
+        }
     }
 }

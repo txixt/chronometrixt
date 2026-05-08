@@ -107,6 +107,7 @@ struct ContentView: View {
     
     private func initialize() {
             gov.nc.gov = gov
+            gov.ac.gov = gov
             gov.nc.context = context
             appDel.governor = gov
             if calendars.isEmpty { context.insert(CalInitializer.first()) }
