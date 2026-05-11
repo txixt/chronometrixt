@@ -6,8 +6,8 @@
 //
 
 import Foundation
-import ActivityKit
 import SwiftUI
+import ActivityKit
 
 @Observable final class LiveActivityManager {
     private var activeActivities: [String: Activity<TimerActivityAttributes>] = [:]

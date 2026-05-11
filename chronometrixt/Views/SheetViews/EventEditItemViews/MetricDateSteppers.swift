@@ -6,6 +6,7 @@
 //
 
 import SwiftUI
+import SwiftData
 
 struct MetricDateSteppers: View {
     @Bindable var gov: Governor
@@ -95,7 +96,8 @@ struct MetricDateStepper: View {
 
 
 #Preview {
-    let gov = Governor()
+    @Previewable @Environment(\.modelContext) var context
+    let gov = Governor(context: context)
     let eg = PreviewEG().eg()
     MetricDateSteppers(
         gov: gov,

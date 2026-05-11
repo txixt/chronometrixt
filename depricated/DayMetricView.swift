@@ -174,7 +174,8 @@ struct DayMetricView: View {
 ///dummyMetricEvents exists in PreviewHelpers
 
 #Preview {
-    let gov = Governor()
+    @Previewable @Environment(\.modelContext) var context
+    let gov = Governor(context: context)
     gov.scale = .day
     gov.populateTimes() // This will call setSpan()
     return DayMetricView(gov: gov, day: MetrixtTime(date: nil))

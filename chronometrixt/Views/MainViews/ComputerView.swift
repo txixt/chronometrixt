@@ -6,6 +6,7 @@
 //
 
 import SwiftUI
+import SwiftData
 
 struct ComputerView: View {
     @Bindable var gov: Governor
@@ -16,5 +17,6 @@ struct ComputerView: View {
 }
 
 #Preview {
-    ComputerView(gov: Governor())
+    @Previewable @Environment(\.modelContext) var context
+    ComputerView(gov: Governor(context: context))
 }

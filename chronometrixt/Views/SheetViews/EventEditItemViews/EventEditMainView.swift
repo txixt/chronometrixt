@@ -265,8 +265,10 @@ struct EventLabelView: View {
 //        ending: MetrixtTime(years: 5056, seconds: 123459),
 //        context: context,
 //        gov: gov)
+    
+    @Previewable @Environment(\.modelContext) var context
     EventEditMainView(
-        gov: Governor(),
+        gov: Governor(context: context),
         update: true
     )
 }

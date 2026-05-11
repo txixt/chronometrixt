@@ -6,6 +6,7 @@
 //
 
 import SwiftUI
+import SwiftData
 
 struct EventEditView: View {
     @Bindable var gov: Governor
@@ -27,5 +28,6 @@ struct EventEditView: View {
 }
 
 #Preview {
-    EventEditView(gov: Governor())
+    @Previewable @Environment(\.modelContext) var context
+    EventEditView(gov: Governor(context: context))
 }

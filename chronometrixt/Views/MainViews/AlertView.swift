@@ -6,6 +6,7 @@
 //
 
 import SwiftUI
+import SwiftData
 
 struct AlertView: View {
     @Bindable var gov: Governor
@@ -28,5 +29,6 @@ struct AlertView: View {
 }
 
 #Preview {
-    AlertView(gov: Governor())
+    @Previewable @Environment(\.modelContext) var context
+    AlertView(gov: Governor(context: context))
 }

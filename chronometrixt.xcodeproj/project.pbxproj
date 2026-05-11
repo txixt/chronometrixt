@@ -8,7 +8,7 @@
 
 /* Begin PBXBuildFile section */
 		C10200892F9EE56B00C4E838 /* WidgetKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = C1501DB02F20853B00521DF6 /* WidgetKit.framework */; };
-		C102008A2F9EE56B00C4E838 /* SwiftUI.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = C1501DB22F20853B00521DF6 /* SwiftUI.framework */; };
+		C102008A2F9EE56B00C4E838 /* SwiftUI.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = C1501DB22F20853B00521DF6 /* SwiftUI.framework */; settings = {ATTRIBUTES = (Weak, ); }; };
 		C10200972F9EE56C00C4E838 /* chronometrixt widgetExtension.appex in Embed Foundation Extensions */ = {isa = PBXBuildFile; fileRef = C10200882F9EE56B00C4E838 /* chronometrixt widgetExtension.appex */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
 		C1501DB12F20853B00521DF6 /* WidgetKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = C1501DB02F20853B00521DF6 /* WidgetKit.framework */; };
 		C1501DB32F20853B00521DF6 /* SwiftUI.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = C1501DB22F20853B00521DF6 /* SwiftUI.framework */; };

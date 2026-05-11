@@ -6,6 +6,7 @@
 //
 
 import SwiftUI
+import SwiftData
 
 struct DayBasicView: View {
     @Bindable var gov: Governor
@@ -55,5 +56,6 @@ struct DayBasicView: View {
 }
 
 #Preview {
-    DayBasicView(gov: Governor(), day: MetrixtTime(date: nil))
+    @Previewable @Environment(\.modelContext) var context
+    DayBasicView(gov: Governor(context: context), day: MetrixtTime(date: nil))
 }

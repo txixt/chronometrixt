@@ -38,16 +38,19 @@ import SwiftData
     var mode: SmallTimeMode = .timer
     enum SmallTimeMode: Hashable { case timer, alarm, stopwatch }
     
-    var gov: Governor?
+    var gov: Governor
     var lam: LiveActivityManager = LiveActivityManager()
     
+    init(gov: Governor) {
+        self.gov = gov
+    }
+    
     func populate(data: [MetricAlarm]) {
-        guard let gov, let context = gov.context else { print("no gov no joy"); return }
         stopwatch = MetrixtStopwatch(time: nil)
         let allAlarms = data.filter({ $0.type == .alarm })
-        while allAlarms.count > 3 { context.delete(allAlarms.last!) }
+        while allAlarms.count > 3 { gov.context.delete(allAlarms.last!) }
         let allTimers = data.filter({ $0.type == .timer })
-        while allTimers.count > 3 { context.delete(allTimers.last!) }
+        while allTimers.count > 3 { gov.context.delete(allTimers.last!) }
         for datum in data {
             if datum.type == .alarm { alarms.append(MetrixtTime(years: datum.metricYears, seconds: datum.metricSeconds)) }
             if datum.type == .timer { timers.append(MetrixtTimer(duration: datum.metricSeconds)) }
@@ -56,7 +59,6 @@ import SwiftData
     }
     
     func setAlarm(oldAlarm: MetrixtTime?) {
-        guard let gov, let context = gov.context else { print("no mud in joyville"); return }
         var ta: MetrixtTime = oldAlarm ?? newAlarm
         if ta.seconds < gov.eternalNow.time.seconds {
             let tomorrow = metric.cal.update(time: gov.eternalNow.time, component: .day, byAdding: 1)
@@ -70,12 +72,12 @@ import SwiftData
         if alarms.count + activeAlarms.count > 3 { alarms.removeLast() }
         
         let dataId = oldAlarm == nil ?
-        saveAlarm(data: gov.alarmData, context: context)
+        saveAlarm(data: gov.alarmData, context: gov.context)
         :
         gov.alarmData.first(where: { $0.type == .alarm && $0.id == oldAlarm!.id })!.id
         
         Task {
-            try? await gov.nc.scheduleAlarm(id: alarm.id, dataId: dataId, triggerTime: ta)
+            try? await NotificationAgent.shared.scheduleAlarm(id: alarm.id, dataId: dataId, triggerTime: ta)
         }
     }
     func saveAlarm(data: [MetricAlarm], context: ModelContext) -> String {
@@ -87,34 +89,31 @@ import SwiftData
         return metric.id
     }
     func dismissAlarm(id: String) {
-        guard let gov else { return }
         if let alarm = activeAlarms.first(where: { $0.id == id }) {
             alarm.escapement?.invalidate()
             activeAlarms.removeAll(where: { $0.id == alarm.id })
             alarms.insert(alarm.deadline, at: 0)
             Task {
-                gov.nc.cancelNotification(id: alarm.id)
+                NotificationAgent.shared.cancelNotification(id: alarm.id)
             }
         }
     }
     func destroyAlarm(alarm: MetrixtTime) {
-        guard let gov, let context = gov.context else { print("didn't destroy, no gov"); return }
         if let datum = gov.alarmData.first(where: { $0.type == .alarm && $0.metricSeconds == alarm.seconds }) {
-            context.delete(datum)
+            gov.context.delete(datum)
             print("alarm deleted")
             alarms.removeAll(where: { $0.id == alarm.id })
         }
     }
     
     func setTimer(oldTimer: MetrixtTimer?) {
-        guard let gov, let context = gov.context else { print("no gov in alarmComptroller slkd"); return }
         let tt = oldTimer ?? newTimer
         
         activeTimers.insert(MetrixtTimer(duration: tt.duration), at: 0)
         timers.removeAll(where: { $0.id == tt.id })
         if timers.count + activeTimers.count > 3 { timers.removeLast() }
         
-        let dataId = oldTimer == nil ? saveTimer(id: newTimer.id, data: gov.alarmData, context: context)
+        let dataId = oldTimer == nil ? saveTimer(id: newTimer.id, data: gov.alarmData, context: gov.context)
         : gov.alarmData.first(where: { $0.type == .timer && $0.metricSeconds == oldTimer!.duration })!.id
         
         Task {
@@ -123,7 +122,7 @@ import SwiftData
                 duration: tt.duration,
                 endTime: tt.toGregDeadline()
             )
-            try? await gov.nc.scheduleTimer(id: tt.id, dataId: dataId, duration: tt.duration)
+            try? await NotificationAgent.shared.scheduleTimer(id: tt.id, dataId: dataId, duration: tt.duration)
         }
     }
     func saveTimer(id: String, data: [MetricAlarm], context: ModelContext) -> String {
@@ -134,11 +133,10 @@ import SwiftData
         return timer.id
     }
     func cancelTimer(timer: MetrixtTimer) {
-        guard let gov else { return }
         timer.cancelTimer()
         timers.insert(timer, at: 0)
         activeTimers.removeAll(where: { $0.id == timer.id})
-        gov.nc.cancelNotification(id: timer.id)
+        NotificationAgent.shared.cancelNotification(id: timer.id)
     }
     func retireTimer(id: String) {
         if let timer = activeTimers.first(where: { $0.id == id }) {
@@ -147,9 +145,8 @@ import SwiftData
         }
     }
     func destroyTimer(timer: MetrixtTimer) {
-        guard let gov, let context = gov.context else { print("who bed the shat?"); return }
         if let datum = gov.alarmData.first(where: { $0.type == .timer && $0.metricSeconds == timer.duration }) {
-            context.delete(datum)
+            gov.context.delete(datum)
             timers.removeAll(where: { $0.id == timer.id})
         }
     }

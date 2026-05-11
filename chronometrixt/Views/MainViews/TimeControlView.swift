@@ -6,6 +6,7 @@
 //
 
 import SwiftUI
+import SwiftData
 
 struct TimeControlView: View {
     @Bindable var gov: Governor
@@ -88,5 +89,6 @@ struct TimeControlView: View {
 }
 
 #Preview {
-    TimeControlView(gov: Governor())
+    @Previewable @Environment(\.modelContext) var context
+    TimeControlView(gov: Governor(context: context))
 }

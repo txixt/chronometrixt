@@ -108,5 +108,6 @@ struct MonthFocusView: View {
 }
 
 #Preview {
-    MonthFocusView(gov: Governor(), month: MetrixtTime(date: nil))
+    @Previewable @Environment(\.modelContext) var context
+    MonthFocusView(gov: Governor(context: context), month: MetrixtTime(date: nil))
 }

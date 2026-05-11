@@ -6,6 +6,7 @@
 //
 
 import SwiftUI
+import SwiftData
 
 struct EventEndDateEditorView: View {
     @Bindable var gov: Governor
@@ -80,7 +81,8 @@ struct AddTimeButton: View {
 
 
 #Preview {
-    let gov = Governor()
+    @Previewable @Environment(\.modelContext) var context
+    let gov = Governor(context: context)
     let eg = PreviewEG().eg()
     EventEndDateEditorView(gov: gov, eg: eg)
 }

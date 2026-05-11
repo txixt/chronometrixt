@@ -6,6 +6,7 @@
 //
 
 import SwiftUI
+import SwiftData
 
 struct LandscapeView: View {
     @Bindable var gov: Governor
@@ -51,5 +52,6 @@ struct LandscapeView: View {
 }
 
 #Preview {
-    LandscapeView(gov: Governor())
+    @Previewable @Environment(\.modelContext) var context
+    LandscapeView(gov: Governor(context: context))
 }

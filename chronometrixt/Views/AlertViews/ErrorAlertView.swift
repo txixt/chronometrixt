@@ -6,6 +6,7 @@
 //
 
 import SwiftUI
+import SwiftData
 
 struct ErrorAlertView: View {
     @Bindable var gov: Governor
@@ -65,5 +66,6 @@ struct ErrorAlertView: View {
 }
 
 #Preview {
-    ErrorAlertView(gov: Governor())
+    @Previewable @Environment(\.modelContext) var context
+    ErrorAlertView(gov: Governor(context: context))
 }

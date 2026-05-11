@@ -6,6 +6,7 @@
 //
 
 import SwiftUI
+import SwiftData
 
 struct CalendarScrollView: View {
     @Bindable var gov: Governor
@@ -105,7 +106,8 @@ struct CalendarScrollView: View {
 }
 
 #Preview {
-    CalendarScrollView(gov: Governor())
+    @Previewable @Environment(\.modelContext) var context
+    CalendarScrollView(gov: Governor(context: context))
 }
 
 

@@ -6,6 +6,7 @@
 //
 
 import SwiftUI
+import SwiftData
 
 struct YearBasicView: View {
     @Bindable var gov: Governor
@@ -64,5 +65,6 @@ struct YearBasicView: View {
 }
 
 #Preview {
-    YearBasicView(gov: Governor(), year: MetrixtTime(date: nil))
+    @Previewable @Environment(\.modelContext) var context
+    YearBasicView(gov: Governor(context: context), year: MetrixtTime(date: nil))
 }

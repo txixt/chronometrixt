@@ -6,6 +6,7 @@
 //
 
 import SwiftUI
+import SwiftData
 
 struct SettingsView: View {
     @Bindable var gov: Governor
@@ -171,5 +172,6 @@ struct SettingsView: View {
 }
 
 #Preview {
-    SettingsView(gov: Governor())
+    @Previewable @Environment(\.modelContext) var context
+    SettingsView(gov: Governor(context: context))
 }

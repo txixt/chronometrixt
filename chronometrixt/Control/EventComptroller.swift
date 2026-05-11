@@ -30,15 +30,12 @@ import SwiftData
     var externalId: String
     
     var originalStart: MetrixtTime? = nil
-    var modelContext: ModelContext
     var gov: Governor
-    var nc: NotificationComptroller?
     
     var editField: EditingFields = .none
     enum EditingFields { case none, title, startDateMetric, startDateGreg, endDateMetric, endDateGreg, alarms, recurrence, location, notes, calendar, participants }
     
-    init(title: String, starting: MetrixtTime, ending: MetrixtTime?, context: ModelContext, gov: Governor) {
-        self.modelContext = context
+    init(title: String, starting: MetrixtTime, ending: MetrixtTime?, gov: Governor) {
         self.gov = gov
         self.id = ""
         self.title = title
@@ -60,8 +57,7 @@ import SwiftData
         self.externalId = ""
     }
     
-    init(event: MetricEvent, context: ModelContext, gov: Governor) {
-        self.modelContext = context
+    init(event: MetricEvent, gov: Governor) {
         self.gov = gov
         self.id = event.id
         self.title = event.title
@@ -105,10 +101,8 @@ import SwiftData
         calendarId: String,
         calendarColor: String,
         externalId: String,
-        context: ModelContext,
         gov: Governor
     ) {
-        self.modelContext = context
         self.gov = gov
         self.id = id
         self.title = title
@@ -189,10 +183,10 @@ import SwiftData
     func save() {
         do {
             let event = try EventHandler.buildEvent(from: self)
-            modelContext.insert(event)
+            gov.context.insert(event)
             
             if recurrence.frequency != .none {
-                try EventHandler.materializeRecurrences(for: event, context: modelContext)
+                try EventHandler.materializeRecurrences(for: event, context: gov.context)
             }
             
             gov.event = event
@@ -202,7 +196,7 @@ import SwiftData
                 for alarm in alarms {
                     Task {
                         let metricAlarmTime = metric.cal.update(time: metricStart, component: .second, byAdding: Int(-alarm.offset / 0.864))
-                        try? await gov.nc.scheduleEvent(
+                        try? await NotificationAgent.shared.scheduleEvent(
                             id: alarm.id,
                             dataId: alarm.id,
                             eventId: event.id,
@@ -233,7 +227,7 @@ import SwiftData
             
             if !alarms.isEmpty {
                 for alarm in alarms {
-                    gov.nc.cancelNotification(id: alarm.id)
+                    NotificationAgent.shared.cancelNotification(id: alarm.id)
                 }
             }
             
@@ -241,7 +235,7 @@ import SwiftData
                 for alarm in alarms {
                     Task {
                         let metricAlarmTime = metric.cal.update(time: metricStart, component: .second, byAdding: Int(-alarm.offset / 0.864))
-                        try? await gov.nc.scheduleEvent(
+                        try? await NotificationAgent.shared.scheduleEvent(
                             id: alarm.id,
                             dataId: alarm.id,
                             eventId: event.id,
@@ -265,9 +259,9 @@ import SwiftData
     func destroySingle() {
         guard let event = gov.event else { return }
         
-        for alarm in alarms { gov.nc.cancelNotification(id: alarm.id) }
+        for alarm in alarms { NotificationAgent.shared.cancelNotification(id: alarm.id) }
         
-        EventHandler.destroySingleEvent(event, context: modelContext)
+        EventHandler.destroySingleEvent(event, context: gov.context)
         gov.event = nil
         gov.alert = nil
         gov.sheet = nil
@@ -277,10 +271,10 @@ import SwiftData
     func destroyThisAndFuture() {
         guard let event = gov.event else { return }
         
-        let alarmIds = EventHandler.futureAlarmIds(for: event, context: modelContext)
-        for alarmId in alarmIds { gov.nc.cancelNotification(id: alarmId) }
+        let alarmIds = EventHandler.futureAlarmIds(for: event, context: gov.context)
+        for alarmId in alarmIds { NotificationAgent.shared.cancelNotification(id: alarmId) }
         
-        EventHandler.destroyThisAndFuture(event, context: modelContext)
+        EventHandler.destroyThisAndFuture(event, context: gov.context)
         gov.event = nil
         gov.alert = nil
         gov.sheet = nil
@@ -290,10 +284,10 @@ import SwiftData
     func destroySeries() {
         guard let event = gov.event else { return }
         
-        let alarmIds = EventHandler.allAlarmIds(for: event, context: modelContext)
-        for alarmId in alarmIds { gov.nc.cancelNotification(id: alarmId) }
+        let alarmIds = EventHandler.allAlarmIds(for: event, context: gov.context)
+        for alarmId in alarmIds { NotificationAgent.shared.cancelNotification(id: alarmId) }
         
-        EventHandler.destroyEventSeries(event, context: modelContext)
+        EventHandler.destroyEventSeries(event, context: gov.context)
         gov.event = nil
         gov.alert = nil
         gov.sheet = nil
@@ -325,8 +319,7 @@ struct PreviewEG {
     let laterMetric = MetrixtCalendar().update(time: MetrixtTime(date: Date.now), component: .minute, byAdding: 1)
     
     func eg() -> EventComptroller {
-        let context = PreviewEG.previewContainer.mainContext
-        let gov = Governor()
+        let gov = Governor(context: PreviewEG.previewContainer.mainContext)
         return EventComptroller(
             id: UUID().uuidString,
             title: "some event thing",
@@ -349,7 +342,6 @@ struct PreviewEG {
             calendarId: "metrixt",
             calendarColor: "#00827C",
             externalId: "",
-            context: context,
             gov: gov
         )
     }

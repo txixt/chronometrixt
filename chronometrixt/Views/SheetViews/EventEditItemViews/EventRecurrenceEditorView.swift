@@ -6,6 +6,7 @@
 //
 
 import SwiftUI
+import SwiftData
 
 struct EventRecurrenceEditorView: View {
     @Bindable var eg: EventComptroller
@@ -286,7 +287,8 @@ struct GregPickerView: View {
 }
 
 #Preview {
-    let gov = Governor()
+    @Previewable @Environment(\.modelContext) var context
+    let gov = Governor(context: context)
     let eg = PreviewEG().eg()
     EventRecurrenceEditorView(
         eg: eg,

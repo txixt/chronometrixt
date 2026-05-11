@@ -9,7 +9,6 @@ import Foundation
 import SwiftData
 
 @Observable final class BackgroundActivityManager {
-    var ng: NotificationComptroller?
     var context: ModelContext?
     private var materializationTimer: Timer?
     
@@ -51,7 +50,7 @@ import SwiftData
     
     func processNotificationQueue() {
         Task {
-            await ng?.processQueue()
+            await NotificationAgent.shared.processQueue()
         }
     }
 

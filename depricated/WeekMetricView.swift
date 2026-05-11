@@ -139,17 +139,18 @@ struct WeekMetricView: View {
     }
 }
 
-struct prePreview {
-    let gov = Governor()
-    
-    init() {
-        gov.scale = .week
-        gov.populateTimes()
-    }
-}
-#Preview {
-    WeekMetricView(gov: prePreview().gov, week: MetrixtTime(years: 5056, seconds: 36_400_000))
-}
+//struct prePreview {
+//    @Previewable @Environment(\.modelContext) var context
+//    let gov = Governor(context: context)
+//    
+//    init() {
+//        gov.scale = .week
+//        gov.populateTimes()
+//    }
+//}
+//#Preview {
+//    WeekMetricView(gov: prePreview().gov, week: MetrixtTime(years: 5056, seconds: 36_400_000))
+//}
 
 //let someTime = week ?? gov.finiteNotNow ?? gov.eternalNow.time
 //

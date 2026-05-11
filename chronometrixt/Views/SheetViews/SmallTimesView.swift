@@ -72,5 +72,6 @@ struct SmallTimesView: View {
 }
 
 #Preview {
-    SmallTimesView(gov: Governor())
+    @Previewable @Environment(\.modelContext) var context
+    SmallTimesView(gov: Governor(context: context))
 }

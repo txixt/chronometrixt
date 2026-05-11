@@ -6,6 +6,7 @@
 //
 
 import SwiftUI
+import SwiftData
 
 struct DestroyEventAlertView: View {
     @Bindable var gov: Governor
@@ -103,5 +104,6 @@ struct DestroyEventAlertView: View {
 }
 
 #Preview {
-    DestroyEventAlertView(gov: Governor())
+    @Previewable @Environment(\.modelContext) var context
+    DestroyEventAlertView(gov: Governor(context: context))
 }

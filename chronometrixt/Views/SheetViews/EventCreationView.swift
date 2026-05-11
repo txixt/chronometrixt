@@ -58,16 +58,15 @@ struct EventCreationView: View {
             title: eventTitle,
             starting: gov.finiteNotNow!,
             ending: metric.cal.update(time: gov.finiteNotNow!, component: .minute, byAdding: 1),
-            context: context,
             gov: gov
         )
-        gov.ec!.nc = gov.nc
     }
 }
 
 
 #Preview {
-    EventCreationView(gov: Governor())
+    @Previewable @Environment(\.modelContext) var context
+    EventCreationView(gov: Governor(context: context))
 }
 
 //struct EventLabelView: View {

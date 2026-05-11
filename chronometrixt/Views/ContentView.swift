@@ -14,7 +14,7 @@ struct ContentView: View {
     @Environment(\.modelContext) private var context
     @Query private var items: [MetricEvent]
     @Query var calendars: [MetricCalendar]
-    @State var gov: Governor = Governor()
+    @State var gov: Governor? = nil
     
     var body: some View {
         GeometryReader { geo in
@@ -23,19 +23,24 @@ struct ContentView: View {
                 
                 ZStack {
 #if os(iOS)
-                if geo.size.width > geo.size.height {
-                    LandscapeView(gov: gov)
-                } else {
-                    ZStack {
-                        PortraitView(gov: gov)
-                        
-                        AlertView(gov: gov)
+                    if let gov {
+                        if geo.size.width > geo.size.height {
+                            LandscapeView(gov: gov)
+                        } else {
+                            ZStack {
+                                PortraitView(gov: gov)
+                                
+                                AlertView(gov: gov)
+                            }
+                        }
                     }
-                }
+
 #endif
 #if os(macOS)
-                ComputerView(gov: gov)
-                    .monospaced()
+                    if let gov {
+                        ComputerView(gov: gov)
+                            .monospaced()
+                    }
 #endif
                 }
                 .environment(gov)
@@ -44,7 +49,7 @@ struct ContentView: View {
                     toggleEscapement(scene: new)
                 }
                 .onChange(of: geo.size) { _, new in
-                    gov.geoSize = new
+                    gov?.geoSize = new
                 }
                 .onAppear { initialize() }
                 
@@ -55,11 +60,11 @@ struct ContentView: View {
                     ToolbarItem(placement: .bottomBar) {
                         Menu("settings, alarm, search", systemImage: "gear") {
                             Group {
-                                Button(action: { gov.sheet = .settings }) {
+                                Button(action: { gov?.sheet = .settings }) {
                                     Image(systemName: "gear")
                                     Text("settings")
                                 }
-                                Button(action: { gov.sheet = .timers }) {
+                                Button(action: { gov?.sheet = .timers }) {
                                     Image(systemName: "bell")
                                     Text("alarms")
                                 }
@@ -75,18 +80,17 @@ struct ContentView: View {
                         Button(action: createEvent) {
                             Image(systemName: "plus")
                         }
-                        .disabled(gov.finiteNotNow == nil)
+                        .disabled(gov?.finiteNotNow == nil)
                     }
-                
             }
 #endif
 #if os(macOS)
                 ToolbarItemGroup {
-                    Button(action: { gov.sheet = .settings }) {
+                    Button(action: { gov?.sheet = .settings }) {
                         Image(systemName: "gear")
                         Text("settings")
                     }
-                    Button(action: { gov.sheet = .timers }) {
+                    Button(action: { gov?.sheet = .timers }) {
                         Image(systemName: "bell")
                         Text("alarms")
                     }
@@ -94,7 +98,7 @@ struct ContentView: View {
                         Image(systemName: "magnifyingglass")
                         Text("search")
                     }
-                    Button(action: { eg = nil; gov.sheet = .makeEvent }) {
+                    Button(action: { createEvent() }) {
                         Image(systemName: "plus")
                     }
                 }
@@ -106,29 +110,27 @@ struct ContentView: View {
     }
     
     private func initialize() {
-            gov.nc.gov = gov
-            gov.ac.gov = gov
-            gov.nc.context = context
-            appDel.governor = gov
-            if calendars.isEmpty { context.insert(CalInitializer.first()) }
+        gov = Governor(context: context)
+        appDel.gov = gov
+        if calendars.isEmpty { context.insert(CalInitializer.first()) }
     }
     
     private func authorize() async throws {
-        let granted = await gov.nc.requestAuthorization()
+        let granted = await NotificationAgent.shared.requestAuthorization()
         if !granted {
-            gov.alertTxt = "alarms and notifications will not work - please allow notifications in settings for full functionality"
-            gov.alert = .error
+            gov?.alertTxt = "alarms and notifications will not work - please allow notifications in settings for full functionality"
+            gov?.alert = .error
         }
     }
     
     private func toggleEscapement(scene: ScenePhase) {
-        if scene == .background || scene == .inactive { gov.eternalNow.killTimer() }
-        else { gov.eternalNow.restartTimer() }
+        if scene == .background || scene == .inactive { gov!.eternalNow.killTimer() }
+        else { gov?.eternalNow.restartTimer() }
     }
     
     private func createEvent() {
-        gov.ec = nil
-        gov.sheet = .makeEvent
+        gov?.ec = nil
+        gov?.sheet = .makeEvent
     }
 }
 

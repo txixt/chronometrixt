@@ -10,8 +10,7 @@ import UIKit
 import UserNotifications
 
 class AppDelegate: NSObject, UIApplicationDelegate, UNUserNotificationCenterDelegate {
-    var governor: Governor?
-    var notificationGovernor: NotificationComptroller?
+    var gov: Governor?
     
     func application(
         _ application: UIApplication,
@@ -27,8 +26,8 @@ class AppDelegate: NSObject, UIApplicationDelegate, UNUserNotificationCenterDele
         withCompletionHandler completionHandler: @escaping (UNNotificationPresentationOptions) -> Void
     ) {
         completionHandler([.banner, .sound])
-        notificationGovernor?.playSound()
-        notificationGovernor?.triggerHaptic()
+        gov?.nr.playSound()
+        gov?.nr.triggerHaptic()
     }
     
     func userNotificationCenter(
@@ -36,10 +35,8 @@ class AppDelegate: NSObject, UIApplicationDelegate, UNUserNotificationCenterDele
         didReceive response: UNNotificationResponse,
         withCompletionHandler completionHandler: @escaping () -> Void
     ) {
-        guard let governor else { completionHandler(); return }
-        
         DispatchQueue.main.async {
-            governor.nc.handleNotificationResponse(response: response)
+            self.gov?.nr.handleNotificationResponse(response: response)
             completionHandler()
         }
     }

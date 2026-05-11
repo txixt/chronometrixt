@@ -6,6 +6,7 @@
 //
 
 import SwiftUI
+import SwiftData
 
 struct EventAlertView: View {
     @Bindable var gov: Governor
@@ -83,5 +84,6 @@ struct EventAlertView: View {
 }
 
 #Preview {
-    EventAlertView(gov: Governor())
+    @Previewable @Environment(\.modelContext) var context
+    EventAlertView(gov: Governor(context: context))
 }

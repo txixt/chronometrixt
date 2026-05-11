@@ -6,6 +6,7 @@
 //
 
 import SwiftUI
+import SwiftData
 
 struct MetricClockNumeral: View {
     let hour: Int
@@ -133,5 +134,6 @@ struct MetricClockView: View {
 }
 
 #Preview {
-    MetricClockView(gov: Governor(), scale: 1.0)
+    @Previewable @Environment(\.modelContext) var context
+    MetricClockView(gov: Governor(context: context), scale: 1.0)
 }

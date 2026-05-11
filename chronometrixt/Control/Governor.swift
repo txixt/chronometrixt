@@ -25,14 +25,21 @@ import SwiftData
     enum SheetView: Identifiable { var id: Self { self }; case makeEvent, editEvent, showEvent, findEvent, timers, settings }
     enum AlertView: Identifiable { var id: Self { self }; case error, event, timer, alarm, destroyEvent, destroyAllEvents }
 
-    var ac: AlarmComptroller = AlarmComptroller()
+    var ac: AlarmComptroller!
     var ec: EventComptroller? = nil
-    var nc: NotificationComptroller = NotificationComptroller()
+    var nr: NotificationResponder!
     
-    var context: ModelContext? = nil
+    var context: ModelContext
     var eventData: [MetricEvent] = []
     var alarmData: [MetricAlarm] = []
     var calendarData: [MetricCalendar] = []
+    
+    init(context: ModelContext) {
+        self.context = context
+        self.ec = nil
+        self.ac = AlarmComptroller(gov: self)
+        self.nr = NotificationResponder(gov: self)
+    }
     
     func populateTimes() {
         ///reset anchor to start of week to avoid truncated calendar weeks and days if the start day is > 4 or 5

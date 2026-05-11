@@ -134,6 +134,6 @@ struct YearMetricView: View {
     for event in sampleEvents { context.insert(event) }
 
     
-    return YearMetricView(gov: Governor(), year: nil)
+    return YearMetricView(gov: Governor(context: context), year: nil)
         .modelContainer(container)
 }

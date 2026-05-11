@@ -23,7 +23,7 @@ struct PortraitView: View {
                 TimeControlView(gov: gov)
                 
             }
-            .onChange(of: gov.event) { gov.ec = gov.event != nil ? EventComptroller(event: gov.event!, context: context, gov: gov) : nil }
+            .onChange(of: gov.event) { gov.ec = gov.event != nil ? EventComptroller(event: gov.event!, gov: gov) : nil }
             .sheet(item: $gov.sheet) { sheet in
                 switch sheet {
                 case .makeEvent: EventCreationView(gov: gov)
@@ -99,5 +99,6 @@ struct PortraitView: View {
 //}
 
 #Preview {
-    PortraitView(gov: Governor())
+    @Previewable @Environment(\.modelContext) var context
+    PortraitView(gov: Governor(context: context))
 }
