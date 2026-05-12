@@ -112,6 +112,7 @@ struct ContentView: View {
     private func initialize() {
         gov = Governor(context: context)
         appDel.gov = gov
+        print(appDel.gov?.eternalNow.time.fullDateTxt ?? "no gov in appDel")
         if calendars.isEmpty { context.insert(CalInitializer.first()) }
     }
     
@@ -124,7 +125,7 @@ struct ContentView: View {
     }
     
     private func toggleEscapement(scene: ScenePhase) {
-        if scene == .background || scene == .inactive { gov!.eternalNow.killTimer() }
+        if scene == .background || scene == .inactive { gov?.eternalNow.killTimer() }
         else { gov?.eternalNow.restartTimer() }
     }
     
