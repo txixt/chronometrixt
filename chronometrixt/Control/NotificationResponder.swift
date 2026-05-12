@@ -111,6 +111,7 @@ import SwiftData
     }
     
     private func handleTimerNotification(id: String) {
+        print("alarm notification received")
         if let thisTimerData = gov.alarmData.first(where: { $0.id == id }) {
             let seconds = thisTimerData.metricSeconds % 100_000
             let hour = (seconds / 10_000) % 10

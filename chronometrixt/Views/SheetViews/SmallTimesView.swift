@@ -62,12 +62,8 @@ struct SmallTimesView: View {
         }
         .monospaced()
         .padding()
-        .onAppear() { prepAlarmComptroller() }
+        .onAppear() { gov.ac.populate() }
         .onDisappear() { gov.ac.stopwatch = nil }
-    }
-    
-    private func prepAlarmComptroller() {
-        gov.ac.populate(data: alarms)
     }
 }
 

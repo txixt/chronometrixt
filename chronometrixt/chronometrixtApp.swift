@@ -10,6 +10,7 @@ import SwiftData
 
 @main
 struct chronometrixtApp: App {
+    @UIApplicationDelegateAdaptor(AppDelegate.self) var appDelegate
     var sharedModelContainer: ModelContainer = {
         let schema = Schema([
             MetricEvent.self,

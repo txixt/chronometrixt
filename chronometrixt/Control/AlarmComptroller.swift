@@ -45,13 +45,13 @@ import SwiftData
         self.gov = gov
     }
     
-    func populate(data: [MetricAlarm]) {
+    func populate() {
         stopwatch = MetrixtStopwatch(time: nil)
-        let allAlarms = data.filter({ $0.type == .alarm })
+        let allAlarms = gov.alarmData.filter({ $0.type == .alarm })
         while allAlarms.count > 3 { gov.context.delete(allAlarms.last!) }
-        let allTimers = data.filter({ $0.type == .timer })
+        let allTimers = gov.alarmData.filter({ $0.type == .timer })
         while allTimers.count > 3 { gov.context.delete(allTimers.last!) }
-        for datum in data {
+        for datum in gov.alarmData {
             if datum.type == .alarm { alarms.append(MetrixtTime(years: datum.metricYears, seconds: datum.metricSeconds)) }
             if datum.type == .timer { timers.append(MetrixtTimer(duration: datum.metricSeconds)) }
             if datum.type == .stopwatch { stopwatch = MetrixtStopwatch(time: MetrixtTime(years: datum.metricYears, seconds: datum.metricSeconds) ) }

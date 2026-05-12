@@ -14,7 +14,7 @@ struct MetrixtTime: Hashable, Codable, Identifiable {
     let seconds: Int
     var creationTimeZone: TimeZone = .current
     enum CodingKeys: String, CodingKey { case years, seconds }
-    private static var cachedOffset: TimeInterval?     ///adjustment for DST or other local time idiosyncracies
+//    private static var cachedOffset: TimeInterval?     ///adjustment for DST or other local time idiosyncracies
     
     init(date: Date?) {
         years = Calendar.current.component(.year, from: date ?? .now) + 3030
@@ -24,11 +24,56 @@ struct MetrixtTime: Hashable, Codable, Identifiable {
     init(years: Int, seconds: Int) { self.years = years; self.seconds = seconds }
     
     func toGreg() -> Date {
-        guard let initialYear = Calendar.current.date(from: DateComponents(year: years - 3030)) else {
+        var components = DateComponents()
+        components.year = years - 3030
+        components.timeZone = creationTimeZone
+        
+        guard let initialYear = Calendar.current.date(from: components) else {
             return Date(timeIntervalSince1970: 0)
         }
-        let result = initialYear.addingTimeInterval((TimeInterval(seconds) * 0.864))
-        return result.addingTimeInterval(-Calendar.current.timeZone.daylightSavingTimeOffset())
+        let initialDate = initialYear.addingTimeInterval(TimeInterval(seconds) * 0.864)
+        let dstOffset = -Calendar.current.timeZone.daylightSavingTimeOffset(for: initialDate)
+        return initialDate.addingTimeInterval(dstOffset)
+    }
+    
+//    func toGreg() -> Date {
+//        var components = DateComponents()
+//        components.year = years - 3030
+//        components.timeZone = creationTimeZone
+//        
+//        guard let initialYear = Calendar.current.date(from: components) else {
+//            return Date(timeIntervalSince1970: 0)
+//        }
+//        
+//        let initialDate = initialYear.addingTimeInterval(TimeInterval(seconds) * 0.864)
+//        
+//        // Get DST offset at Jan 1 (probably 0 in winter)
+//        let dstAtJan1 = creationTimeZone.daylightSavingTimeOffset(for: initialYear)
+//        
+//        // Get DST offset at the target date (might be 3600 in summer)
+//        let dstAtTarget = creationTimeZone.daylightSavingTimeOffset(for: initialDate)
+//        
+//        // Adjust by the DIFFERENCE
+//        return initialDate.addingTimeInterval(dstAtTarget - dstAtJan1)
+//    }
+//    
+//        guard let initialYear = Calendar.current.date(from: DateComponents(year: years - 3030)) else {
+//            return Date(timeIntervalSince1970: 0)
+//        }
+//        let result = initialYear.addingTimeInterval((TimeInterval(seconds) * 0.864))
+//        return result.addingTimeInterval(-Calendar.current.timeZone.daylightSavingTimeOffset())
+    
+//        var components = DateComponents()
+//        components.year = years - 3030
+//        components.timeZone = creationTimeZone
+//        guard let initialYear = Calendar.current.date(from: components) else {
+//            return Date(timeIntervalSince1970: 0)
+//        }
+//        let initialDate = initialYear.addingTimeInterval((TimeInterval(seconds) * 0.864))
+//        let gregDate = initialDate.addingTimeInterval(-Calendar.current.timeZone.daylightSavingTimeOffset())
+//        return gregDate
+//
+
         
         ///REPLACE DST OFFSET ABOVE WITH THIS BELOW IF TESTING DEMANDS
 //        let someOffset = MetrixtTime.cachedOffset ?? MetrixtTime.getOffset()
@@ -42,7 +87,8 @@ struct MetrixtTime: Hashable, Codable, Identifiable {
 //    private func basicGreg() -> Date {
 //        guard let initialYear = Calendar.current.date(from: DateComponents(year: years - 3030, month: 1, day: 1)) else { return Date(timeIntervalSince1970: 0) }
 //        return initialYear.addingTimeInterval(TimeInterval(seconds) * 0.864)
-    }
+//    }
+    
         ///Moved to Calendar
 //    func toUTC() -> MetrixtTime {
 //        let offset = creationTimeZone.secondsFromGMT() / 0.864
