@@ -196,18 +196,18 @@ import SwiftData
         )
         
         // DEBUG: Print what we're actually scheduling
-        print("📅 Extracted components:")
-        print("   Year: \(components.year ?? 0)")
-        print("   Month: \(components.month ?? 0)")
-        print("   Day: \(components.day ?? 0)")
-        print("   Hour: \(components.hour ?? 0)")
-        print("   Minute: \(components.minute ?? 0)")
-        print("   Second: \(components.second ?? 0)")
-        print("   Calendar timezone: \(Calendar.current.timeZone.identifier)")
+//        print("📅 Extracted components:")
+//        print("   Year: \(components.year ?? 0)")
+//        print("   Month: \(components.month ?? 0)")
+//        print("   Day: \(components.day ?? 0)")
+//        print("   Hour: \(components.hour ?? 0)")
+//        print("   Minute: \(components.minute ?? 0)")
+//        print("   Second: \(components.second ?? 0)")
+//        print("   Calendar timezone: \(Calendar.current.timeZone.identifier)")
         
         try await UNUserNotificationCenter.current().add(request)
         scheduledIdentifiers.insert(id)
-        print("✅ Scheduled notification: \(id) for \(triggerDate)")
+//        print("✅ Scheduled notification: \(id) for \(triggerDate)")
     }
     
     func cancelNotification(id: String) {

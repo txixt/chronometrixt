@@ -25,10 +25,9 @@ class AppDelegate: NSObject, UIApplicationDelegate, UNUserNotificationCenterDele
         willPresent notification: UNNotification,
         withCompletionHandler completionHandler: @escaping (UNNotificationPresentationOptions) -> Void
     ) {
-        print("🔔 Notification received in FOREGROUND: \(notification.request.identifier)")
-        completionHandler([.banner, .sound])
-        gov?.nr.playSound()
-        gov?.nr.triggerHaptic()
+        gov?.nr.handleNotification(notification: notification)
+        completionHandler([])
+
     }
     
     func userNotificationCenter(
@@ -36,10 +35,19 @@ class AppDelegate: NSObject, UIApplicationDelegate, UNUserNotificationCenterDele
         didReceive response: UNNotificationResponse,
         withCompletionHandler completionHandler: @escaping () -> Void
     ) {
-        print("Received notification response: \(response)")
-        DispatchQueue.main.async {
-            self.gov?.nr.handleNotificationResponse(response: response)
-            completionHandler()
-        }
+        gov?.nr.handleNotificationResponse(response: response)
+        completionHandler()
     }
 }
+
+
+//        print("🔔 Notification received in FOREGROUND: \(notification.request.identifier)")
+//        completionHandler([.banner, .sound])
+//        gov?.nr.playSound()
+//        gov?.nr.triggerHaptic()
+
+//        print("Received notification response: \(response)")
+//        DispatchQueue.main.async {
+//            self.gov?.nr.handleNotificationResponse(response: response)
+//            completionHandler()
+//        }

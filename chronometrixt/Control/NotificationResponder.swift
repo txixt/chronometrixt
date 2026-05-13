@@ -19,6 +19,14 @@ import SwiftData
         self.gov = gov
     }
     
+    func handleNotification(notification: UNNotification) {
+        print("data and state changes should be handled here - transfer handle notification response things here ")
+        print("handle reset timer and alarm issues in case user doesn't respond")
+        ///if alarm, reset alarm, gov.alert = .alarm, , play sound.
+        ///if timer, reset timer, gov.alert = .timer, play sound.
+        ///if event, gov.event = event, gov.alert = .event, play sound.
+    }
+    
     func handleNotificationResponse(response: UNNotificationResponse) {
         let id = response.notification.request.identifier
         let dataId = response.notification.request.identifier
@@ -73,14 +81,15 @@ import SwiftData
         
         switch notificationType {
         case .event: handleEventNotification(alarmId: id, dataId: dataId, eventId: eventId!)
-        case .alarm: handleAlarmNotification(id: id)
-        case .timer: handleTimerNotification(id: id)
+        case .alarm: handleAlarmNotification(id: id, dataId: dataId)
+        case .timer: handleTimerNotification(id: id, dataId: dataId)
         }
         playSound()
         triggerHaptic()
     }
     
     private func handleEventNotification(alarmId: String, dataId: String, eventId: String) {
+        print("handling event notification")
         if let alarm = gov.alarmData.first(where: { $0.id == dataId }) {
             gov.context.delete(alarm)
         } else {
@@ -96,7 +105,8 @@ import SwiftData
         }
     }
     
-    private func handleAlarmNotification(id: String) {
+    private func handleAlarmNotification(id: String, dataId: String) {
+        print("handling alarm Notification")
         if let thisAlarmData = gov.alarmData.first(where: { $0.id == id }) {
             let seconds = thisAlarmData.metricSeconds % 100_000
             let hour = (seconds / 10_000) % 10
@@ -110,8 +120,8 @@ import SwiftData
         }
     }
     
-    private func handleTimerNotification(id: String) {
-        print("alarm notification received")
+    private func handleTimerNotification(id: String, dataId: String) {
+        print("handling timer notification")
         if let thisTimerData = gov.alarmData.first(where: { $0.id == id }) {
             let seconds = thisTimerData.metricSeconds % 100_000
             let hour = (seconds / 10_000) % 10
