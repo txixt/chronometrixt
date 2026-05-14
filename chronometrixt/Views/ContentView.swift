@@ -9,10 +9,11 @@ import SwiftUI
 import SwiftData
 
 struct ContentView: View {
-    @UIApplicationDelegateAdaptor(AppDelegate.self) var appDel
+    @Bindable var appDel: AppDelegate
     @Environment(\.scenePhase) private var scene
     @Environment(\.modelContext) private var context
-    @Query private var items: [MetricEvent]
+    @Query private var events: [MetricEvent]
+    @Query private var alarms: [MetricAlarm]
     @Query var calendars: [MetricCalendar]
     @State var gov: Governor? = nil
     
@@ -51,6 +52,9 @@ struct ContentView: View {
                 .onChange(of: geo.size) { _, new in
                     gov?.geoSize = new
                 }
+                .onChange(of: events) { gov?.eventData = events }
+                .onChange(of: alarms) { gov?.alarmData = alarms }
+                .onChange(of: calendars) { gov?.calendarData = calendars }
                 .onAppear { initialize() }
                 
             }
@@ -111,6 +115,9 @@ struct ContentView: View {
     
     private func initialize() {
         gov = Governor(context: context)
+        gov?.alarmData = alarms
+        gov?.eventData = events
+        gov?.calendarData = calendars
         appDel.gov = gov
         print(appDel.gov?.eternalNow.time.fullDateTxt ?? "no gov in appDel")
         if calendars.isEmpty { context.insert(CalInitializer.first()) }
@@ -136,7 +143,7 @@ struct ContentView: View {
 }
 
 #Preview {
-    ContentView()
+    ContentView(appDel: AppDelegate())
 //        .modelContainer(for: MetricEvent.self, inMemory: true)
 }
 

@@ -117,6 +117,8 @@ import SwiftData
         print("🚨 Scheduling alarm for: \(adjustedTT)")
         print("Time until trigger: \(adjustedTT.timeIntervalSinceNow) seconds")
         print("triggerTime.fromUTC: \(metric.cal.fromUTC(time: triggerTime).toGreg().description)")
+        print("id: \(id)")
+        print("dataId: \(dataId)")
         try await scheduleNotification(
             id: id,
             dataId: dataId,

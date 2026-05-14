@@ -83,7 +83,15 @@ struct AlarmAlertView: View {
     }
     
     private func snooze() {
-        ///HANDLE SNOOZE
+        guard let thisAlarm = gov.ac.triggeredAlarm else { return }
+        guard let thisAlarmDatum = gov.alarmData.first(where: { $0.metricSeconds == thisAlarm.deadline.seconds }) else { return }
+        Task {
+            try? await NotificationAgent.shared.scheduleAlarm(
+                id: thisAlarm.id,
+                dataId: thisAlarmDatum.id,
+                triggerTime: metric.cal.update(time: MetrixtTime(date: nil), component: .minute, byAdding: 5)
+            )
+        }
     }
     
     private func goToTimer() {
@@ -93,6 +101,7 @@ struct AlarmAlertView: View {
     }
 
     private func tidyUp() {
+        gov.nr.stopSound()
         gov.alertTxt = ""
         gov.alert = nil
     }

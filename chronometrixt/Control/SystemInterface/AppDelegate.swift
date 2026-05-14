@@ -9,7 +9,7 @@ import Foundation
 import UIKit
 import UserNotifications
 
-class AppDelegate: NSObject, UIApplicationDelegate, UNUserNotificationCenterDelegate {
+@Observable class AppDelegate: NSObject, UIApplicationDelegate, UNUserNotificationCenterDelegate {
     var gov: Governor?
     
     func application(
@@ -25,9 +25,10 @@ class AppDelegate: NSObject, UIApplicationDelegate, UNUserNotificationCenterDele
         willPresent notification: UNNotification,
         withCompletionHandler completionHandler: @escaping (UNNotificationPresentationOptions) -> Void
     ) {
-        gov?.nr.handleNotification(notification: notification)
+        print("notification received")
+        if gov != nil { print("got gov") } else { print("no gov") }
+        gov?.nr.handleNotification(notification: notification) ?? print("no gov")
         completionHandler([])
-
     }
     
     func userNotificationCenter(
@@ -35,7 +36,8 @@ class AppDelegate: NSObject, UIApplicationDelegate, UNUserNotificationCenterDele
         didReceive response: UNNotificationResponse,
         withCompletionHandler completionHandler: @escaping () -> Void
     ) {
-        gov?.nr.handleNotificationResponse(response: response)
+        print("notification response received")
+        gov?.nr.handleNotificationResponse(response: response) ?? print("no gov")
         completionHandler()
     }
 }

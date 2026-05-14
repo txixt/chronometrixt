@@ -28,7 +28,7 @@ struct chronometrixtApp: App {
 
     var body: some Scene {
         WindowGroup {
-            ContentView()
+            ContentView(appDel: appDelegate)
         }
         .modelContainer(sharedModelContainer)
     }

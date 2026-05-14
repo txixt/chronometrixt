@@ -14,56 +14,59 @@ struct SmallTimesView: View {
     @Bindable var gov: Governor
     
     var body: some View {
-        VStack {
+        ZStack {
             
-            SheetHeaderView(
-                gov: gov,
-                title: gov.ac.mode == .alarm ? "alarm" : gov.ac.mode == .timer ? "timer" : "stopwatch",
-                titleImage: "timelapse"
-            )
-            
-            Spacer()
-            
-            TabView(selection: $gov.ac.mode) {
-                TimerView(gov: gov)
-                    .tag(AlarmComptroller.SmallTimeMode.timer)
+            VStack {
                 
-                AlarmView(gov: gov)
-                    .tag(AlarmComptroller.SmallTimeMode.alarm)
+                SheetHeaderView(
+                    gov: gov,
+                    title: gov.ac.mode == .alarm ? "alarm" : gov.ac.mode == .timer ? "timer" : "stopwatch",
+                    titleImage: "timelapse"
+                )
+                
+                Spacer()
+                
+                TabView(selection: $gov.ac.mode) {
+                    TimerView(gov: gov)
+                        .tag(AlarmComptroller.SmallTimeMode.timer)
+                    
+                    AlarmView(gov: gov)
+                        .tag(AlarmComptroller.SmallTimeMode.alarm)
 
-                StopwatchView(gov: gov)
-                    .tag(AlarmComptroller.SmallTimeMode.stopwatch)
+                    StopwatchView(gov: gov)
+                        .tag(AlarmComptroller.SmallTimeMode.stopwatch)
+                }
+                .tabViewStyle(PageTabViewStyle(indexDisplayMode: .never))
+                
+                Spacer()
+                
+                MetrixtSubdivider()
+                
+                HStack {
+                    Button(action: { gov.ac.mode = .timer }) {
+                        Image(systemName: gov.ac.mode != .timer ? "timer.circle" : "timer.circle.fill")
+                            .shadow(radius: gov.ac.mode == .timer ? 0 : 5)
+                    }
+                    Button(action: { gov.ac.mode = .alarm }) {
+                        Image(systemName: gov.ac.mode != .alarm ? "alarm" : "alarm.fill")
+                            .shadow(radius: gov.ac.mode == .alarm ? 0 : 5)
+                    }
+                    Button(action: { gov.ac.mode = .stopwatch }) {
+                        Image(systemName: gov.ac.mode != .stopwatch ? "stopwatch" : "stopwatch.fill")
+                            .shadow(radius: gov.ac.mode == .stopwatch ? 0 : 5)
+                    }
+                }
+                .tint(.primary)
+                
+                Spacer()
             }
-            .tabViewStyle(PageTabViewStyle(indexDisplayMode: .never))
-            
-            Spacer()
-            
-            MetrixtSubdivider()
-            
-            HStack {
-                Button(action: { gov.ac.mode = .timer }) {
-                    Image(systemName: gov.ac.mode != .timer ? "timer.circle" : "timer.circle.fill")
-                        .shadow(radius: gov.ac.mode == .timer ? 0 : 5)
-                }
-                Button(action: { gov.ac.mode = .alarm }) {
-                    Image(systemName: gov.ac.mode != .alarm ? "alarm" : "alarm.fill")
-                        .shadow(radius: gov.ac.mode == .alarm ? 0 : 5)
-                }
-                Button(action: { gov.ac.mode = .stopwatch }) {
-                    Image(systemName: gov.ac.mode != .stopwatch ? "stopwatch" : "stopwatch.fill")
-                        .shadow(radius: gov.ac.mode == .stopwatch ? 0 : 5)
-                }
-            }
-            .tint(.primary)
-            
-            Spacer()
+            .monospaced()
+            .padding()
+            .onAppear() { gov.ac.populate() }
+            .onDisappear() { gov.ac.stopwatch = nil }
             
             AlertView(gov: gov)
         }
-        .monospaced()
-        .padding()
-        .onAppear() { gov.ac.populate() }
-        .onDisappear() { gov.ac.stopwatch = nil }
     }
 }
 
