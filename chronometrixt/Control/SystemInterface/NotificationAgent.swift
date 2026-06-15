@@ -13,7 +13,6 @@ import SwiftData
 
 @Observable final class NotificationAgent {
     static let shared = NotificationAgent()
-    
     private let systemLimit = 64
     private var pendingQueue: [PendingNotification] = []
     private var scheduledIdentifiers: Set<String> = []

@@ -9,7 +9,7 @@ import Foundation
 import SwiftUI
 import ActivityKit
 
-@Observable final class LiveActivityManager {
+@MainActor @Observable final class LiveActivityManager {
     private var activeActivities: [String: Activity<TimerActivityAttributes>] = [:]
     
     func startTimerActivity(
@@ -43,7 +43,7 @@ import ActivityKit
             activeActivities[timerID] = activity
             print("✅ Started Live Activity for timer: \(timerID)")
             
-            Task {
+            Task { @MainActor in
                 await updateTimerActivity(timerID: timerID, endTime: endTime)
             }
             
@@ -90,10 +90,11 @@ import ActivityKit
         currentState.endTime = endTime
         
         await activity.update(.init(state: currentState, staleDate: endTime))
+
         print("▶️ Resumed Live Activity: \(timerID)")
         
         // Restart update loop
-        Task {
+        Task { @MainActor in
             await updateTimerActivity(timerID: timerID, endTime: endTime)
         }
     }
@@ -106,7 +107,6 @@ import ActivityKit
             endTime: Date.now,
             isPaused: false
         )
-        
         await activity.end(
             .init(state: finalState, staleDate: nil),
             dismissalPolicy: .default

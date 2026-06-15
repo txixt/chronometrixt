@@ -46,7 +46,6 @@
             BuildableIdentifier = "primary"
             BlueprintIdentifier = "C1E7322A2F0B39C600B3A639"
             BuildableName = "watchixt Watch App.app"
-            BlueprintName = "watchixt Watch App"
             ReferencedContainer = "container:chronometrixt.xcodeproj">
          </BuildableReference>
       </BuildableProductRunnable>
@@ -63,7 +62,6 @@
             BuildableIdentifier = "primary"
             BlueprintIdentifier = "C1E7322A2F0B39C600B3A639"
             BuildableName = "watchixt Watch App.app"
-            BlueprintName = "watchixt Watch App"
             ReferencedContainer = "container:chronometrixt.xcodeproj">
          </BuildableReference>
       </BuildableProductRunnable>
