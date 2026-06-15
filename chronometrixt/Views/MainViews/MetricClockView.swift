@@ -135,5 +135,5 @@ struct MetricClockView: View {
 
 #Preview {
     @Previewable @Environment(\.modelContext) var context
-    MetricClockView(gov: Governor(context: context), scale: 1.0)
+    MetricClockView(gov: Governor(), scale: 1.0)
 }

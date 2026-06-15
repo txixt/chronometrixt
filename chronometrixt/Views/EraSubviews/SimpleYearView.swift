@@ -52,5 +52,5 @@ struct SimpleYearView: View {
 
 #Preview {
     @Previewable @Environment(\.modelContext) var context
-    SimpleYearView(gov: Governor(context: context))
+    SimpleYearView(gov: Governor())
 }

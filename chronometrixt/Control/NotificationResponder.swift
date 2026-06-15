@@ -89,9 +89,10 @@ import SwiftData
     }
     
     private func handleEventNotification(alarmId: String, dataId: String, eventId: String) {
+        guard let context = gov.context else { return }
         print("handling event notification")
         if let alarm = gov.alarmData.first(where: { $0.id == dataId }) {
-            gov.context.delete(alarm)
+            context.delete(alarm)
         } else {
             print("handleEventNotification error deleting alarm")
         }

@@ -30,5 +30,5 @@ struct AlertView: View {
 
 #Preview {
     @Previewable @Environment(\.modelContext) var context
-    AlertView(gov: Governor(context: context))
+    AlertView(gov: Governor())
 }

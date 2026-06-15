@@ -8,7 +8,7 @@
 import Foundation
 
 typealias metric = MetrixtCalendar
-@MainActor final class MetrixtCalendar {
+final class MetrixtCalendar {
     static let cal = MetrixtCalendar()
     
     ///Convert time to UTC

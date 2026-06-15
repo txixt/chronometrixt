@@ -29,17 +29,17 @@ import SwiftData
     var ec: EventComptroller? = nil
     var nr: NotificationResponder!
     
-    var context: ModelContext
+    var context: ModelContext? = nil
     var eventData: [MetricEvent] = []
     var alarmData: [MetricAlarm] = []
     var calendarData: [MetricCalendar] = []
     
-    init(context: ModelContext) {
-        self.context = context
-        self.ec = nil
-        self.ac = AlarmComptroller(gov: self)
-        self.nr = NotificationResponder(gov: self)
-    }
+//    init(context: ModelContext) {
+//        self.context = context
+//        self.ec = nil
+//        self.ac = AlarmComptroller(gov: self)
+//        self.nr = NotificationResponder(gov: self)
+//    }
     
     func populateTimes() {
         ///reset anchor to start of week to avoid truncated calendar weeks and days if the start day is > 4 or 5

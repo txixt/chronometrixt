@@ -67,5 +67,5 @@ struct ErrorAlertView: View {
 
 #Preview {
     @Previewable @Environment(\.modelContext) var context
-    ErrorAlertView(gov: Governor(context: context))
+    ErrorAlertView(gov: Governor())
 }

@@ -6,7 +6,6 @@
 //
 
 import Foundation
-import DeviceActivity
 import ActivityKit
 
 /// Attributes for timer Live Activity

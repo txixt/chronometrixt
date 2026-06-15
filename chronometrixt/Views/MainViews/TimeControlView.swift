@@ -90,5 +90,5 @@ struct TimeControlView: View {
 
 #Preview {
     @Previewable @Environment(\.modelContext) var context
-    TimeControlView(gov: Governor(context: context))
+    TimeControlView(gov: Governor())
 }

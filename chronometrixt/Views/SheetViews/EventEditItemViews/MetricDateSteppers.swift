@@ -97,7 +97,7 @@ struct MetricDateStepper: View {
 
 #Preview {
     @Previewable @Environment(\.modelContext) var context
-    let gov = Governor(context: context)
+    let gov = Governor()
     let eg = PreviewEG().eg()
     MetricDateSteppers(
         gov: gov,

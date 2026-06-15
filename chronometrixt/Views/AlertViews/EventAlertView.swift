@@ -85,5 +85,5 @@ struct EventAlertView: View {
 
 #Preview {
     @Previewable @Environment(\.modelContext) var context
-    EventAlertView(gov: Governor(context: context))
+    EventAlertView(gov: Governor())
 }

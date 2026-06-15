@@ -37,5 +37,5 @@ struct SheetHeaderView: View {
 
 #Preview {
     @Previewable @Environment(\.modelContext) var context
-    SheetHeaderView(gov: Governor(context: context), title: "title", titleImage: "photo")
+    SheetHeaderView(gov: Governor(), title: "title", titleImage: "photo")
 }

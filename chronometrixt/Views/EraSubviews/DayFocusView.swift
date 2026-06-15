@@ -150,5 +150,5 @@ struct DayFocusView: View {
 
 #Preview {
     @Previewable @Environment(\.modelContext) var context
-    DayFocusView(gov: Governor(context: context), day: MetrixtTime(date: nil))
+    DayFocusView(gov: Governor(), day: MetrixtTime(date: nil))
 }

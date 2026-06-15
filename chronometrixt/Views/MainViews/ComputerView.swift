@@ -18,5 +18,5 @@ struct ComputerView: View {
 
 #Preview {
     @Previewable @Environment(\.modelContext) var context
-    ComputerView(gov: Governor(context: context))
+    ComputerView(gov: Governor())
 }

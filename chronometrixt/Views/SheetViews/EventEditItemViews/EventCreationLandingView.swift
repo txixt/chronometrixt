@@ -49,5 +49,5 @@ struct EventCreationLandingView: View {
 
 #Preview {
     @Previewable @Environment(\.modelContext) var context
-    EventCreationLandingView(gov: Governor(context: context), eventTitle: .constant(""), onSubmit: {})
+    EventCreationLandingView(gov: Governor(), eventTitle: .constant(""), onSubmit: {})
 }

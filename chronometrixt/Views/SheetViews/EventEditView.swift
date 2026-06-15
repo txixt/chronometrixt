@@ -29,5 +29,5 @@ struct EventEditView: View {
 
 #Preview {
     @Previewable @Environment(\.modelContext) var context
-    EventEditView(gov: Governor(context: context))
+    EventEditView(gov: Governor())
 }

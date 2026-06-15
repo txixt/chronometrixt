@@ -107,7 +107,7 @@ struct CalendarScrollView: View {
 
 #Preview {
     @Previewable @Environment(\.modelContext) var context
-    CalendarScrollView(gov: Governor(context: context))
+    CalendarScrollView(gov: Governor())
 }
 
 

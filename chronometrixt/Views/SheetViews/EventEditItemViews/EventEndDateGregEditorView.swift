@@ -99,7 +99,7 @@ struct AddGregTimeButton: View {
 
 #Preview {
     @Previewable @Environment(\.modelContext) var context
-    let gov = Governor(context: context)
+    let gov = Governor()
     let eg = PreviewEG().eg()
     EventEndDateGregEditorView(gov: gov, eg: eg)
 }

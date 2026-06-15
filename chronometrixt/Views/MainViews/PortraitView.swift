@@ -100,5 +100,5 @@ struct PortraitView: View {
 
 #Preview {
     @Previewable @Environment(\.modelContext) var context
-    PortraitView(gov: Governor(context: context))
+    PortraitView(gov: Governor())
 }

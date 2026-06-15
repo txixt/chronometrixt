@@ -105,5 +105,5 @@ struct DestroyEventAlertView: View {
 
 #Preview {
     @Previewable @Environment(\.modelContext) var context
-    DestroyEventAlertView(gov: Governor(context: context))
+    DestroyEventAlertView(gov: Governor())
 }

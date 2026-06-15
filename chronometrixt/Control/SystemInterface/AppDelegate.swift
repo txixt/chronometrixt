@@ -25,7 +25,12 @@ class AppDelegate: NSObject, UIApplicationDelegate, UNUserNotificationCenterDele
         willPresent notification: UNNotification,
         withCompletionHandler completionHandler: @escaping (UNNotificationPresentationOptions) -> Void
     ) {
-        gov?.nr.handleNotification(notification: notification)
+        guard let gov = gov else {
+            print("⚠️ AppDelegate.gov is nil in willPresent")
+            completionHandler([])
+            return
+        }
+        gov.nr.handleNotification(notification: notification)
         completionHandler([])
 
     }
@@ -35,7 +40,12 @@ class AppDelegate: NSObject, UIApplicationDelegate, UNUserNotificationCenterDele
         didReceive response: UNNotificationResponse,
         withCompletionHandler completionHandler: @escaping () -> Void
     ) {
-        gov?.nr.handleNotificationResponse(response: response)
+        guard let gov = gov else {
+            print("⚠️ AppDelegate.gov is nil in didReceive")
+            completionHandler()
+            return
+        }
+        gov.nr.handleNotificationResponse(response: response)
         completionHandler()
     }
 }

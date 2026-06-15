@@ -67,5 +67,5 @@ struct MonthBasicView: View {
 
 #Preview {
     @Previewable @Environment(\.modelContext) var context
-    MonthBasicView(gov: Governor(context: context), month: MetrixtTime(date: nil))
+    MonthBasicView(gov: Governor(), month: MetrixtTime(date: nil))
 }

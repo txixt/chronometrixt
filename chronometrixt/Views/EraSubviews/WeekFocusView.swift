@@ -132,5 +132,5 @@ struct WeekFocusView: View {
 
 #Preview {
     @Previewable @Environment(\.modelContext) var context
-    WeekFocusView(gov: Governor(context: context), week: MetrixtTime(date: nil))
+    WeekFocusView(gov: Governor(), week: MetrixtTime(date: nil))
 }

@@ -164,5 +164,5 @@ struct TimerView: View {
 
 #Preview {
     @Previewable @Environment(\.modelContext) var context
-    TimerView(gov: Governor(context: context))
+    TimerView(gov: Governor())
 }

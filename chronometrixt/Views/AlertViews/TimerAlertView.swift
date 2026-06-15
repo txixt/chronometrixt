@@ -85,5 +85,5 @@ struct TimerAlertView: View {
 
 #Preview {
     @Previewable @Environment(\.modelContext) var context
-    TimerAlertView(gov: Governor(context: context))
+    TimerAlertView(gov: Governor())
 }

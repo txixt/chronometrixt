@@ -66,7 +66,7 @@ struct EventCreationView: View {
 
 #Preview {
     @Previewable @Environment(\.modelContext) var context
-    EventCreationView(gov: Governor(context: context))
+    EventCreationView(gov: Governor())
 }
 
 //struct EventLabelView: View {

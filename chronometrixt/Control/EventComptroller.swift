@@ -181,12 +181,13 @@ import SwiftData
     
     /// Create a new event from the current EventGovernor state
     func save() {
+        guard let context = gov.context else { return }
         do {
             let event = try EventHandler.buildEvent(from: self)
-            gov.context.insert(event)
+            context.insert(event)
             
             if recurrence.frequency != .none {
-                try EventHandler.materializeRecurrences(for: event, context: gov.context)
+                try EventHandler.materializeRecurrences(for: event, context: context)
             }
             
             gov.event = event
@@ -257,11 +258,11 @@ import SwiftData
     
     /// Delete a single non-recurring event (or a single instance of a recurring event)
     func destroySingle() {
-        guard let event = gov.event else { return }
+        guard let event = gov.event, let context = gov.context else { return }
         
         for alarm in alarms { NotificationAgent.shared.cancelNotification(id: alarm.id) }
         
-        EventHandler.destroySingleEvent(event, context: gov.context)
+        EventHandler.destroySingleEvent(event, context: context)
         gov.event = nil
         gov.alert = nil
         gov.sheet = nil
@@ -269,12 +270,12 @@ import SwiftData
 
     /// Delete this event and all future instances in its recurring series
     func destroyThisAndFuture() {
-        guard let event = gov.event else { return }
+        guard let event = gov.event, let context = gov.context else { return }
         
-        let alarmIds = EventHandler.futureAlarmIds(for: event, context: gov.context)
+        let alarmIds = EventHandler.futureAlarmIds(for: event, context: context)
         for alarmId in alarmIds { NotificationAgent.shared.cancelNotification(id: alarmId) }
         
-        EventHandler.destroyThisAndFuture(event, context: gov.context)
+        EventHandler.destroyThisAndFuture(event, context: context)
         gov.event = nil
         gov.alert = nil
         gov.sheet = nil
@@ -282,12 +283,12 @@ import SwiftData
 
     /// Delete the entire recurring series
     func destroySeries() {
-        guard let event = gov.event else { return }
+        guard let event = gov.event, let context = gov.context else { return }
         
-        let alarmIds = EventHandler.allAlarmIds(for: event, context: gov.context)
+        let alarmIds = EventHandler.allAlarmIds(for: event, context: context)
         for alarmId in alarmIds { NotificationAgent.shared.cancelNotification(id: alarmId) }
         
-        EventHandler.destroyEventSeries(event, context: gov.context)
+        EventHandler.destroyEventSeries(event, context: context)
         gov.event = nil
         gov.alert = nil
         gov.sheet = nil
@@ -319,7 +320,7 @@ struct PreviewEG {
     let laterMetric = MetrixtCalendar().update(time: MetrixtTime(date: Date.now), component: .minute, byAdding: 1)
     
     func eg() -> EventComptroller {
-        let gov = Governor(context: PreviewEG.previewContainer.mainContext)
+        let gov = Governor()
         return EventComptroller(
             id: UUID().uuidString,
             title: "some event thing",

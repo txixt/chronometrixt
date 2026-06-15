@@ -53,5 +53,5 @@ struct LandscapeView: View {
 
 #Preview {
     @Previewable @Environment(\.modelContext) var context
-    LandscapeView(gov: Governor(context: context))
+    LandscapeView(gov: Governor())
 }

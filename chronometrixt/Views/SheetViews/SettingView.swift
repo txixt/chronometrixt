@@ -173,5 +173,5 @@ struct SettingsView: View {
 
 #Preview {
     @Previewable @Environment(\.modelContext) var context
-    SettingsView(gov: Governor(context: context))
+    SettingsView(gov: Governor())
 }

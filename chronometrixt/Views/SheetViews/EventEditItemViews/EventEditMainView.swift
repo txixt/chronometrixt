@@ -268,7 +268,7 @@ struct EventLabelView: View {
     
     @Previewable @Environment(\.modelContext) var context
     EventEditMainView(
-        gov: Governor(context: context),
+        gov: Governor(),
         update: true
     )
 }

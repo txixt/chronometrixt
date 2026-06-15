@@ -163,5 +163,5 @@ struct AlarmView: View {
 
 #Preview {
     @Previewable @Environment(\.modelContext) var context
-    AlarmView(gov: Governor(context: context))
+    AlarmView(gov: Governor())
 }

@@ -155,5 +155,5 @@ struct EventDisplayView: View {
 
 #Preview {
     @Previewable @Environment(\.modelContext) var context
-    EventDisplayView(gov: Governor(context: context))
+    EventDisplayView(gov: Governor())
 }

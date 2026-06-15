@@ -105,5 +105,5 @@ struct YearFocusView: View {
 
 #Preview {
     @Previewable @Environment(\.modelContext) var context
-    YearFocusView(gov: Governor(context: context), year: MetrixtTime(date: nil))
+    YearFocusView(gov: Governor(), year: MetrixtTime(date: nil))
 }

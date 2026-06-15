@@ -78,5 +78,5 @@ struct StopwatchView: View {
 
 #Preview {
     @Previewable @Environment(\.modelContext) var context
-    StopwatchView(gov: Governor(context: context))
+    StopwatchView(gov: Governor())
 }
