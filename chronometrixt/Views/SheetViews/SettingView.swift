@@ -6,11 +6,14 @@
 //
 
 import SwiftUI
+import SwiftData
 
 struct SettingsView: View {
     @Bindable var gov: Governor
     
     var body: some View {
+        ZStack {
+            
         VStack {
             SheetHeaderView(gov: gov, title: "settings", titleImage: "gear")
             
@@ -143,8 +146,8 @@ struct SettingsView: View {
                         .bold(false)
                 }
                 .foregroundStyle(.gray)
-
-
+                
+                
             }
             .bold()
             .foregroundColor(.primary)
@@ -161,9 +164,14 @@ struct SettingsView: View {
         .font(.subheadline)
         .padding()
         .monospaced()
+            
+            AlertView(gov: gov)
+        
+    }
     }
 }
 
 #Preview {
+    @Previewable @Environment(\.modelContext) var context
     SettingsView(gov: Governor())
 }

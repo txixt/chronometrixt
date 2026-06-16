@@ -6,6 +6,7 @@
 //
 
 import SwiftUI
+import SwiftData
 
 struct SheetHeaderView: View {
     @Bindable var gov: Governor
@@ -35,5 +36,6 @@ struct SheetHeaderView: View {
 }
 
 #Preview {
+    @Previewable @Environment(\.modelContext) var context
     SheetHeaderView(gov: Governor(), title: "title", titleImage: "photo")
 }

@@ -11,53 +11,53 @@ import SwiftData
 struct EventCreationView: View {
     @Environment(\.modelContext) private var context
     @Bindable var gov: Governor
-    @Binding var eventGov: EventGovernor?
     @State var eventTitle: String = ""
     
     var body: some View {
-        
-        VStack {
-            SheetHeaderView(gov: gov, title: "new event", titleImage: "plus")
-            
+        ZStack {
             VStack {
+                SheetHeaderView(gov: gov, title: "new event", titleImage: "plus")
                 
-                if eventGov == nil {
-                    EventCreationLandingView(
-                        gov: gov,
-                        eventTitle: $eventTitle,
-                        onSubmit: finishEditingTitle)
+                VStack {
+                    
+                    if gov.ec == nil {
+                        EventCreationLandingView(
+                            gov: gov,
+                            eventTitle: $eventTitle,
+                            onSubmit: finishEditingTitle)
+                    }
+                    
+                    if gov.ec != nil {
+                        EventEditMainView(gov: gov, update: false)
+                    } else {
+                        Spacer()
+                    }
+                    
                 }
-                
-                if eventGov != nil {
-                    EventEditMainView(gov: gov, eventGov: eventGov!, update: false)
-                } else {
-                    Spacer()
-                }
-                
-            }
 
+            }
+            .padding()
+            .monospaced()
         }
-        .padding()
-        .monospaced()
-        
+
+        AlertView(gov: gov)
     }
     
     private func finishEditingTitle() {
         guard !eventTitle.isEmpty else { return }
-        if eventGov == nil {
+        if gov.ec == nil {
             initializeEvent()
         } else {
-            eventGov!.title = eventTitle
+            gov.ec!.title = eventTitle
         }
     }
     
     private func initializeEvent() {
         if gov.finiteNotNow == nil { gov.finiteNotNow = gov.eternalNow.time }
-        eventGov = EventGovernor(
+        gov.ec = EventComptroller(
             title: eventTitle,
             starting: gov.finiteNotNow!,
             ending: metric.cal.update(time: gov.finiteNotNow!, component: .minute, byAdding: 1),
-            context: context,
             gov: gov
         )
     }
@@ -65,17 +65,8 @@ struct EventCreationView: View {
 
 
 #Preview {
-    let context = PreviewEG.previewContainer.mainContext
-    let gov = Governor()
-    EventCreationView(gov: gov, eventGov: .constant(EventGovernor(
-            title: "sample",
-            starting: MetrixtTime(years: 5056, seconds: 123456),
-            ending: MetrixtTime(years: 5056, seconds: 123459),
-            context: context,
-            gov: gov
-            )
-        )
-    )
+    @Previewable @Environment(\.modelContext) var context
+    EventCreationView(gov: Governor())
 }
 
 //struct EventLabelView: View {

@@ -6,13 +6,15 @@
 //
 
 import SwiftUI
+import SwiftData
 
 struct DayBasicView: View {
     @Bindable var gov: Governor
     var day: MetrixtTime
     
     var body: some View {
-        GeometryReader { geo in
+        GeometryReader { geometryReader in
+            let geo = gov.geoSize ?? geometryReader.size
             VStack {
                 
                 HStack(spacing: 0) {
@@ -29,7 +31,7 @@ struct DayBasicView: View {
                         ZStack {
                             
                             RoundedRectangle(cornerRadius: 11)
-                                .frame(width: geo.size.width * 0.9, height: 22)
+                                .frame(width: geo.width * 0.9, height: 22)
                                 .foregroundColor(.gray).opacity(0.2)
                             
                             HStack(spacing: 0) {
@@ -48,11 +50,12 @@ struct DayBasicView: View {
                 }
             }
             .padding(.horizontal)
-            .frame(width: geo.size.width, height: geo.size.width)
+            .frame(width: geo.width, height: geo.width)
         }
     }
 }
 
 #Preview {
+    @Previewable @Environment(\.modelContext) var context
     DayBasicView(gov: Governor(), day: MetrixtTime(date: nil))
 }

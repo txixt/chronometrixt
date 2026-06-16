@@ -6,23 +6,28 @@
 //
 
 import SwiftUI
+import SwiftData
 
 struct EventEditView: View {
     @Bindable var gov: Governor
-    @Bindable var eg: EventGovernor
     
     var body: some View {
-        let truncatedTitl: String = eg.title.split(separator: " ", maxSplits: 2).prefix(2).joined(separator: " ")
+        let truncatedTitl: String = gov.ec!.title.split(separator: " ", maxSplits: 2).prefix(2).joined(separator: " ")
         
-        VStack {
-            SheetHeaderView(gov: gov, title: "edit \(truncatedTitl)", titleImage: "wrench")
+        ZStack {
+            VStack {
+                SheetHeaderView(gov: gov, title: "edit \(truncatedTitl)", titleImage: "wrench")
+                
+                EventEditMainView(gov: gov, update: true)
+            }
+            .padding()
             
-            EventEditMainView(gov: gov, eventGov: eg, update: true)
+            AlertView(gov: gov)
         }
-        .padding()
     }
 }
 
 #Preview {
-    EventEditView(gov: Governor(), eg: PreviewEG().eg() )
+    @Previewable @Environment(\.modelContext) var context
+    EventEditView(gov: Governor())
 }

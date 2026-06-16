@@ -174,6 +174,7 @@ struct DayMetricView: View {
 ///dummyMetricEvents exists in PreviewHelpers
 
 #Preview {
+    @Previewable @Environment(\.modelContext) var context
     let gov = Governor()
     gov.scale = .day
     gov.populateTimes() // This will call setSpan()

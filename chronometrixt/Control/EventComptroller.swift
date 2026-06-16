@@ -9,7 +9,7 @@ import Foundation
 import SwiftUI
 import SwiftData
 
-@Observable final class EventGovernor {
+@Observable final class EventComptroller {
     var id: String
     var title: String
     var notes: String
@@ -30,16 +30,12 @@ import SwiftData
     var externalId: String
     
     var originalStart: MetrixtTime? = nil
-    var modelContext: ModelContext
     var gov: Governor
     
     var editField: EditingFields = .none
     enum EditingFields { case none, title, startDateMetric, startDateGreg, endDateMetric, endDateGreg, alarms, recurrence, location, notes, calendar, participants }
     
-    // MARK: - Init: New Event
-    
-    init(title: String, starting: MetrixtTime, ending: MetrixtTime?, context: ModelContext, gov: Governor) {
-        self.modelContext = context
+    init(title: String, starting: MetrixtTime, ending: MetrixtTime?, gov: Governor) {
         self.gov = gov
         self.id = ""
         self.title = title
@@ -61,10 +57,7 @@ import SwiftData
         self.externalId = ""
     }
     
-    // MARK: - Init: From Existing MetricEvent
-    
-    init(event: MetricEvent, context: ModelContext, gov: Governor) {
-        self.modelContext = context
+    init(event: MetricEvent, gov: Governor) {
         self.gov = gov
         self.id = event.id
         self.title = event.title
@@ -85,8 +78,6 @@ import SwiftData
         self.calendarColor = event.calendarColor
         self.externalId = event.externalId
     }
-    
-    // MARK: - Init: Full Parameters (for previews/tests)
     
     init(
         id: String,
@@ -110,10 +101,8 @@ import SwiftData
         calendarId: String,
         calendarColor: String,
         externalId: String,
-        context: ModelContext,
         gov: Governor
     ) {
-        self.modelContext = context
         self.gov = gov
         self.id = id
         self.title = title
@@ -135,13 +124,8 @@ import SwiftData
         self.externalId = externalId
     }
     
-    // MARK: - Metric Date Helpers
-    
     /// Weeks in a given month: months 0-2 have 10 weeks (0-9), month 3 has 6 (0-5)
-    func maxWeek(forMonth month: Int) -> Int {
-        month < 3 ? 9 : 5
-    }
-    
+    func maxWeek(forMonth month: Int) -> Int { month < 3 ? 9 : 5 }
     /// Days in a given week: normally 0-9, except month 3 week 5 is the partial stub
     func maxDay(forMonth month: Int, week: Int, year: Int) -> Int {
         if month == 3 && week == 5 {
@@ -149,14 +133,12 @@ import SwiftData
         }
         return 9
     }
-    
     /// After changing a metric start component, rebuild metricStart and sync gregStart
     func updateMetricStart(year: Int, month: Int, week: Int, day: Int, hour: Int, minute: Int, second: Int) {
         let secs = month * 10_000_000 + week * 1_000_000 + day * 100_000 + hour * 10_000 + minute * 100 + second
         metricStart = MetrixtTime(years: year, seconds: secs)
         gregStart = metricStart.toGreg()
     }
-    
     /// After changing a metric end component, rebuild metricEnd and sync gregEnd
     func updateMetricEnd(year: Int, month: Int, week: Int, day: Int, hour: Int, minute: Int, second: Int) {
         let secs = month * 10_000_000 + week * 1_000_000 + day * 100_000 + hour * 10_000 + minute * 100 + second
@@ -191,33 +173,44 @@ import SwiftData
     }
     
     /// After changing gregStart via DatePicker, rebuild metricStart
-    func syncStartFromGreg() {
-        metricStart = MetrixtTime(date: gregStart)
-    }
-    
+    func syncStartFromGreg() { metricStart = MetrixtTime(date: gregStart) }
     /// After changing gregEnd via DatePicker, rebuild metricEnd
-    func syncEndFromGreg() {
-        metricEnd = MetrixtTime(date: gregEnd)
-    }
+    func syncEndFromGreg() { metricEnd = MetrixtTime(date: gregEnd) }
     
     // MARK: - CRUD Operations
     
     /// Create a new event from the current EventGovernor state
     func save() {
+        guard let context = gov.context else { return }
         do {
             let event = try EventHandler.buildEvent(from: self)
-            modelContext.insert(event)
+            context.insert(event)
             
             if recurrence.frequency != .none {
-                try EventHandler.materializeRecurrences(for: event, context: modelContext)
+                try EventHandler.materializeRecurrences(for: event, context: context)
             }
             
             gov.event = event
             gov.sheet = .showEvent
+            
+            if !alarms.isEmpty {
+                for alarm in alarms {
+                    Task {
+                        let metricAlarmTime = metric.cal.update(time: metricStart, component: .second, byAdding: Int(-alarm.offset / 0.864))
+                        try? await NotificationAgent.shared.scheduleEvent(
+                            id: alarm.id,
+                            dataId: alarm.id,
+                            eventId: event.id,
+                            eventTime: metricAlarmTime,
+                            eventTitle: title
+                        )
+                    }
+                }
+            }
         } catch let error as EventHandler.EventError {
             handleEventError(error)
         } catch {
-            gov.errorMessage = "unexpected error: \(error.localizedDescription)"
+            gov.alertTxt = "unexpected error: \(error.localizedDescription)"
             gov.alert = .error
         }
     }
@@ -225,61 +218,92 @@ import SwiftData
     /// Update an existing event from the current EventGovernor state
     func update() {
         guard let event = gov.event else {
-            gov.errorMessage = "gov.event is empty"
+            gov.alertTxt = "gov.event is empty"
             gov.alert = .error
             return
         }
         
         do {
             try EventHandler.applyUpdates(to: event, from: self)
+            
+            if !alarms.isEmpty {
+                for alarm in alarms {
+                    NotificationAgent.shared.cancelNotification(id: alarm.id)
+                }
+            }
+            
+            if !alarms.isEmpty {
+                for alarm in alarms {
+                    Task {
+                        let metricAlarmTime = metric.cal.update(time: metricStart, component: .second, byAdding: Int(-alarm.offset / 0.864))
+                        try? await NotificationAgent.shared.scheduleEvent(
+                            id: alarm.id,
+                            dataId: alarm.id,
+                            eventId: event.id,
+                            eventTime: metricAlarmTime,  // Offset applied!
+                            eventTitle: title
+                        )
+                    }
+                }
+            }
+            
             gov.sheet = .showEvent
         } catch let error as EventHandler.EventError {
             handleEventError(error)
         } catch {
-            gov.errorMessage = "event was not updated: \(error.localizedDescription)"
+            gov.alertTxt = "event was not updated: \(error.localizedDescription)"
             gov.alert = .error
         }
     }
     
     /// Delete a single non-recurring event (or a single instance of a recurring event)
     func destroySingle() {
-        guard let event = gov.event else { return }
-        EventHandler.destroySingleEvent(event, context: modelContext)
+        guard let event = gov.event, let context = gov.context else { return }
+        
+        for alarm in alarms { NotificationAgent.shared.cancelNotification(id: alarm.id) }
+        
+        EventHandler.destroySingleEvent(event, context: context)
         gov.event = nil
         gov.alert = nil
         gov.sheet = nil
     }
-    
+
     /// Delete this event and all future instances in its recurring series
     func destroyThisAndFuture() {
-        guard let event = gov.event else { return }
-        EventHandler.destroyThisAndFuture(event, context: modelContext)
+        guard let event = gov.event, let context = gov.context else { return }
+        
+        let alarmIds = EventHandler.futureAlarmIds(for: event, context: context)
+        for alarmId in alarmIds { NotificationAgent.shared.cancelNotification(id: alarmId) }
+        
+        EventHandler.destroyThisAndFuture(event, context: context)
         gov.event = nil
         gov.alert = nil
         gov.sheet = nil
     }
-    
+
     /// Delete the entire recurring series
     func destroySeries() {
-        guard let event = gov.event else { return }
-        EventHandler.destroyEventSeries(event, context: modelContext)
+        guard let event = gov.event, let context = gov.context else { return }
+        
+        let alarmIds = EventHandler.allAlarmIds(for: event, context: context)
+        for alarmId in alarmIds { NotificationAgent.shared.cancelNotification(id: alarmId) }
+        
+        EventHandler.destroyEventSeries(event, context: context)
         gov.event = nil
         gov.alert = nil
         gov.sheet = nil
     }
-    
-    // MARK: - Error Handling
     
     private func handleEventError(_ error: EventHandler.EventError) {
         switch error {
         case .eventNotFound:
-            gov.errorMessage = "social 404: event not found"
+            gov.alertTxt = "social 404: event not found"
         case .invalidJSON:
-            gov.errorMessage = "invalid data format"
+            gov.alertTxt = "invalid data format"
         case .invalidTimeRange:
-            gov.errorMessage = "end time must be after start time"
+            gov.alertTxt = "end time must be after start time"
         case .invalidTitle:
-            gov.errorMessage = "event needs a title"
+            gov.alertTxt = "event needs a title"
         }
         gov.alert = .error
     }
@@ -295,10 +319,9 @@ struct PreviewEG {
     let metric = MetrixtTime(date: Date.now)
     let laterMetric = MetrixtCalendar().update(time: MetrixtTime(date: Date.now), component: .minute, byAdding: 1)
     
-    func eg() -> EventGovernor {
-        let context = PreviewEG.previewContainer.mainContext
+    func eg() -> EventComptroller {
         let gov = Governor()
-        return EventGovernor(
+        return EventComptroller(
             id: UUID().uuidString,
             title: "some event thing",
             notes: "my aunt once took me to disney land and we had a threesome with goofy.",
@@ -320,7 +343,6 @@ struct PreviewEG {
             calendarId: "metrixt",
             calendarColor: "#00827C",
             externalId: "",
-            context: context,
             gov: gov
         )
     }

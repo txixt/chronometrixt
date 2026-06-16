@@ -6,11 +6,12 @@
 //
 
 import SwiftUI
+import SwiftData
 
 struct EventMetricDateEditorView: View {
     @Bindable var gov: Governor
-    @Bindable var eg: EventGovernor
-    var target: EventGovernor.EditingFields
+    @Bindable var eg: EventComptroller
+    var target: EventComptroller.EditingFields
     
     var body: some View {
         VStack {
@@ -41,6 +42,7 @@ struct EventMetricDateEditorView: View {
 }
 
 #Preview {
+    @Previewable @Environment(\.modelContext) var context
     let gov = Governor()
     let eg = PreviewEG().eg()
     EventMetricDateEditorView(

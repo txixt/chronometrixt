@@ -6,10 +6,11 @@
 //
 
 import SwiftUI
+import SwiftData
 
 struct EventEndDateGregEditorView: View {
     @Bindable var gov: Governor
-    @Bindable var eg: EventGovernor
+    @Bindable var eg: EventComptroller
     
     var body: some View {
         MetrixtSubdivider()
@@ -97,6 +98,7 @@ struct AddGregTimeButton: View {
 }
 
 #Preview {
+    @Previewable @Environment(\.modelContext) var context
     let gov = Governor()
     let eg = PreviewEG().eg()
     EventEndDateGregEditorView(gov: gov, eg: eg)

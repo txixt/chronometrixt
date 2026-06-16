@@ -8,8 +8,8 @@
 import SwiftUI
 
 struct EventGregDateEditorView: View {
-    @Bindable var eg: EventGovernor
-    var target: EventGovernor.EditingFields
+    @Bindable var eg: EventComptroller
+    var target: EventComptroller.EditingFields
     
     var body: some View {
         let isStart = target == .startDateGreg

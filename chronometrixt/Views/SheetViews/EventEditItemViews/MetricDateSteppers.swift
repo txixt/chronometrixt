@@ -6,11 +6,12 @@
 //
 
 import SwiftUI
+import SwiftData
 
 struct MetricDateSteppers: View {
     @Bindable var gov: Governor
-    @Bindable var eg: EventGovernor
-    var target: EventGovernor.EditingFields
+    @Bindable var eg: EventComptroller
+    var target: EventComptroller.EditingFields
     
     var body: some View {
         let isStart = target == .startDateMetric
@@ -95,6 +96,7 @@ struct MetricDateStepper: View {
 
 
 #Preview {
+    @Previewable @Environment(\.modelContext) var context
     let gov = Governor()
     let eg = PreviewEG().eg()
     MetricDateSteppers(

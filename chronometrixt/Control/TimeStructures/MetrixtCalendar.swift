@@ -1,118 +1,34 @@
 //
-//  MetrixtTime.swift
+//  MetrixtCalendar.swift
 //  chronometrixt
 //
-//  Created by Becket Bowes on 3/14/26.
+//  Created by Becket Bowes on 4/28/26.
 //
 
 import Foundation
 
-@Observable final class MetrixtEntropy {
-    var time: MetrixtTime
-    private var escapement: Timer?
-    
-    init() {
-        self.time = MetrixtTime(date: nil)
-        escapement = Timer.scheduledTimer(withTimeInterval: 0.864, repeats: true) { [weak self] _ in
-            guard let self else { return }
-            self.update()
-        }
-    }
-    
-    private func update() {
-        time = time.seconds % 1000 == 0 ? MetrixtTime(date: nil) : metric.cal.update(time: time, component: .second, byAdding: 1)
-    }
-    
-    func killTimer() { escapement?.invalidate(); escapement = nil }
-    
-    func restartTimer() {
-        killTimer()
-        time = MetrixtTime(date: nil)
-        escapement = Timer.scheduledTimer(withTimeInterval: 0.864, repeats: true) { [weak self] _ in
-            guard let self else { return }
-            self.update()
-        }
-    }
-    
-    deinit {  }
-}
-
-struct MetrixtTime: Hashable, Codable, Identifiable {
-    var id: String { "\(years):\(seconds)" }
-    let years: Int
-    let seconds: Int
-    let creationTimeZone: TimeZone = .current
-    enum CodingKeys: String, CodingKey { case years, seconds }
-    private static var cachedOffset: TimeInterval?     ///adjustment for DST or other local time idiosyncracies
-    
-    init(date: Date?) {
-        years = Calendar.current.component(.year, from: date ?? .now) + 3030
-        seconds = Int((Double(Calendar.current.ordinality(of: .second, in: .year, for: date ?? .now) ?? 0) - 1.0) / 0.864) //-1 for the 0index
-    }
-    
-    init(years: Int, seconds: Int) { self.years = years; self.seconds = seconds }
-    
-    func toGreg() -> Date {
-        guard let initialYear = Calendar.current.date(from: DateComponents(year: years - 3030)) else {
-            return Date(timeIntervalSince1970: 0)
-        }
-        let result = initialYear.addingTimeInterval((TimeInterval(seconds) * 0.864))
-        let someOffset = MetrixtTime.cachedOffset ?? MetrixtTime.getOffset()
-        return someOffset == 0 ? result : result.addingTimeInterval(someOffset)
-    }
-    private static func getOffset() -> TimeInterval {
-        cachedOffset = Date.now.timeIntervalSince(MetrixtTime(date: nil).basicGreg())
-        return cachedOffset!
-    }
-    private func basicGreg() -> Date {
-        guard let initialYear = Calendar.current.date(from: DateComponents(year: years - 3030, month: 1, day: 1)) else { return Date(timeIntervalSince1970: 0) }
-        return initialYear.addingTimeInterval(TimeInterval(seconds) * 0.864)
-    }
-}
-///Computed properties are simple divisions of the seconds per year, plus rotational values for clock hands
-extension MetrixtTime {
-    var year: Int { years }
-    var month: Int { min((seconds / 10_000_000) % 10, 3) }
-    var week: Int { min((seconds / 1_000_000) % 10, 10) }
-    var day: Int { min((seconds / 100_000) % 10, 10) }
-    var hour: Int { min((seconds / 10_000) % 10, 10) }
-    var minute: Int { min((seconds / 100) % 100, 100) }
-    var second: Int { min(seconds % 100, 100) }
-    var mwd: Int { min(seconds / 100_000, daysInYear()) }
-    var hms: Int { min(seconds % 10_000, 100_000) }
-    var metmin: Int { min((seconds / 1_000) % 10, 10) }
-    var modmin: Int { min((seconds / 100) % 10, 10) }
-    var metsec: Int { min((seconds / 10) % 10, 10) }
-    var modsec: Int { min(seconds % 10, 10) }
-    var hourHand: CGFloat { (CGFloat(seconds).truncatingRemainder(dividingBy: 100_000.0) / 100_000.0) * 360.0  }
-    var minuteHand: CGFloat { (CGFloat(seconds).truncatingRemainder(dividingBy: 10_000.0) / 10_000.0) * 360.0 }
-    var secondHand: CGFloat { (CGFloat(seconds).truncatingRemainder(dividingBy: 100.0) / 100.0) * 360.0 }
-    
-    private func daysInYear() -> Int { isLeapYear() ? 365 : 364 } //0index
-    private func isLeapYear() -> Bool {
-        let gregYear = years - 3030
-        return (gregYear % 4 == 0 && gregYear % 100 != 0) || gregYear % 400 == 0
-    }
-}
-extension MetrixtTime: CustomStringConvertible {
-    var description: String { "\(years):\(seconds)" }
-    var yearTxt: String { String(years) }
-    var monthTxt: String { String(format: "%01d", month) }
-    var weekTxt: String { String(format: "%01d", week) }
-    var dayTxt: String { String(format: "%01d", day) }
-    var hourTxt: String { String(format: "%01d", hour) }
-    var minuteTxt: String { String(format: "%02d", minute) }
-    var secondTxt: String { String(format: "%02d", second) }
-    var mwdTxt: String { String(format: "%03d", mwd) }
-    var monthWeekDayTxt: String { "\(monthTxt):\(weekTxt):\(dayTxt)" }
-    var hmstxt: String { String(format: "%05d", hms) }
-    var hourMinuteSecondTxt: String { "\(hourTxt):\(minuteTxt):\(secondTxt)" }
-    var fullDateTxt: String { "\(yearTxt).\(monthWeekDayTxt).\(hourMinuteSecondTxt)" }
-}
-
 typealias metric = MetrixtCalendar
-@MainActor final class MetrixtCalendar {
+final class MetrixtCalendar {
     static let cal = MetrixtCalendar()
+    
+    ///Convert time to UTC
+    func toUTC(time: MetrixtTime) -> MetrixtTime {
+        let offset = Int(Double(time.creationTimeZone.secondsFromGMT()) / 0.864)
+        var utc = update(time: time, component: .second, byAdding: -offset)
+        utc.creationTimeZone = TimeZone.gmt
+        return utc
+    }
+    ///Convert to current time zone from UTC
+    func fromUTC(time: MetrixtTime) -> MetrixtTime {
+        let offset = Int(Double(time.creationTimeZone.secondsFromGMT()) / 0.864)
+        return update(time: time, component: .second, byAdding: offset)
+    }
+    ///Convert time to a user's current timezone
+    func updateTimezone(time: MetrixtTime) -> MetrixtTime {
+        let offset = Int(Double(Calendar.current.timeZone.secondsFromGMT()) / 0.864)
+        let utc = toUTC(time: time)
+        return update(time: utc, component: .second, byAdding: offset)
+    }
     
     ///Basic replacement of components clamped to acceptable values
     func replace(time: MetrixtTime, component: Component, with value: Int) -> MetrixtTime {
@@ -126,6 +42,15 @@ typealias metric = MetrixtCalendar
         return MetrixtTime(years: year, seconds: m + w + d + h + mi + se)
     }
     enum Component { case year, month, week, day, hour, minute, second }
+    
+    func replaceComponents(time: MetrixtTime, components: [Component], with values: [Int]) -> MetrixtTime {
+        guard components.count == values.count else { return MetrixtTime(date: nil) }
+        var newTime = time
+        for i in 0..<components.count {
+            newTime = replace(time: newTime, component: components[i], with: values[i])
+        }
+        return newTime
+    }
     
     ///Because of the rotational/orbital discrepancy (that a year does not divide evenly into days) we have leap years
     ///And because sidereal orbit is an annoying ~365.265363 or so days long, we have a gap in the metric calendar

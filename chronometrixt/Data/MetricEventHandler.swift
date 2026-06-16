@@ -13,7 +13,7 @@ struct EventHandler {
     // MARK: - Build Event (pure data translation, no insertion)
     
     /// Build a MetricEvent from EventGovernor state. Does NOT insert into context.
-    static func buildEvent(from eg: EventGovernor) throws -> MetricEvent {
+    static func buildEvent(from eg: EventComptroller) throws -> MetricEvent {
         guard !eg.title.isEmpty else {
             throw EventError.invalidTitle
         }
@@ -57,7 +57,7 @@ struct EventHandler {
     // MARK: - Apply Updates
     
     /// Write all EventGovernor fields onto an existing MetricEvent.
-    static func applyUpdates(to event: MetricEvent, from eg: EventGovernor) throws {
+    static func applyUpdates(to event: MetricEvent, from eg: EventComptroller) throws {
         guard !eg.title.isEmpty else { throw EventError.invalidTitle }
         
         let utcStart = UTCConverter.toUTC(from: eg.metricStart)
@@ -252,10 +252,65 @@ struct EventHandler {
         }
     }
     
+    /// Get all alarm IDs from an event and all its recurring instances
+    static func allAlarmIds(for event: MetricEvent, context: ModelContext) -> [String] {
+        var alarmIds: [String] = []
+        
+        // Get the parent ID (either this event or its parent)
+        let parentId = event.recurringParentId != "NONE" ? event.recurringParentId : event.id
+        
+        // Fetch all events in the series (parent + children)
+        let seriesPredicate = #Predicate<MetricEvent> { e in
+            e.id == parentId || e.recurringParentId == parentId
+        }
+        
+        guard let seriesEvents = try? context.fetch(FetchDescriptor<MetricEvent>(predicate: seriesPredicate)) else {
+            return []
+        }
+        
+        // Extract alarm IDs from each event
+        for event in seriesEvents {
+            let eventAlarms = alarms(for: event)
+            alarmIds.append(contentsOf: eventAlarms.map { $0.id })
+        }
+        
+        return alarmIds
+    }
+
+    /// Get alarm IDs from this event and all future instances
+    static func futureAlarmIds(for event: MetricEvent, context: ModelContext) -> [String] {
+        var alarmIds: [String] = []
+        
+        guard event.recurringParentId != "NONE" else {
+            // Not a recurring instance, treat as full series
+            return allAlarmIds(for: event, context: context)
+        }
+        
+        let parentId = event.recurringParentId
+        let cutoffStart = event.utcStart
+        
+        // Fetch future events in the series
+        let futurePredicate = #Predicate<MetricEvent> { e in
+            e.recurringParentId == parentId && e.utcStart >= cutoffStart
+        }
+        
+        guard let futureEvents = try? context.fetch(FetchDescriptor<MetricEvent>(predicate: futurePredicate)) else {
+            return []
+        }
+        
+        // Extract alarm IDs from future events
+        for event in futureEvents {
+            let eventAlarms = alarms(for: event)
+            alarmIds.append(contentsOf: eventAlarms.map { $0.id })
+        }
+        
+        return alarmIds
+    }
+    
     // MARK: - Edit Propagation
     
     /// Update all events in a series from EventGovernor data.
-    static func updateEventSeries(_ event: MetricEvent, from eg: EventGovernor, context: ModelContext) throws {
+    static func updateEventSeries(_ event: MetricEvent, from eg: EventComptroller, context: ModelContext) throws {
         let parentId = event.recurringParentId != "NONE" ? event.recurringParentId : event.id
         let parentPredicate = #Predicate<MetricEvent> { e in e.id == parentId }
         guard let parents = try? context.fetch(FetchDescriptor<MetricEvent>(predicate: parentPredicate)),
@@ -272,7 +327,7 @@ struct EventHandler {
     }
     
     /// Update this event and all future siblings: splits the series.
-    static func updateThisAndFuture(_ event: MetricEvent, from eg: EventGovernor, context: ModelContext) throws {
+    static func updateThisAndFuture(_ event: MetricEvent, from eg: EventComptroller, context: ModelContext) throws {
         guard event.recurringParentId != "NONE" else {
             try updateEventSeries(event, from: eg, context: context)
             return
@@ -513,6 +568,90 @@ struct EventHandler {
                 }
             }
         }
+    }
+    
+    // MARK: - Extend Recurrences
+
+    /// Extend materialized recurrences to maintain lookAheadYears into the future
+    static func extendRecurrences(
+        for parent: MetricEvent,
+        context: ModelContext,
+        lookAheadYears: Int = 2
+    ) throws {
+        // Find the latest materialized child
+        let parentId = parent.id
+        let childPredicate = #Predicate<MetricEvent> { event in
+            event.recurringParentId == parentId
+        }
+        
+        let sortDescriptor = SortDescriptor(\MetricEvent.utcStart, order: .reverse)
+        let descriptor = FetchDescriptor<MetricEvent>(
+            predicate: childPredicate,
+            sortBy: [sortDescriptor]
+        )
+        
+        let children = try context.fetch(descriptor)
+        
+        // Determine the cutoff date (lookAheadYears from now)
+        let cutoffDate = Calendar.current.date(
+            byAdding: .year,
+            value: lookAheadYears,
+            to: Date.now
+        ) ?? Date.now.addingTimeInterval(TimeInterval(lookAheadYears * 365 * 86400))
+        
+        // If latest child is already beyond cutoff, we're good
+        if let latestChild = children.first, latestChild.utcStart >= cutoffDate {
+            return
+        }
+        
+        // Otherwise, materialize more instances
+        let rule = RecurrenceRule.fromRRULE(parent.recurrenceRule).toRRULE()
+        
+        // Start from the latest child or from parent
+        let startDate = children.first?.utcStart ?? parent.utcStart
+        
+        // Expand from startDate to cutoffDate
+        let newOccurrences = RecurrenceExpander.expand(
+            rruleString: rule,
+            utcStart: startDate.addingTimeInterval(1), // Start after last instance
+            utcEnd: cutoffDate,
+            timeZoneIdentifier: parent.timeZoneIdentifier,
+            horizon: parent.utcEnd
+        )
+        
+        // Materialize each occurrence
+        for occurrence in newOccurrences {
+            let metricStart = MetrixtTime(date: occurrence.utcStart)
+            let metricEnd = MetrixtTime(date: occurrence.utcEnd)
+            
+            let child = MetricEvent(
+                id: UUID().uuidString,
+                title: parent.title,
+                notes: parent.notes,
+                location: parent.location,
+                startYears: metricStart.years,
+                startSeconds: metricStart.seconds,
+                endYears: metricEnd.years,
+                endSeconds: metricEnd.seconds,
+                utcStart: occurrence.utcStart,
+                utcEnd: occurrence.utcEnd,
+                timeZoneIdentifier: parent.timeZoneIdentifier,
+                isAllDay: parent.isAllDay,
+                status: parent.status,
+                sequence: parent.sequence,
+                recurrenceRule: "NONE",
+                recurringParentId: parent.id,
+                participantsJson: parent.participantsJson,
+                alarmsJson: parent.alarmsJson,
+                calendarId: parent.calendarId,
+                calendarColor: parent.calendarColor,
+                externalId: ""
+            )
+            
+            context.insert(child)
+        }
+        
+        print("✅ Extended recurrences for \(parent.title): added \(newOccurrences.count) instances")
     }
 }
 

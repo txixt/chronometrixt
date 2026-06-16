@@ -8,7 +8,7 @@
 import SwiftUI
 
 struct EventLocationEditorView: View {
-    @Bindable var eg: EventGovernor
+    @Bindable var eg: EventComptroller
     @FocusState private var focus: Bool
     
     var body: some View {

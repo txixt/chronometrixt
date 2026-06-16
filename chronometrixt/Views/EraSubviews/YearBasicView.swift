@@ -6,13 +6,15 @@
 //
 
 import SwiftUI
+import SwiftData
 
 struct YearBasicView: View {
     @Bindable var gov: Governor
     var year: MetrixtTime
     
     var body: some View {
-        GeometryReader { geo in
+        GeometryReader { geometryReader in
+            let geo = gov.geoSize ?? geometryReader.size
             VStack {
                 
                 HStack {
@@ -42,7 +44,7 @@ struct YearBasicView: View {
                                                 let pastEndOfYear = thisMwd >= (isLeapYear ? 365 : 364)
                                                 
                                                 RoundedRectangle(cornerRadius: 2)
-                                                    .frame(width: geo.size.width * 0.068, height: 4)
+                                                    .frame(width: geo.width * 0.068, height: 4)
                                                     .foregroundColor(isToday ? .metricOrange : .primary)
                                                     .opacity(pastEndOfYear ? 0 : 1)
                                                 
@@ -57,11 +59,12 @@ struct YearBasicView: View {
                 
             }
             .padding(.horizontal)
-            .frame(width: geo.size.width, height: geo.size.width)
+            .frame(width: geo.width, height: geo.width)
         }
     }
 }
 
 #Preview {
+    @Previewable @Environment(\.modelContext) var context
     YearBasicView(gov: Governor(), year: MetrixtTime(date: nil))
 }

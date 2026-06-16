@@ -6,6 +6,7 @@
 //
 
 import SwiftUI
+import SwiftData
 
 struct SimpleYearView: View {
     @Bindable var gov: Governor
@@ -50,5 +51,6 @@ struct SimpleYearView: View {
 }
 
 #Preview {
+    @Previewable @Environment(\.modelContext) var context
     SimpleYearView(gov: Governor())
 }

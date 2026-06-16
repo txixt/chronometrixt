@@ -6,6 +6,7 @@
 //
 
 import SwiftUI
+import SwiftData
 
 struct EventCreationLandingView: View {
     @Bindable var gov: Governor
@@ -47,5 +48,6 @@ struct EventCreationLandingView: View {
 }
 
 #Preview {
+    @Previewable @Environment(\.modelContext) var context
     EventCreationLandingView(gov: Governor(), eventTitle: .constant(""), onSubmit: {})
 }

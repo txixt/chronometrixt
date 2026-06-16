@@ -6,14 +6,16 @@
 //
 
 import SwiftUI
+import SwiftData
 
 struct DestroyEventAlertView: View {
     @Bindable var gov: Governor
-    @Bindable var eg: EventGovernor
     
     var body: some View {
-        GeometryReader { geo in
+        GeometryReader { geometryReader in
+            let geo = gov.geoSize ?? geometryReader.size
             ZStack {
+                Color(.gray).opacity(0.2).ignoresSafeArea()
                 HStack{
                     Spacer()
                     VStack {
@@ -21,41 +23,60 @@ struct DestroyEventAlertView: View {
                         
                         
                         VStack {
-                            Spacer()
                             ZStack {
                                 Divider()
                                 Text("💣")
-                                    .font(.largeTitle)
                             }
                             
                             Spacer()
                             
                             if gov.event != nil {
-                                Button(action: { eg.destroySingle() }) {
+                                Button(action: { gov.ec!.destroySingle() }) {
                                     VStack {
                                         Image(systemName: "trash")
-                                        Text("destroy this event?")
+                                        Text("destroy this event")
                                     }
-                                    .tint(.red)
-                                    .shadow(color: .red, radius: 3)
+                                    .tint(.primary)
+                                    .frame(width: geo.width * 0.4)
+                                    .background(RoundedRectangle(cornerRadius: 10).fill(.red))
                                 }
                             }
                             
                             if gov.event != nil && gov.event!.recurrenceRule != "NONE" {
                                 Spacer()
                                 
-                                Button(action: { eg.destroyThisAndFuture() }) {
+                                Button(action: { gov.ec!.destroyThisAndFuture() }) {
                                     VStack {
                                         HStack {
                                             Image(systemName: "trash")
                                             Image(systemName: "trash")
                                             Image(systemName: "trash")
                                         }
-                                        Text("destroy this and future events?")
+                                        Text("erase this and future events")
                                     }
-                                    .tint(.red)
-                                    .shadow(color: .red, radius: 3)
+                                    .tint(.primary)
+                                    .frame(width: geo.width * 0.4)
+                                    .background(RoundedRectangle(cornerRadius: 10).fill(.red))
                                 }
+                                
+                                Spacer()
+                                
+                                Button(action: { gov.ec!.destroySeries()} ) {
+                                    VStack {
+                                        HStack {
+                                            Image(systemName: "trash")
+                                            Image(systemName: "trash")
+                                            Image(systemName: "trash")
+                                            Image(systemName: "trash")
+                                            Image(systemName: "trash")
+                                        }
+                                        Text("obliterate this from the timeline")
+                                    }
+                                    .tint(.primary)
+                                    .frame(width: geo.width * 0.4)
+                                    .background(RoundedRectangle(cornerRadius: 10).fill(.red))
+                                }
+
                             }
                             
                             Spacer()
@@ -67,15 +88,11 @@ struct DestroyEventAlertView: View {
                                     .shadow(color: .gray, radius: 3)
                                     .bold()
                             }
-                            
-                            
-                            
-                            Spacer()
                         }
                         .padding()
                         .monospaced()
                         .background(RoundedRectangle(cornerRadius: 30).fill(.background.opacity(0.9)))
-                        .frame(width: geo.size.width * 0.5, height: geo.size.height * 0.5)
+                        .frame(width: geo.width * 0.5, height: geo.height * 0.5)
         
                         Spacer()
                     }
@@ -87,5 +104,6 @@ struct DestroyEventAlertView: View {
 }
 
 #Preview {
-    DestroyEventAlertView(gov: Governor(), eg: PreviewEG().eg())
+    @Previewable @Environment(\.modelContext) var context
+    DestroyEventAlertView(gov: Governor())
 }

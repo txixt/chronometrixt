@@ -77,11 +77,9 @@ struct MapInsetView: View {
             .frame(height: 150)
         }
         .monospaced()
-        .onAppear { print("this exists now. ")}
         .task(id: location) {
             let trimmed = location.trimmingCharacters(in: .whitespacesAndNewlines)
             guard !trimmed.isEmpty else {
-                print("trimmed is empty")
                 mapItem = nil
                 didSearch = false
                 return
@@ -93,7 +91,6 @@ struct MapInsetView: View {
             let request = MKLocalSearch.Request()
             request.naturalLanguageQuery = trimmed
             let search = MKLocalSearch(request: request)
-            print(request)
 
             do {
                 let response = try await search.start()

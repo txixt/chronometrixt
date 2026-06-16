@@ -7,6 +7,9 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		C10200892F9EE56B00C4E838 /* WidgetKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = C1501DB02F20853B00521DF6 /* WidgetKit.framework */; };
+		C102008A2F9EE56B00C4E838 /* SwiftUI.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = C1501DB22F20853B00521DF6 /* SwiftUI.framework */; settings = {ATTRIBUTES = (Weak, ); }; };
+		C10200972F9EE56C00C4E838 /* chronometrixt widgetExtension.appex in Embed Foundation Extensions */ = {isa = PBXBuildFile; fileRef = C10200882F9EE56B00C4E838 /* chronometrixt widgetExtension.appex */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
 		C1501DB12F20853B00521DF6 /* WidgetKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = C1501DB02F20853B00521DF6 /* WidgetKit.framework */; };
 		C1501DB32F20853B00521DF6 /* SwiftUI.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = C1501DB22F20853B00521DF6 /* SwiftUI.framework */; };
 		C1501DC22F20853C00521DF6 /* MetricWatchWidgitExtension.appex in Embed Foundation Extensions */ = {isa = PBXBuildFile; fileRef = C1501DAE2F20853B00521DF6 /* MetricWatchWidgitExtension.appex */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
@@ -14,6 +17,13 @@
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
+		C10200952F9EE56C00C4E838 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = C1362A0B2F0496A500F2B467 /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = C10200872F9EE56B00C4E838;
+			remoteInfo = "chronometrixt widgetExtension";
+		};
 		C1501DC02F20853C00521DF6 /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
 			containerPortal = C1362A0B2F0496A500F2B467 /* Project object */;
@@ -24,6 +34,17 @@
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXCopyFilesBuildPhase section */
+		C102009C2F9EE56C00C4E838 /* Embed Foundation Extensions */ = {
+			isa = PBXCopyFilesBuildPhase;
+			buildActionMask = 2147483647;
+			dstPath = "";
+			dstSubfolderSpec = 13;
+			files = (
+				C10200972F9EE56C00C4E838 /* chronometrixt widgetExtension.appex in Embed Foundation Extensions */,
+			);
+			name = "Embed Foundation Extensions";
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 		C1501DC72F20853C00521DF6 /* Embed Foundation Extensions */ = {
 			isa = PBXCopyFilesBuildPhase;
 			buildActionMask = 2147483647;
@@ -38,6 +59,7 @@
 /* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
+		C10200882F9EE56B00C4E838 /* chronometrixt widgetExtension.appex */ = {isa = PBXFileReference; explicitFileType = "wrapper.app-extension"; includeInIndex = 0; path = "chronometrixt widgetExtension.appex"; sourceTree = BUILT_PRODUCTS_DIR; };
 		C1362A132F0496A500F2B467 /* chronometrixt.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = chronometrixt.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		C1501DAE2F20853B00521DF6 /* MetricWatchWidgitExtension.appex */ = {isa = PBXFileReference; explicitFileType = "wrapper.app-extension"; includeInIndex = 0; path = MetricWatchWidgitExtension.appex; sourceTree = BUILT_PRODUCTS_DIR; };
 		C1501DB02F20853B00521DF6 /* WidgetKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = WidgetKit.framework; path = System/Library/Frameworks/WidgetKit.framework; sourceTree = SDKROOT; };
@@ -47,6 +69,46 @@
 /* End PBXFileReference section */
 
 /* Begin PBXFileSystemSynchronizedBuildFileExceptionSet section */
+		C102006E2F9E9EE100C4E838 /* Exceptions for "chronometrixt" folder in "watchixt Watch App" target */ = {
+			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
+			membershipExceptions = (
+				Resources/satGnos5.caf,
+				Resources/satieGnossienne5.caf,
+			);
+			target = C1E7322A2F0B39C600B3A639 /* watchixt Watch App */;
+		};
+		C102006F2F9E9EE100C4E838 /* Exceptions for "chronometrixt" folder in "MetricWatchWidgitExtension" target */ = {
+			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
+			membershipExceptions = (
+				Resources/satGnos5.caf,
+				Resources/satieGnossienne5.caf,
+			);
+			target = C1501DAD2F20853B00521DF6 /* MetricWatchWidgitExtension */;
+		};
+		C10200802F9ED53A00C4E838 /* Exceptions for "chronometrixt" folder in "chronometrixt" target */ = {
+			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
+			membershipExceptions = (
+				Info.plist,
+			);
+			target = C1362A122F0496A500F2B467 /* chronometrixt */;
+		};
+		C102009B2F9EE56C00C4E838 /* Exceptions for "chronometrixt widget" folder in "chronometrixt widgetExtension" target */ = {
+			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
+			membershipExceptions = (
+				Info.plist,
+				LiveActivityManager.swift,
+			);
+			target = C10200872F9EE56B00C4E838 /* chronometrixt widgetExtension */;
+		};
+		C10200A32F9EE67F00C4E838 /* Exceptions for "chronometrixt widget" folder in "chronometrixt" target */ = {
+			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
+			membershipExceptions = (
+				LiveActivityManager.swift,
+				TimerActivityAttributes.swift,
+				TimerLiveActivity.swift,
+			);
+			target = C1362A122F0496A500F2B467 /* chronometrixt */;
+		};
 		C1501DC32F20853C00521DF6 /* Exceptions for "MetricWatchWidgit" folder in "MetricWatchWidgitExtension" target */ = {
 			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
 			membershipExceptions = (
@@ -54,9 +116,18 @@
 			);
 			target = C1501DAD2F20853B00521DF6 /* MetricWatchWidgitExtension */;
 		};
+		C1C0FE9E2FA1A8A600E416ED /* Exceptions for "chronometrixt widget" folder in "MetricWatchWidgitExtension" target */ = {
+			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
+			membershipExceptions = (
+				LiveActivityManager.swift,
+				TimerActivityAttributes.swift,
+			);
+			target = C1501DAD2F20853B00521DF6 /* MetricWatchWidgitExtension */;
+		};
 		C1E64CD42F6621AB00059B84 /* Exceptions for "depricated" folder in "chronometrixt" target */ = {
 			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
 			membershipExceptions = (
+				AlarmAlertViewnot.swift,
 				CalendarSubviews/DayMetricViewArchaic.swift,
 				CalendarSubviews/HourMetricView.swift,
 				CalendarSubviews/MetricDayView.swift,
@@ -75,10 +146,13 @@
 				MetricCalendarView.swift,
 				MetricDateEditView.swift,
 				MetricLogic.swift,
+				MobileView.swift,
 				MonthMetricView.swift,
 				MonthScrollView.swift,
 				MonthSubScrollView.swift,
+				NotificationGovernor.swift,
 				tempCreationView.swift,
+				TimerAlertViewnope.swift,
 				WeekMetricView.swift,
 				WeekScrollView.swift,
 				YearMetricView.swift,
@@ -89,6 +163,7 @@
 		C1E64CD52F6621AB00059B84 /* Exceptions for "depricated" folder in "MetricWatchWidgitExtension" target */ = {
 			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
 			membershipExceptions = (
+				AlarmAlertViewnot.swift,
 				CalendarSubviews/DayMetricViewArchaic.swift,
 				CalendarSubviews/HourMetricView.swift,
 				CalendarSubviews/MetricDayView.swift,
@@ -107,10 +182,13 @@
 				MetricCalendarView.swift,
 				MetricDateEditView.swift,
 				MetricLogic.swift,
+				MobileView.swift,
 				MonthMetricView.swift,
 				MonthScrollView.swift,
 				MonthSubScrollView.swift,
+				NotificationGovernor.swift,
 				tempCreationView.swift,
+				TimerAlertViewnope.swift,
 				WeekMetricView.swift,
 				WeekScrollView.swift,
 				YearMetricView.swift,
@@ -121,8 +199,23 @@
 /* End PBXFileSystemSynchronizedBuildFileExceptionSet section */
 
 /* Begin PBXFileSystemSynchronizedRootGroup section */
+		C102008B2F9EE56B00C4E838 /* chronometrixt widget */ = {
+			isa = PBXFileSystemSynchronizedRootGroup;
+			exceptions = (
+				C10200A32F9EE67F00C4E838 /* Exceptions for "chronometrixt widget" folder in "chronometrixt" target */,
+				C1C0FE9E2FA1A8A600E416ED /* Exceptions for "chronometrixt widget" folder in "MetricWatchWidgitExtension" target */,
+				C102009B2F9EE56C00C4E838 /* Exceptions for "chronometrixt widget" folder in "chronometrixt widgetExtension" target */,
+			);
+			path = "chronometrixt widget";
+			sourceTree = "<group>";
+		};
 		C1362A152F0496A500F2B467 /* chronometrixt */ = {
 			isa = PBXFileSystemSynchronizedRootGroup;
+			exceptions = (
+				C10200802F9ED53A00C4E838 /* Exceptions for "chronometrixt" folder in "chronometrixt" target */,
+				C102006E2F9E9EE100C4E838 /* Exceptions for "chronometrixt" folder in "watchixt Watch App" target */,
+				C102006F2F9E9EE100C4E838 /* Exceptions for "chronometrixt" folder in "MetricWatchWidgitExtension" target */,
+			);
 			path = chronometrixt;
 			sourceTree = "<group>";
 		};
@@ -151,6 +244,15 @@
 /* End PBXFileSystemSynchronizedRootGroup section */
 
 /* Begin PBXFrameworksBuildPhase section */
+		C10200852F9EE56B00C4E838 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				C102008A2F9EE56B00C4E838 /* SwiftUI.framework in Frameworks */,
+				C10200892F9EE56B00C4E838 /* WidgetKit.framework in Frameworks */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 		C1362A102F0496A500F2B467 /* Frameworks */ = {
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
@@ -185,6 +287,7 @@
 				C1362A152F0496A500F2B467 /* chronometrixt */,
 				C1E7322F2F0B39C600B3A639 /* watchixt Watch App */,
 				C1501DB42F20853B00521DF6 /* MetricWatchWidgit */,
+				C102008B2F9EE56B00C4E838 /* chronometrixt widget */,
 				C1501DAF2F20853B00521DF6 /* Frameworks */,
 				C1362A142F0496A500F2B467 /* Products */,
 			);
@@ -196,6 +299,7 @@
 				C1362A132F0496A500F2B467 /* chronometrixt.app */,
 				C1E7322B2F0B39C600B3A639 /* watchixt Watch App.app */,
 				C1501DAE2F20853B00521DF6 /* MetricWatchWidgitExtension.appex */,
+				C10200882F9EE56B00C4E838 /* chronometrixt widgetExtension.appex */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -212,6 +316,28 @@
 /* End PBXGroup section */
 
 /* Begin PBXNativeTarget section */
+		C10200872F9EE56B00C4E838 /* chronometrixt widgetExtension */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = C10200982F9EE56C00C4E838 /* Build configuration list for PBXNativeTarget "chronometrixt widgetExtension" */;
+			buildPhases = (
+				C10200842F9EE56B00C4E838 /* Sources */,
+				C10200852F9EE56B00C4E838 /* Frameworks */,
+				C10200862F9EE56B00C4E838 /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			fileSystemSynchronizedGroups = (
+				C102008B2F9EE56B00C4E838 /* chronometrixt widget */,
+			);
+			name = "chronometrixt widgetExtension";
+			packageProductDependencies = (
+			);
+			productName = "chronometrixt widgetExtension";
+			productReference = C10200882F9EE56B00C4E838 /* chronometrixt widgetExtension.appex */;
+			productType = "com.apple.product-type.app-extension";
+		};
 		C1362A122F0496A500F2B467 /* chronometrixt */ = {
 			isa = PBXNativeTarget;
 			buildConfigurationList = C1362A202F0496A600F2B467 /* Build configuration list for PBXNativeTarget "chronometrixt" */;
@@ -219,10 +345,12 @@
 				C1362A0F2F0496A500F2B467 /* Sources */,
 				C1362A102F0496A500F2B467 /* Frameworks */,
 				C1362A112F0496A500F2B467 /* Resources */,
+				C102009C2F9EE56C00C4E838 /* Embed Foundation Extensions */,
 			);
 			buildRules = (
 			);
 			dependencies = (
+				C10200962F9EE56C00C4E838 /* PBXTargetDependency */,
 			);
 			fileSystemSynchronizedGroups = (
 				C1362A152F0496A500F2B467 /* chronometrixt */,
@@ -288,9 +416,12 @@
 			isa = PBXProject;
 			attributes = {
 				BuildIndependentTargetsInParallel = 1;
-				LastSwiftUpdateCheck = 2620;
+				LastSwiftUpdateCheck = 2640;
 				LastUpgradeCheck = 2640;
 				TargetAttributes = {
+					C10200872F9EE56B00C4E838 = {
+						CreatedOnToolsVersion = 26.4.1;
+					};
 					C1362A122F0496A500F2B467 = {
 						CreatedOnToolsVersion = 26.2;
 					};
@@ -319,11 +450,19 @@
 				C1362A122F0496A500F2B467 /* chronometrixt */,
 				C1E7322A2F0B39C600B3A639 /* watchixt Watch App */,
 				C1501DAD2F20853B00521DF6 /* MetricWatchWidgitExtension */,
+				C10200872F9EE56B00C4E838 /* chronometrixt widgetExtension */,
 			);
 		};
 /* End PBXProject section */
 
 /* Begin PBXResourcesBuildPhase section */
+		C10200862F9EE56B00C4E838 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 		C1362A112F0496A500F2B467 /* Resources */ = {
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
@@ -349,6 +488,13 @@
 /* End PBXResourcesBuildPhase section */
 
 /* Begin PBXSourcesBuildPhase section */
+		C10200842F9EE56B00C4E838 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 		C1362A0F2F0496A500F2B467 /* Sources */ = {
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
@@ -373,6 +519,11 @@
 /* End PBXSourcesBuildPhase section */
 
 /* Begin PBXTargetDependency section */
+		C10200962F9EE56C00C4E838 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = C10200872F9EE56B00C4E838 /* chronometrixt widgetExtension */;
+			targetProxy = C10200952F9EE56C00C4E838 /* PBXContainerItemProxy */;
+		};
 		C1501DC12F20853C00521DF6 /* PBXTargetDependency */ = {
 			isa = PBXTargetDependency;
 			target = C1501DAD2F20853B00521DF6 /* MetricWatchWidgitExtension */;
@@ -381,6 +532,96 @@
 /* End PBXTargetDependency section */
 
 /* Begin XCBuildConfiguration section */
+		C10200992F9EE56C00C4E838 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				ASSETCATALOG_COMPILER_WIDGET_BACKGROUND_COLOR_NAME = WidgetBackground;
+				CODE_SIGN_IDENTITY = "Apple Development";
+				"CODE_SIGN_IDENTITY[sdk=macosx*]" = "Apple Development";
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = M6HGB5492Y;
+				ENABLE_APP_SANDBOX = YES;
+				ENABLE_HARDENED_RUNTIME = YES;
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = "chronometrixt widget/Info.plist";
+				INFOPLIST_KEY_CFBundleDisplayName = "chronometrixt widget";
+				INFOPLIST_KEY_NSHumanReadableCopyright = "";
+				INFOPLIST_KEY_NSSupportsLiveActivities = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 26.4;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+					"@executable_path/../../Frameworks",
+				);
+				"LD_RUNPATH_SEARCH_PATHS[sdk=macosx*]" = (
+					"$(inherited)",
+					"@executable_path/../Frameworks",
+					"@executable_path/../../../../Frameworks",
+				);
+				MACOSX_DEPLOYMENT_TARGET = 26.4;
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = com.txixt.chronometrixt.widgetExtension;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SDKROOT = auto;
+				SKIP_INSTALL = YES;
+				STRING_CATALOG_GENERATE_SYMBOLS = YES;
+				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator macosx xros xrsimulator";
+				SWIFT_APPROACHABLE_CONCURRENCY = YES;
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_UPCOMING_FEATURE_MEMBER_IMPORT_VISIBILITY = YES;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2,7";
+				XROS_DEPLOYMENT_TARGET = 26.4;
+			};
+			name = Debug;
+		};
+		C102009A2F9EE56C00C4E838 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				ASSETCATALOG_COMPILER_WIDGET_BACKGROUND_COLOR_NAME = WidgetBackground;
+				CODE_SIGN_IDENTITY = "Apple Development";
+				"CODE_SIGN_IDENTITY[sdk=macosx*]" = "Apple Development";
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = M6HGB5492Y;
+				ENABLE_APP_SANDBOX = YES;
+				ENABLE_HARDENED_RUNTIME = YES;
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = "chronometrixt widget/Info.plist";
+				INFOPLIST_KEY_CFBundleDisplayName = "chronometrixt widget";
+				INFOPLIST_KEY_NSHumanReadableCopyright = "";
+				INFOPLIST_KEY_NSSupportsLiveActivities = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 26.4;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+					"@executable_path/../../Frameworks",
+				);
+				"LD_RUNPATH_SEARCH_PATHS[sdk=macosx*]" = (
+					"$(inherited)",
+					"@executable_path/../Frameworks",
+					"@executable_path/../../../../Frameworks",
+				);
+				MACOSX_DEPLOYMENT_TARGET = 26.4;
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = com.txixt.chronometrixt.widgetExtension;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SDKROOT = auto;
+				SKIP_INSTALL = YES;
+				STRING_CATALOG_GENERATE_SYMBOLS = YES;
+				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator macosx xros xrsimulator";
+				SWIFT_APPROACHABLE_CONCURRENCY = YES;
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_UPCOMING_FEATURE_MEMBER_IMPORT_VISIBILITY = YES;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2,7";
+				XROS_DEPLOYMENT_TARGET = 26.4;
+			};
+			name = Release;
+		};
 		C1362A1E2F0496A600F2B467 /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
@@ -506,8 +747,8 @@
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				CODE_SIGN_ENTITLEMENTS = chronometrixt/chronometrixt.entitlements;
 				CODE_SIGN_IDENTITY = "Apple Development";
-				"CODE_SIGN_IDENTITY[sdk=macosx*]" = "Apple Development";
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
 				DEAD_CODE_STRIPPING = YES;
@@ -517,7 +758,10 @@
 				ENABLE_PREVIEWS = YES;
 				ENABLE_USER_SELECTED_FILES = readonly;
 				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = chronometrixt/Info.plist;
 				INFOPLIST_KEY_CFBundleDisplayName = "'metrixt";
+				INFOPLIST_KEY_LSApplicationCategoryType = "";
+				INFOPLIST_KEY_NSSupportsLiveActivities = YES;
 				"INFOPLIST_KEY_UIApplicationSceneManifest_Generation[sdk=iphoneos*]" = YES;
 				"INFOPLIST_KEY_UIApplicationSceneManifest_Generation[sdk=iphonesimulator*]" = YES;
 				"INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents[sdk=iphoneos*]" = YES;
@@ -555,8 +799,8 @@
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				CODE_SIGN_ENTITLEMENTS = chronometrixt/chronometrixt.entitlements;
 				CODE_SIGN_IDENTITY = "Apple Development";
-				"CODE_SIGN_IDENTITY[sdk=macosx*]" = "Apple Development";
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
 				DEAD_CODE_STRIPPING = YES;
@@ -566,7 +810,10 @@
 				ENABLE_PREVIEWS = YES;
 				ENABLE_USER_SELECTED_FILES = readonly;
 				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = chronometrixt/Info.plist;
 				INFOPLIST_KEY_CFBundleDisplayName = "'metrixt";
+				INFOPLIST_KEY_LSApplicationCategoryType = "";
+				INFOPLIST_KEY_NSSupportsLiveActivities = YES;
 				"INFOPLIST_KEY_UIApplicationSceneManifest_Generation[sdk=iphoneos*]" = YES;
 				"INFOPLIST_KEY_UIApplicationSceneManifest_Generation[sdk=iphonesimulator*]" = YES;
 				"INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents[sdk=iphoneos*]" = YES;
@@ -606,6 +853,7 @@
 				ASSETCATALOG_COMPILER_WIDGET_BACKGROUND_COLOR_NAME = WidgetBackground;
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = M6HGB5492Y;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_FILE = MetricWatchWidgit/Info.plist;
 				INFOPLIST_KEY_CFBundleDisplayName = MetricWatchWidgit;
@@ -617,7 +865,7 @@
 					"@executable_path/../../../../Frameworks",
 				);
 				MARKETING_VERSION = 1.0;
-				PRODUCT_BUNDLE_IDENTIFIER = com.txixt.watchixt.watchkitapp.MetricWatchWidgit;
+				PRODUCT_BUNDLE_IDENTIFIER = com.txixt.watchixt.watchWidget;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SDKROOT = watchos;
 				SKIP_INSTALL = YES;
@@ -638,6 +886,7 @@
 				ASSETCATALOG_COMPILER_WIDGET_BACKGROUND_COLOR_NAME = WidgetBackground;
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = M6HGB5492Y;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_FILE = MetricWatchWidgit/Info.plist;
 				INFOPLIST_KEY_CFBundleDisplayName = MetricWatchWidgit;
@@ -649,7 +898,7 @@
 					"@executable_path/../../../../Frameworks",
 				);
 				MARKETING_VERSION = 1.0;
-				PRODUCT_BUNDLE_IDENTIFIER = com.txixt.watchixt.watchkitapp.MetricWatchWidgit;
+				PRODUCT_BUNDLE_IDENTIFIER = com.txixt.watchixt.watchWidget;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SDKROOT = watchos;
 				SKIP_INSTALL = YES;
@@ -671,6 +920,7 @@
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = M6HGB5492Y;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_KEY_CFBundleDisplayName = watchixt;
@@ -681,7 +931,7 @@
 					"@executable_path/Frameworks",
 				);
 				MARKETING_VERSION = 1.0;
-				PRODUCT_BUNDLE_IDENTIFIER = com.txixt.watchixt.watchkitapp;
+				PRODUCT_BUNDLE_IDENTIFIER = com.txixt.watchixt;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SDKROOT = watchos;
 				SKIP_INSTALL = YES;
@@ -703,6 +953,7 @@
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = M6HGB5492Y;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_KEY_CFBundleDisplayName = watchixt;
@@ -713,7 +964,7 @@
 					"@executable_path/Frameworks",
 				);
 				MARKETING_VERSION = 1.0;
-				PRODUCT_BUNDLE_IDENTIFIER = com.txixt.watchixt.watchkitapp;
+				PRODUCT_BUNDLE_IDENTIFIER = com.txixt.watchixt;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SDKROOT = watchos;
 				SKIP_INSTALL = YES;
@@ -732,6 +983,15 @@
 /* End XCBuildConfiguration section */
 
 /* Begin XCConfigurationList section */
+		C10200982F9EE56C00C4E838 /* Build configuration list for PBXNativeTarget "chronometrixt widgetExtension" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				C10200992F9EE56C00C4E838 /* Debug */,
+				C102009A2F9EE56C00C4E838 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
 		C1362A0E2F0496A500F2B467 /* Build configuration list for PBXProject "chronometrixt" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (

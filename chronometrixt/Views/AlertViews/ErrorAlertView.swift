@@ -6,30 +6,31 @@
 //
 
 import SwiftUI
+import SwiftData
 
 struct ErrorAlertView: View {
     @Bindable var gov: Governor
     
     var body: some View {
-        GeometryReader { geo in
+        GeometryReader { geometryReader in
+            let geo = gov.geoSize ?? geometryReader.size
             ZStack {
+                Color.gray.opacity(0.2).ignoresSafeArea()
+                
                 HStack{
                     Spacer()
                     VStack {
                         Spacer()
                         
-                        
                         VStack {
-                            Spacer()
                             ZStack {
                                 Divider()
                                 Image(systemName: "ant")
-                                    .font(.largeTitle)
                             }
                             
                             Spacer()
                             
-                            Text(gov.errorMessage.isEmpty ? "oops. some random thing went wrong." : gov.errorMessage)
+                            Text(gov.alertTxt.isEmpty ? "oops. some random thing went wrong." : gov.alertTxt)
                             
                             Spacer()
                             
@@ -40,15 +41,12 @@ struct ErrorAlertView: View {
                                     .shadow(color: .gray, radius: 3)
                                     .bold()
                             }
-                            
-                            
-                            
-                            Spacer()
+                        
                         }
                         .padding()
                         .monospaced()
                         .background(RoundedRectangle(cornerRadius: 30).fill(.background.opacity(0.9)))
-                        .frame(width: geo.size.width * 0.5, height: geo.size.height * 0.5)
+                        .frame(width: geo.width * 0.5, height: geo.height * 0.5)
                         .task { await lifeIsShort() }
         
                         
@@ -62,11 +60,12 @@ struct ErrorAlertView: View {
     
     private func lifeIsShort() async {
         try? await Task.sleep(for: .seconds(2))
-        gov.errorMessage = ""
+        gov.alertTxt = ""
         gov.alert = nil
     }
 }
 
 #Preview {
+    @Previewable @Environment(\.modelContext) var context
     ErrorAlertView(gov: Governor())
 }

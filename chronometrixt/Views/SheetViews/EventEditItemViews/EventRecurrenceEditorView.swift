@@ -6,9 +6,10 @@
 //
 
 import SwiftUI
+import SwiftData
 
 struct EventRecurrenceEditorView: View {
-    @Bindable var eg: EventGovernor
+    @Bindable var eg: EventComptroller
     @State var limit: Limiters = .none
     enum Limiters { case none, metric, gregorian, iterations }
     let chronologyError: ()-> Void
@@ -73,7 +74,7 @@ struct EventRecurrenceEditorView: View {
 }
 
 struct LimitPickerView: View {
-    @Bindable var eg: EventGovernor
+    @Bindable var eg: EventComptroller
     @Binding var limit: EventRecurrenceEditorView.Limiters
     
     var body: some View {
@@ -132,7 +133,7 @@ struct RecurrenceOptionView: View {
 }
 
 struct IterationPickerView: View {
-    @Bindable var eg: EventGovernor
+    @Bindable var eg: EventComptroller
     @Binding var limit: EventRecurrenceEditorView.Limiters
     
     var body: some View {
@@ -171,7 +172,7 @@ struct IterationPickerView: View {
 }
 
 struct MetricPickerView: View {
-    @Bindable var eg: EventGovernor
+    @Bindable var eg: EventComptroller
     @Binding var limit: EventRecurrenceEditorView.Limiters
     @State var time: MetrixtTime = metric.cal.update(time: MetrixtTime(date: Date.now), component: .year, byAdding: 1)
     let chronologyError: ()-> Void
@@ -249,7 +250,7 @@ struct MetricPickerView: View {
 }
 
 struct GregPickerView: View {
-    @Bindable var eg: EventGovernor
+    @Bindable var eg: EventComptroller
     @Binding var limit: EventRecurrenceEditorView.Limiters
     @State var date: Date = Calendar.current.date(byAdding: .year, value: 1, to: Date.now) ?? Date.now
     let chronologyError: ()-> Void
@@ -286,13 +287,13 @@ struct GregPickerView: View {
 }
 
 #Preview {
+    @Previewable @Environment(\.modelContext) var context
     let gov = Governor()
     let eg = PreviewEG().eg()
     EventRecurrenceEditorView(
         eg: eg,
         chronologyError: EventEditMainView(
             gov: gov,
-            eventGov: eg,
             update: false
         ).chronologyError
     )

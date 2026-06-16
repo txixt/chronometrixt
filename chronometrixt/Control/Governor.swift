@@ -7,40 +7,43 @@
 
 import Foundation
 import SwiftUI
+import SwiftData
 
 @Observable final class Governor {
-    var eternalNow: MetrixtEntropy
+    var eternalNow: MetrixtEntropy = MetrixtEntropy()
     var finiteNotNow: MetrixtTime? = nil
+    
     var someTimes: [MetrixtTime] = []
-    var event: MetricEvent?
+    var event: MetricEvent? = nil
     var span: ClosedRange<Int>? = nil
     var scale: CalendarScale = .year
     var sheet: SheetView? = nil
     var alert: AlertView? = nil
-    var errorMessage: String = ""
+    var alertTxt: String = ""
+    var geoSize: CGSize? = nil
     enum CalendarScale { case eon, year, month, week, day }
     enum SheetView: Identifiable { var id: Self { self }; case makeEvent, editEvent, showEvent, findEvent, timers, settings }
-    enum AlertView: Identifiable { var id: Self { self }; case error, destroyEvent, destroyAllEvents }
+    enum AlertView: Identifiable { var id: Self { self }; case error, event, timer, alarm, destroyEvent, destroyAllEvents }
 
+    var ac: AlarmComptroller!
+    var ec: EventComptroller? = nil
+    var nr: NotificationResponder!
+    
+    var context: ModelContext? = nil
+    var eventData: [MetricEvent] = []
+    var alarmData: [MetricAlarm] = []
+    var calendarData: [MetricCalendar] = []
+    
     init() {
-        eternalNow = MetrixtEntropy()
+        populateTimes()
+        self.ac = AlarmComptroller(gov: self)
+        self.nr = NotificationResponder(gov: self)
     }
     
     func populateTimes() {
-        ///reset anchor to start of week to avoid truncated calendar weeks and days if the start day is > 4 or 5
-//        let thisTime = finiteNotNow ?? eternalNow.time
-//        let anchor = metric.cal.update(time: thisTime, component: .day, byAdding: -(thisTime.day))
-        ///UNRESOLVED BUG ISSUE WITH WEEK NOT HAVING A 36 IF CURRENT DAY > 4/5  (EG. NO TARGET DAY IN THAT WEEK) or something else...
-        ///this doesn't work:
-//        if scale == .month {
-//        anchor = metric.cal.update(time: anchor, component: .day, byAdding: -(anchor.day))
-//        print("adjusted anchor to: \(anchor.fullDateTxt)")
-//    }
-        
         let anchor = finiteNotNow ?? eternalNow.time
         var newTimes: [MetrixtTime] = []
         
-
         switch scale {
         case .eon: for i in -1...1 { newTimes.append(metric.cal.update(time: anchor, component: .year, byAdding: i * 100)) }
         case .year: for i in -1...1 { newTimes.append(metric.cal.update(time: anchor, component: .year, byAdding: i)) }
@@ -66,6 +69,23 @@ import SwiftUI
         }
     }
 }
+
+///reset anchor to start of week to avoid truncated calendar weeks and days if the start day is > 4 or 5
+//        let thisTime = finiteNotNow ?? eternalNow.time
+//        let anchor = metric.cal.update(time: thisTime, component: .day, byAdding: -(thisTime.day))
+///UNRESOLVED BUG ISSUE WITH WEEK NOT HAVING A 36 IF CURRENT DAY > 4/5  (EG. NO TARGET DAY IN THAT WEEK) or something else...
+///this doesn't work:
+//        if scale == .month {
+//        anchor = metric.cal.update(time: anchor, component: .day, byAdding: -(anchor.day))
+//        print("adjusted anchor to: \(anchor.fullDateTxt)")
+//    }
+
+//    init(context: ModelContext) {
+//        self.context = context
+//        self.ec = nil
+//        self.ac = AlarmComptroller(gov: self)
+//        self.nr = NotificationResponder(gov: self)
+//    }
 
 //    private func update() {
 //        if finiteNotNow != nil { populateTimes(); setSpan() }

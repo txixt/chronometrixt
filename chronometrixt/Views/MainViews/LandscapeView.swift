@@ -6,43 +6,52 @@
 //
 
 import SwiftUI
+import SwiftData
 
 struct LandscapeView: View {
     @Bindable var gov: Governor
     
     var body: some View {
 
-        HStack {
+        VStack {
+            Spacer()
             
-            VStack {
-                HStack {
-                    SimpleYearView(gov: gov)
-        
-                    Spacer()
-                }
-                .padding(.bottom)
+            HStack {
                 
-                HStack {
-                    VStack {
-                        Text(gov.eternalNow.time.fullDateTxt)
-                            .font(.largeTitle).bold()
-                            .lineLimit(1)
-                            .foregroundColor(.metricOrange)
-                            .monospaced()
+                VStack {
+                    HStack {
+                        SimpleYearView(gov: gov)
+            
+                        Spacer()
                     }
+                    .padding(.bottom)
                     
-                    Spacer()
+                    HStack {
+                        VStack {
+                            Text(gov.eternalNow.time.fullDateTxt)
+                                .font(.largeTitle).bold()
+                                .lineLimit(1)
+                                .foregroundColor(.metricOrange)
+                                .monospaced()
+                        }
+                        
+                        Spacer()
+                    }
+                    .padding(.top)
                 }
-                .padding(.top)
+                
+                Spacer()
+                
+                MetricClockView(gov: gov, scale: 3.0)
             }
             
             Spacer()
-            
-            MetricClockView(gov: gov, scale: 3.0)
         }
+
     }
 }
 
 #Preview {
+    @Previewable @Environment(\.modelContext) var context
     LandscapeView(gov: Governor())
 }
