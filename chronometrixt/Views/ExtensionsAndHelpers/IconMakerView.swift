@@ -31,14 +31,12 @@ struct IconMakerView: View {
                     .opacity(0.5)
                 
                 ForEach(0...9, id: \.self) { hour in
-                    Text(String(hour))
-                        .font(.system(size: clockSize * 25, weight: .semibold))
-                        .foregroundColor(.primary)
-                        .offset(y: clockSize * 65)
-                        .rotationEffect(Angle(degrees: Double(hour * 36) + 180.0))
-
+                    MetricClockNumeral(hour: hour, clockSize: clockSize * 180).monospaced().bold()
                 }
                 
+                Circle()
+                    .strokeBorder(.primary, lineWidth: 11)
+
                 RoundedRectangle(cornerRadius: 5)
                     .fill(.primary)
                     .frame(width: 10, height: clockSize * 50)
@@ -60,9 +58,6 @@ struct IconMakerView: View {
                 Circle()
                     .fill(.metricOrange)
                     .frame(width: 16, height: 16)
-                
-                Circle()
-                    .strokeBorder(.primary, lineWidth: 11)
             }
             .frame(width: clockSize * 180, height: clockSize * 180)
             
