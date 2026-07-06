@@ -41,6 +41,7 @@ struct PortraitView: View {
                     }
                 case .settings: SettingsView(gov: gov)
                 case .timers: SmallTimesView(gov: gov)
+                case .search: SearchView(gov: gov)
                 default: EmptyView()
 //                case .makeEvent: EventCreationView(gov: gov, eventGov: $eg).alertHost(gov: gov, eg: eg)
 //                case .editEvent:

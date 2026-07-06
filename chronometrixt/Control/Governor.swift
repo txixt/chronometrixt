@@ -22,7 +22,7 @@ import SwiftData
     var alertTxt: String = ""
     var geoSize: CGSize? = nil
     enum CalendarScale { case eon, year, month, week, day }
-    enum SheetView: Identifiable { var id: Self { self }; case makeEvent, editEvent, showEvent, findEvent, timers, settings }
+    enum SheetView: Identifiable { var id: Self { self }; case makeEvent, editEvent, showEvent, findEvent, timers, search, settings }
     enum AlertView: Identifiable { var id: Self { self }; case error, event, timer, alarm, destroyEvent, destroyAllEvents }
 
     var ac: AlarmComptroller!

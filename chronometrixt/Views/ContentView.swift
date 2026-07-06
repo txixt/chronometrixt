@@ -65,7 +65,7 @@ struct ContentView: View {
                                     Image(systemName: "bell")
                                     Text("alarms")
                                 }
-                                Button(action: {}) {
+                                Button(action: { gov.sheet = .search }) {
                                     Image(systemName: "magnifyingglass")
                                     Text("search")
                                 }
@@ -91,7 +91,7 @@ struct ContentView: View {
                         Image(systemName: "bell")
                         Text("alarms")
                     }
-                    Button(action: {}) {
+                    Button(action: gov?.sheet = .search) {
                         Image(systemName: "magnifyingglass")
                         Text("search")
                     }
@@ -110,6 +110,8 @@ struct ContentView: View {
         print("starting initialize")
         gov.context = context
         if calendars.isEmpty { context.insert(CalInitializer.first()) }
+        gov.eventData = items
+        gov.calendarData = calendars
     }
     
     private func authorize() async throws {
